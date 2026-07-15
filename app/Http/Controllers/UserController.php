@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 
 class UserController extends Controller
 {
@@ -24,16 +26,10 @@ class UserController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
         $role = $request->session()->get('role');
         if ($role !== 'admin') return redirect('/dashboard');
-
-        $request->validate([
-            'username' => 'required|string|max:50|unique:users,username',
-            'password' => 'required|string|min:6',
-            'role' => 'required|string|in:admin,surveyor,visitor,atp,staff_cme,vendor',
-        ]);
 
         User::create([
             'username' => trim($request->input('username')),
@@ -44,25 +40,17 @@ class UserController extends Controller
         return redirect('/users')->with('success', 'User baru berhasil ditambahkan!');
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
         $role = $request->session()->get('role');
         if ($role !== 'admin') return redirect('/dashboard');
 
         $user = User::findOrFail($id);
 
-        $request->validate([
-            'username' => 'required|string|max:50|unique:users,username,' . $user->id,
-            'role' => 'required|string|in:admin,surveyor,visitor,atp,staff_cme,vendor',
-        ]);
-
         $user->username = trim($request->input('username'));
         $user->role = $request->input('role');
 
         if ($request->filled('password')) {
-            $request->validate([
-                'password' => 'string|min:6',
-            ]);
             $user->password = Hash::make($request->input('password'));
         }
 
@@ -99,8 +87,7 @@ class UserController extends Controller
             return redirect('/dashboard');
         }
 
-        $logs = LoginLog::orderBy('created_at', 'desc')->limit(100)->get();
-
+        $logs = LoginLog::orderBy('created_at', 'desc')->take(200)->get();
         return Inertia::render('User/Logs', [
             'logs' => $logs,
         ]);

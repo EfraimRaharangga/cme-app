@@ -6,7 +6,7 @@ import Table from '../../Components/Table';
 
 export default function MasukDetail({ transaction }) {
     // Photos list is saved as a comma-separated string of filenames
-    const photos = transaction.foto ? transaction.foto.split(',') : [];
+    const photos = transaction.media_urls || [];
 
     return (
         <>
@@ -95,7 +95,7 @@ export default function MasukDetail({ transaction }) {
                                 {photos.map((ph, idx) => (
                                     <div key={idx} className="border border-gray-150 rounded-lg overflow-hidden bg-gray-50">
                                         <img
-                                            src={`/uploads/gudang/${ph}`}
+                                            src={ph}
                                             alt="Surat Jalan"
                                             className="w-full h-32 object-cover"
                                             onError={(e) => {

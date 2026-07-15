@@ -16,6 +16,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Authenticated Routes (Session-protected via CustomAuthMiddleware)
 Route::middleware('custom_auth')->group(function () {
+    // Temporary Upload Route
+    Route::post('/api/upload-temp', [App\Http\Controllers\MediaController::class, 'uploadTemp']);
+
     // Dashboards
     Route::get('/cme-dashboard', [DashboardController::class, 'cmeDashboard']);
     Route::get('/dashboard', [DashboardController::class, 'surveyDashboard']);

@@ -5,7 +5,7 @@ import Card from '../../Components/Card';
 import Table from '../../Components/Table';
 
 export default function KeluarDetail({ transaction }) {
-    const photos = transaction.foto ? transaction.foto.split(',') : [];
+    const photos = transaction.media_urls || [];
 
     return (
         <>
@@ -105,7 +105,7 @@ export default function KeluarDetail({ transaction }) {
                                 {photos.map((ph, idx) => (
                                     <div key={idx} className="border border-gray-150 rounded-lg overflow-hidden bg-gray-50">
                                         <img
-                                            src={`/uploads/gudang/${ph}`}
+                                            src={ph}
                                             alt="Bukti Serah Terima"
                                             className="w-full h-32 object-cover"
                                             onError={(e) => {

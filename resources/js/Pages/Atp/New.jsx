@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
+import axios from 'axios';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Input from '../../Components/Input';
 import Button from '../../Components/Button';
 import ConfirmationModal from '../../Components/ConfirmationModal';
+import ImageUpload from '../../Components/ImageUpload';
 
 export default function New({ defaultTemplate, templates }) {
     const [mapLoaded, setMapLoaded] = useState(false);
@@ -50,9 +52,9 @@ export default function New({ defaultTemplate, templates }) {
         const initialItems = {};
         const initialHasil = {};
         const initialCatatan = {};
-        const itemNames = {};
-        const itemStds = {};
-        const itemTools = {};
+        const names = {};
+        const stds = {};
+        const tools = {};
 
         defaultTemplate.forEach((item) => {
             if (item.ty === 'it') {
@@ -60,9 +62,9 @@ export default function New({ defaultTemplate, templates }) {
                 initialItems[key] = '';
                 initialHasil[key] = '';
                 initialCatatan[key] = '';
-                itemNames[key] = item.d[0];
-                itemStds[key] = item.d[1];
-                itemTools[key] = item.d[2];
+                names[key] = item.d[0];
+                stds[key] = item.d[1];
+                tools[key] = item.d[2];
             }
         });
 
@@ -70,9 +72,9 @@ export default function New({ defaultTemplate, templates }) {
             items: initialItems,
             hasil: initialHasil,
             catatan: initialCatatan,
-            itemNames,
-            itemStds,
-            itemTools,
+            itemNames: names,
+            itemStds: stds,
+            itemTools: tools,
             approval: {
                 vendor_company: '',
                 vendor_1_role: '',
@@ -201,10 +203,37 @@ export default function New({ defaultTemplate, templates }) {
         });
     };
 
-    const handleFileChange = (key, files) => {
+    const handleFileChange = async (key, files) => {
+        const fileList = Array.from(files);
+        const uploadedFiles = [];
+
+        for (const file of fileList) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await axios.post('/api/upload-temp', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                uploadedFiles.push({
+                    path: response.data.path,
+                    url: response.data.url,
+                    name: file.name
+                });
+            } catch (err) {
+                const msg = err.response?.data?.message || err.response?.data?.errors?.image?.[0] || 'Gagal mengunggah foto.';
+                setAlertModal({
+                    isOpen: true,
+                    title: 'Validasi Gambar Gagal',
+                    message: msg,
+                    type: 'danger'
+                });
+            }
+        }
+
         setData('fotos_item', {
             ...data.fotos_item,
-            [key]: Array.from(files),
+            [key]: [...(data.fotos_item[key] || []), ...uploadedFiles]
         });
     };
 
@@ -222,28 +251,7 @@ export default function New({ defaultTemplate, templates }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        const formData = new FormData();
-        formData.append('nama_site', data.nama_site);
-        formData.append('tanggal', data.tanggal);
-        formData.append('region', data.region);
-        formData.append('latitude', data.latitude);
-        formData.append('longitude', data.longitude);
-        formData.append('no_po', data.no_po);
-        formData.append('verdict', data.verdict);
-        formData.append('verdict_notes', data.verdict_notes);
-        formData.append('hasil_json', JSON.stringify(data.hasil_json));
-
-        Object.entries(data.fotos_item).forEach(([key, fileList]) => {
-            fileList.forEach((file, idx) => {
-                formData.append(`fotos_item[${key}][${idx}]`, file);
-            });
-        });
-
-        post('/atp/baru', {
-            data: formData,
-            forceFormData: true,
-        });
+        post('/atp/baru');
     };
 
     const progress = getProgress();
@@ -432,12 +440,14 @@ export default function New({ defaultTemplate, templates }) {
                                             />
 
                                             <div className="w-40">
-                                                <input
-                                                    type="file"
-                                                    multiple
-                                                    accept="image/*"
-                                                    onChange={(e) => handleFileChange(key, e.target.files)}
-                                                    className="w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-1.5 file:rounded file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 transition"
+                                                <ImageUpload
+                                                    compact={true}
+                                                    multiple={true}
+                                                    value={data.fotos_item[key] || []}
+                                                    onChange={(files) => setData('fotos_item', {
+                                                        ...data.fotos_item,
+                                                        [key]: files
+                                                    })}
                                                 />
                                             </div>
                                         </div>

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
 
+use App\Http\Requests\LoginRequest;
+
 class LoginController extends Controller
 {
     public function showLoginForm(Request $request)
@@ -25,13 +27,8 @@ class LoginController extends Controller
         ]);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|string',
-        ]);
-
         $username = $request->input('username');
         $password = $request->input('password');
 

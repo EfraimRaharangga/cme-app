@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Head, useForm, Link, router } from '@inertiajs/react';
+import axios from 'axios';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Table from '../../Components/Table';
@@ -7,6 +8,7 @@ import Button from '../../Components/Button';
 import Input from '../../Components/Input';
 import Select from '../../Components/Select';
 import Modal from '../../Components/Modal';
+import ImageUpload from '../../Components/ImageUpload';
 import { Package, ArrowUpRight, ArrowDownLeft, ChevronDown, ChevronRight, Plus } from 'lucide-react';
 
 export default function Stock({ items, categories, totals, filters }) {
@@ -291,6 +293,15 @@ export default function Stock({ items, categories, totals, filters }) {
                             <textarea value={masukForm.data.keterangan} onChange={(e) => masukForm.setData('keterangan', e.target.value)} className="w-full border border-gray-300 rounded p-1.5" />
                         </div>
                     </div>
+                    <div className="w-full">
+                        <label className="block font-medium text-xs text-gray-700 mb-1">Unggah Nota / Surat Jalan Fisik</label>
+                        <ImageUpload
+                            compact={false}
+                            multiple={true}
+                            value={masukForm.data.foto || []}
+                            onChange={(files) => masukForm.setData('foto', files)}
+                        />
+                    </div>
 
                     {/* Multiple items adding grid */}
                     <div className="border-t pt-3 space-y-2">
@@ -349,6 +360,15 @@ export default function Stock({ items, categories, totals, filters }) {
                             <label className="block font-medium text-xs text-gray-700 mb-1">Keperluan / Keterangan</label>
                             <textarea value={keluarForm.data.keterangan} onChange={(e) => keluarForm.setData('keterangan', e.target.value)} className="w-full border border-gray-300 rounded p-1.5" />
                         </div>
+                    </div>
+                    <div className="w-full">
+                        <label className="block font-medium text-xs text-gray-700 mb-1">Unggah Dokumen Pengeluaran / Bukti Fisik</label>
+                        <ImageUpload
+                            compact={false}
+                            multiple={true}
+                            value={keluarForm.data.foto || []}
+                            onChange={(files) => keluarForm.setData('foto', files)}
+                        />
                     </div>
 
                     {/* Release list */}

@@ -29,7 +29,7 @@ export default function ConfirmationModal({
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="max-w-md">
-            <div className={`space-y-4 ${colors[type]} pt-2`}>
+            <div className={`space-y-4 pt-2`}>
                 <div className="flex gap-4 items-start">
                     <div className="p-2 bg-gray-50 rounded-lg flex-shrink-0">
                         {icons[type]}

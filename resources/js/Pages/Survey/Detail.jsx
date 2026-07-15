@@ -183,7 +183,7 @@ export default function Detail({ survey }) {
                                         className="border border-gray-100 rounded-lg overflow-hidden bg-gray-50 hover:shadow-sm transition"
                                     >
                                         <img
-                                            src={`/uploads/photos/${photo.file_path}`}
+                                            src={photo.file_url}
                                             alt="Survey Check"
                                             className="w-full h-32 object-cover"
                                             onError={(e) => {

@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Http\Requests\StoreAtpRequest;
+use App\Http\Requests\UpdateAtpRequest;
+use App\Http\Requests\StoreAtpTemplateRequest;
 
 class AtpController extends Controller
 {
@@ -78,14 +81,8 @@ class AtpController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreAtpRequest $request)
     {
-        $request->validate([
-            'nama_site' => 'required|string',
-            'tanggal' => 'required|date',
-            'no_po' => 'required|string',
-        ]);
-
         $userId = $request->session()->get('user_id');
 
         DB::beginTransaction();
@@ -106,23 +103,23 @@ class AtpController extends Controller
             ]);
 
             // Handle uploads
-            if ($request->hasFile('fotos_item')) {
-                $uploadDir = public_path('uploads/atp');
-                if (!file_exists($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
+            if ($request->has('fotos_item')) {
+                foreach ($request->input('fotos_item') as $itemId => $fileList) {
+                    foreach ($fileList as $idx => $fileData) {
+                        $tempPath = $fileData['path'] ?? null;
+                        if (!$tempPath) continue;
 
-                foreach ($request->file('fotos_item') as $itemId => $files) {
-                    foreach ($files as $idx => $file) {
-                        $ext = $file->getClientOriginalExtension();
-                        $filename = 'atp_' . $record->id . '_' . $itemId . '_' . $idx . '_' . time() . '.' . $ext;
-                        $file->move($uploadDir, $filename);
+                        $fullTempPath = storage_path('app/public/' . $tempPath);
+                        if (file_exists($fullTempPath)) {
+                            $atpPhoto = AtpPhoto::create([
+                                'atp_id' => $record->id,
+                                'item_id' => $itemId,
+                                'file_path' => basename($fullTempPath),
+                            ]);
 
-                        AtpPhoto::create([
-                            'atp_id' => $record->id,
-                            'item_id' => $itemId,
-                            'file_path' => $filename,
-                        ]);
+                            $atpPhoto->addMedia($fullTempPath)
+                                     ->toMediaCollection('photo');
+                        }
                     }
                 }
             }
@@ -155,14 +152,8 @@ class AtpController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateAtpRequest $request, $id)
     {
-        $request->validate([
-            'nama_site' => 'required|string',
-            'tanggal' => 'required|date',
-            'no_po' => 'required|string',
-        ]);
-
         $record = AtpRecord::findOrFail($id);
 
         DB::beginTransaction();
@@ -181,19 +172,23 @@ class AtpController extends Controller
             ]);
 
             // Handle uploads
-            if ($request->hasFile('fotos_item')) {
-                $uploadDir = public_path('uploads/atp');
-                foreach ($request->file('fotos_item') as $itemId => $files) {
-                    foreach ($files as $idx => $file) {
-                        $ext = $file->getClientOriginalExtension();
-                        $filename = 'atp_' . $record->id . '_' . $itemId . '_' . $idx . '_' . time() . '.' . $ext;
-                        $file->move($uploadDir, $filename);
+            if ($request->has('fotos_item')) {
+                foreach ($request->input('fotos_item') as $itemId => $fileList) {
+                    foreach ($fileList as $idx => $fileData) {
+                        $tempPath = $fileData['path'] ?? null;
+                        if (!$tempPath) continue;
 
-                        AtpPhoto::create([
-                            'atp_id' => $record->id,
-                            'item_id' => $itemId,
-                            'file_path' => $filename,
-                        ]);
+                        $fullTempPath = storage_path('app/public/' . $tempPath);
+                        if (file_exists($fullTempPath)) {
+                            $atpPhoto = AtpPhoto::create([
+                                'atp_id' => $record->id,
+                                'item_id' => $itemId,
+                                'file_path' => basename($fullTempPath),
+                            ]);
+
+                            $atpPhoto->addMedia($fullTempPath)
+                                     ->toMediaCollection('photo');
+                        }
                     }
                 }
             }
@@ -283,13 +278,8 @@ class AtpController extends Controller
         ]);
     }
 
-    public function storeTemplate(Request $request)
+    public function storeTemplate(StoreAtpTemplateRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string',
-            'data_json' => 'required',
-        ]);
-
         $userId = $request->session()->get('user_id');
 
         AtpTemplate::create([

@@ -42,40 +42,53 @@ cme-app/
 │   │   │   ├── GudangController.php     # Stock ledger and transaction logs
 │   │   │   ├── InstructionController.php # SOW guidelines
 │   │   │   ├── LoginController.php      # Manual session login
+│   │   │   ├── MediaController.php      # Installs temp upload handler
 │   │   │   └── UserController.php       # Admin account CRUD
-│   │   └── Middleware/
-│   │       ├── CustomAuthMiddleware.php # Redirects unauthenticated sessions
-│   │       └── HandleInertiaRequests.php# Exposes shared auth & flash props to React
+│   │   ├── Middleware/
+│   │   │   ├── CustomAuthMiddleware.php # Redirects unauthenticated sessions
+│   │   │   └── HandleInertiaRequests.php# Exposes shared auth & flash props to React
+│   │   └── Requests/                # Form request validation modules
+│   │       ├── LoginRequest.php
+│   │       ├── StoreAtpRequest.php
+│   │       ├── StoreAtpTemplateRequest.php
+│   │       ├── StoreGudangKategoriRequest.php
+│   │       ├── StoreGudangKeluarRequest.php
+│   │       ├── StoreGudangMasukRequest.php
+│   │       ├── StoreGudangTipeRequest.php
+│   │       ├── StoreSurveyRequest.php
+│   │       ├── StoreSurveyTemplateRequest.php
+│   │       ├── StoreUserRequest.php
+│   │       ├── TempUploadRequest.php
+│   │       ├── UpdateAtpRequest.php
+│   │       ├── UpdateSurveyRequest.php
+│   │       └── UpdateUserRequest.php
 │   └── Models/                      # Eloquent relational models mapping database tables
-│       ├── AtpPhoto.php
+│       ├── AtpPhoto.php             # Uses Spatie MediaLibrary trait
 │       ├── AtpRecord.php
 │       ├── AtpTemplate.php
 │       ├── BalData.php
 │       ├── BastpData.php
 │       ├── GudangBarang.php
-│       ├── GudangKeluar.php
+│       ├── GudangKeluar.php          # Uses Spatie MediaLibrary trait
 │       ├── GudangKeluarDetail.php
-│       ├── GudangMasuk.php
+│       ├── GudangMasuk.php           # Uses Spatie MediaLibrary trait
 │       ├── GudangMasukDetail.php
-│       ├── InstructionImage.php
+│       ├── InstructionImage.php     # Uses Spatie MediaLibrary trait
 │       ├── InstructionTable.php
 │       ├── LoginLog.php
 │       ├── Survey.php
 │       ├── SurveyItem.php
-│       ├── SurveyPhoto.php
+│       ├── SurveyPhoto.php          # Uses Spatie MediaLibrary trait
 │       ├── SurveyTemplate.php
 │       └── User.php
 ├── bootstrap/
 │   └── app.php                      # Pipeline config & middleware registrations
 ├── config/                          # Laravel system configurations
 ├── database/
-│   ├── migrations/                  # Database schema definitions
+│   ├── migrations/                  # Database schema definitions (including media table)
 │   └── seeders/                     # Initial seed data (default users & stocks)
 ├── public/
-│   └── uploads/                     # Upload storage directories
-│       ├── atp/                         # Checked ATP step photos
-│       ├── gudang/                      # Stock logs invoices
-│       └── photos/                      # Survey ODC check photos
+│   └── uploads/                     # Upload storage directories (legacy fallback and temp)
 ├── resources/
 │   ├── css/
 │   │   └── app.css                  # Tailwind v4 directives & typography mapping
@@ -95,7 +108,7 @@ cme-app/
 │   └── views/
 │       └── app.blade.php            # Base template containing react scripts
 └── routes/
-    └── web.php                      # Application endpoints route mappings
+    └── web.php                      # Application endpoints route mappings (including /api/upload-temp)
 ```
 
 ---

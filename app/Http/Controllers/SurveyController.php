@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Http\Requests\StoreSurveyRequest;
+use App\Http\Requests\UpdateSurveyRequest;
+use App\Http\Requests\StoreSurveyTemplateRequest;
 
 class SurveyController extends Controller
 {
@@ -95,14 +98,8 @@ class SurveyController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreSurveyRequest $request)
     {
-        $request->validate([
-            'nama_site' => 'required|string',
-            'tanggal_survey' => 'required|date',
-            'nama_surveyor' => 'required|string',
-        ]);
-
         $userId = $request->session()->get('user_id');
 
         DB::beginTransaction();
@@ -148,26 +145,26 @@ class SurveyController extends Controller
             }
 
             // Handle files
-            if ($request->hasFile('photos')) {
-                $uploadDir = public_path('uploads/photos');
-                if (!file_exists($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-
-                foreach ($request->file('photos') as $key => $files) {
+            if ($request->has('photos')) {
+                foreach ($request->input('photos') as $key => $fileList) {
                     $itemId = $itemIdMap[$key] ?? null;
                     if (!$itemId) continue;
 
-                    foreach ($files as $idx => $file) {
-                        $ext = $file->getClientOriginalExtension();
-                        $filename = $survey->id . '_' . $key . '_' . $idx . '_' . time() . '.' . $ext;
-                        $file->move($uploadDir, $filename);
+                    foreach ($fileList as $idx => $fileData) {
+                        $tempPath = $fileData['path'] ?? null;
+                        if (!$tempPath) continue;
 
-                        SurveyPhoto::create([
-                            'survey_id' => $survey->id,
-                            'item_id' => $itemId,
-                            'file_path' => $filename,
-                        ]);
+                        $fullTempPath = storage_path('app/public/' . $tempPath);
+                        if (file_exists($fullTempPath)) {
+                            $surveyPhoto = SurveyPhoto::create([
+                                'survey_id' => $survey->id,
+                                'item_id' => $itemId,
+                                'file_path' => basename($fullTempPath),
+                            ]);
+
+                            $surveyPhoto->addMedia($fullTempPath)
+                                        ->toMediaCollection('photo');
+                        }
                     }
                 }
             }
@@ -200,14 +197,8 @@ class SurveyController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateSurveyRequest $request, $id)
     {
-        $request->validate([
-            'nama_site' => 'required|string',
-            'tanggal_survey' => 'required|date',
-            'nama_surveyor' => 'required|string',
-        ]);
-
         $survey = Survey::findOrFail($id);
 
         DB::beginTransaction();
@@ -247,22 +238,26 @@ class SurveyController extends Controller
             }
 
             // Handle uploads
-            if ($request->hasFile('photos')) {
-                $uploadDir = public_path('uploads/photos');
-                foreach ($request->file('photos') as $key => $files) {
+            if ($request->has('photos')) {
+                foreach ($request->input('photos') as $key => $fileList) {
                     $ri = SurveyItem::where('survey_id', $survey->id)->where('nomor_item', $key)->first();
                     if (!$ri) continue;
 
-                    foreach ($files as $idx => $file) {
-                        $ext = $file->getClientOriginalExtension();
-                        $filename = $survey->id . '_' . $key . '_' . $idx . '_' . time() . '.' . $ext;
-                        $file->move($uploadDir, $filename);
+                    foreach ($fileList as $idx => $fileData) {
+                        $tempPath = $fileData['path'] ?? null;
+                        if (!$tempPath) continue;
 
-                        SurveyPhoto::create([
-                            'survey_id' => $survey->id,
-                            'item_id' => $ri->id,
-                            'file_path' => $filename,
-                        ]);
+                        $fullTempPath = storage_path('app/public/' . $tempPath);
+                        if (file_exists($fullTempPath)) {
+                            $surveyPhoto = SurveyPhoto::create([
+                                'survey_id' => $survey->id,
+                                'item_id' => $ri->id,
+                                'file_path' => basename($fullTempPath),
+                            ]);
+
+                            $surveyPhoto->addMedia($fullTempPath)
+                                        ->toMediaCollection('photo');
+                        }
                     }
                 }
             }
@@ -303,13 +298,8 @@ class SurveyController extends Controller
         ]);
     }
 
-    public function storeTemplate(Request $request)
+    public function storeTemplate(StoreSurveyTemplateRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string',
-            'kategori_json' => 'required',
-        ]);
-
         $userId = $request->session()->get('user_id');
 
         SurveyTemplate::create([

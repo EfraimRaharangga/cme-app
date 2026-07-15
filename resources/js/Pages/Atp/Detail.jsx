@@ -177,7 +177,7 @@ export default function Detail({ record }) {
                                     return (
                                         <div key={photo.id} className="border border-gray-150 rounded-lg overflow-hidden bg-gray-50 hover:shadow-sm transition">
                                             <img
-                                                src={`/uploads/atp/${photo.file_path}`}
+                                                src={photo.file_url}
                                                 alt={pName}
                                                 className="w-full h-36 object-cover"
                                                 onError={(e) => {

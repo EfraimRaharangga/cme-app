@@ -8,10 +8,18 @@ import Input from '../../Components/Input';
 import Select from '../../Components/Select';
 import PasswordField from '../../Components/PasswordField';
 import Alert from '../../Components/Alert';
+import ConfirmationModal from '../../Components/ConfirmationModal';
 
 export default function List({ users }) {
     const [editMode, setEditMode] = useState(false);
     const [editingUserId, setEditingUserId] = useState(null);
+    const [confirmModal, setConfirmModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'info',
+        onConfirm: null
+    });
 
     const { data, setData, post, put, delete: destroy, reset, errors, processing } = useForm({
         username: '',
@@ -53,9 +61,13 @@ export default function List({ users }) {
     };
 
     const handleDelete = (id) => {
-        if (confirm('Apakah Anda yakin ingin menghapus user ini?')) {
-            router.delete(`/users/${id}`);
-        }
+        setConfirmModal({
+            isOpen: true,
+            title: 'Hapus Akun Pengguna',
+            message: 'Apakah Anda yakin ingin menghapus user ini?',
+            type: 'danger',
+            onConfirm: () => router.delete(`/users/${id}`)
+        });
     };
 
     const roles = [
@@ -193,6 +205,15 @@ export default function List({ users }) {
                     </Card>
                 </div>
             </div>
+
+            <ConfirmationModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                type={confirmModal.type}
+            />
         </>
     );
 }

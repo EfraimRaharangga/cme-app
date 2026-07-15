@@ -5,9 +5,17 @@ import Card from '../../Components/Card';
 import Table from '../../Components/Table';
 import Input from '../../Components/Input';
 import Button from '../../Components/Button';
+import ConfirmationModal from '../../Components/ConfirmationModal';
 
 export default function List({ surveys, filters }) {
     const [search, setSearch] = useState(filters.cari || '');
+    const [confirmModal, setConfirmModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'info',
+        onConfirm: null
+    });
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -15,9 +23,13 @@ export default function List({ surveys, filters }) {
     };
 
     const handleDelete = (id) => {
-        if (confirm('Apakah Anda yakin ingin menghapus data survey ODC ini? Semua data terkait (termasuk foto) akan ikut terhapus.')) {
-            router.delete(`/survey/${id}`);
-        }
+        setConfirmModal({
+            isOpen: true,
+            title: 'Hapus Laporan Survey',
+            message: 'Apakah Anda yakin ingin menghapus data survey ODC ini? Semua data terkait (termasuk foto) akan ikut terhapus.',
+            type: 'danger',
+            onConfirm: () => router.delete(`/survey/${id}`)
+        });
     };
 
     return (
@@ -114,6 +126,15 @@ export default function List({ surveys, filters }) {
                     )}
                 </Table>
             </Card>
+
+            <ConfirmationModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                type={confirmModal.type}
+            />
         </>
     );
 }

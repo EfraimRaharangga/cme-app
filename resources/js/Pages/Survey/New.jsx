@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
+import axios from 'axios';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Input from '../../Components/Input';
 import Button from '../../Components/Button';
 import Alert from '../../Components/Alert';
 import ConfirmationModal from '../../Components/ConfirmationModal';
+import ImageUpload from '../../Components/ImageUpload';
 
 export default function New({ defaultTemplate, templates }) {
     const [mapLoaded, setMapLoaded] = useState(false);
@@ -151,45 +153,43 @@ export default function New({ defaultTemplate, templates }) {
         });
     };
 
-    const handleFileChange = (key, files) => {
+    const handleFileChange = async (key, files) => {
+        const fileList = Array.from(files);
+        const uploadedFiles = [];
+
+        for (const file of fileList) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await axios.post('/api/upload-temp', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                uploadedFiles.push({
+                    path: response.data.path,
+                    url: response.data.url,
+                    name: file.name
+                });
+            } catch (err) {
+                const msg = err.response?.data?.message || err.response?.data?.errors?.image?.[0] || 'Gagal mengunggah foto.';
+                setAlertModal({
+                    isOpen: true,
+                    title: 'Validasi Gambar Gagal',
+                    message: msg,
+                    type: 'danger'
+                });
+            }
+        }
+
         setData('photos', {
             ...data.photos,
-            [key]: Array.from(files),
+            [key]: [...(data.photos[key] || []), ...uploadedFiles]
         });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        // Convert files & data to FormData for posting files
-        const formData = new FormData();
-        formData.append('nama_site', data.nama_site);
-        formData.append('tanggal_survey', data.tanggal_survey);
-        formData.append('nama_surveyor', data.nama_surveyor);
-        formData.append('lokasi', data.lokasi);
-        formData.append('latitude', data.latitude);
-        formData.append('longitude', data.longitude);
-        formData.append('catatan_tambahan', data.catatan_tambahan);
-
-        Object.entries(data.items).forEach(([key, item]) => {
-            formData.append(`items[${key}][kategori]`, item.kategori);
-            formData.append(`items[${key}][nomor]`, item.nomor);
-            formData.append(`items[${key}][nama]`, item.nama);
-            formData.append(`items[${key}][status]`, item.status);
-            formData.append(`items[${key}][kondisi]`, item.kondisi);
-            formData.append(`items[${key}][catatan]`, item.catatan);
-        });
-
-        Object.entries(data.photos).forEach(([key, fileList]) => {
-            fileList.forEach((file, idx) => {
-                formData.append(`photos[${key}][${idx}]`, file);
-            });
-        });
-
-        post('/survey/baru', {
-            data: formData,
-            forceFormData: true,
-        });
+        post('/survey/baru');
     };
 
     return (
@@ -360,22 +360,19 @@ export default function New({ defaultTemplate, templates }) {
                                             )}
 
                                             <div>
-                                                <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">
-                                                    Unggah Foto
-                                                </label>
-                                                <input
-                                                    type="file"
-                                                    multiple
-                                                    accept="image/*"
-                                                    onChange={(e) => handleFileChange(key, e.target.files)}
-                                                    className="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 transition"
-                                                />
-                                                {data.photos[key] && (
-                                                    <p className="text-[10px] text-[#00ADB5] font-semibold mt-1">
-                                                        {data.photos[key].length} foto dipilih
-                                                    </p>
-                                                )}
-                                            </div>
+                                                 <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">
+                                                     Unggah Foto
+                                                 </label>
+                                                 <ImageUpload
+                                                     compact={true}
+                                                     multiple={true}
+                                                     value={data.photos[key] || []}
+                                                     onChange={(files) => setData('photos', {
+                                                         ...data.photos,
+                                                         [key]: files
+                                                     })}
+                                                 />
+                                             </div>
                                         </div>
                                     </div>
                                 );

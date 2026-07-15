@@ -11,6 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Http\Requests\StoreGudangKategoriRequest;
+use App\Http\Requests\StoreGudangTipeRequest;
+use App\Http\Requests\StoreGudangMasukRequest;
+use App\Http\Requests\StoreGudangKeluarRequest;
 
 class GudangController extends Controller
 {
@@ -73,13 +77,8 @@ class GudangController extends Controller
         ]);
     }
 
-    public function storeKategori(Request $request)
+    public function storeKategori(StoreGudangKategoriRequest $request)
     {
-        $request->validate([
-            'kategori' => 'required|string',
-            'satuan' => 'required|string',
-        ]);
-
         $kat = $request->input('kategori');
         $sat = $request->input('satuan');
 
@@ -95,13 +94,8 @@ class GudangController extends Controller
         return redirect('/gudang')->with('success', 'Kategori baru berhasil ditambahkan!');
     }
 
-    public function storeTipe(Request $request)
+    public function storeTipe(StoreGudangTipeRequest $request)
     {
-        $request->validate([
-            'kategori' => 'required|string',
-            'tipe' => 'required|string',
-        ]);
-
         $kat = $request->input('kategori');
         $tipe = $request->input('tipe');
 
@@ -117,15 +111,8 @@ class GudangController extends Controller
         return redirect('/gudang')->with('success', 'Tipe baru berhasil ditambahkan!');
     }
 
-    public function storeMasuk(Request $request)
+    public function storeMasuk(StoreGudangMasukRequest $request)
     {
-        $request->validate([
-            'tanggal' => 'required|date',
-            'supplier' => 'required|string',
-            'penerima' => 'required|string',
-            'items' => 'required|array',
-        ]);
-
         $userId = $request->session()->get('user_id');
         $noForm = 'BM-' . date('Ymd') . '-' . time();
 
@@ -145,19 +132,23 @@ class GudangController extends Controller
                 'created_by' => $userId,
             ]);
 
-            // Handle file attachments
-            if ($request->hasFile('foto')) {
+            // Handle file attachments from temporary uploads
+            if ($request->has('foto')) {
                 $fotoNames = [];
-                $uploadDir = public_path('uploads/gudang');
-                if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
+                foreach ($request->input('foto') as $fileData) {
+                    $tempPath = $fileData['path'] ?? null;
+                    if (!$tempPath) continue;
 
-                foreach ($request->file('foto') as $file) {
-                    $ext = $file->getClientOriginalExtension();
-                    $filename = 'masuk_' . $gudangMasuk->id . '_' . rand(100,999) . '_' . time() . '.' . $ext;
-                    $file->move($uploadDir, $filename);
-                    $fotoNames[] = $filename;
+                    $fullTempPath = storage_path('app/public/' . $tempPath);
+                    if (file_exists($fullTempPath)) {
+                        $gudangMasuk->addMedia($fullTempPath)
+                                    ->toMediaCollection('attachments');
+                        $fotoNames[] = basename($fullTempPath);
+                    }
                 }
-                $gudangMasuk->update(['foto' => implode(',', $fotoNames)]);
+                if (!empty($fotoNames)) {
+                    $gudangMasuk->update(['foto' => implode(',', $fotoNames)]);
+                }
             }
 
             foreach ($request->input('items') as $item) {
@@ -207,15 +198,8 @@ class GudangController extends Controller
         }
     }
 
-    public function storeKeluar(Request $request)
+    public function storeKeluar(StoreGudangKeluarRequest $request)
     {
-        $request->validate([
-            'tanggal' => 'required|date',
-            'pengambil' => 'required|string',
-            'lokasi_tujuan' => 'required|string',
-            'items' => 'required|array',
-        ]);
-
         $userId = $request->session()->get('user_id');
         $noForm = 'BK-' . date('Ymd') . '-' . time();
 
@@ -238,19 +222,23 @@ class GudangController extends Controller
                 'created_by' => $userId,
             ]);
 
-            // Handle file attachments
-            if ($request->hasFile('foto')) {
+            // Handle file attachments from temporary uploads
+            if ($request->has('foto')) {
                 $fotoNames = [];
-                $uploadDir = public_path('uploads/gudang');
-                if (!file_exists($uploadDir)) mkdir($uploadDir, 0777, true);
+                foreach ($request->input('foto') as $fileData) {
+                    $tempPath = $fileData['path'] ?? null;
+                    if (!$tempPath) continue;
 
-                foreach ($request->file('foto') as $file) {
-                    $ext = $file->getClientOriginalExtension();
-                    $filename = 'keluar_' . $gudangKeluar->id . '_' . rand(100,999) . '_' . time() . '.' . $ext;
-                    $file->move($uploadDir, $filename);
-                    $fotoNames[] = $filename;
+                    $fullTempPath = storage_path('app/public/' . $tempPath);
+                    if (file_exists($fullTempPath)) {
+                        $gudangKeluar->addMedia($fullTempPath)
+                                     ->toMediaCollection('attachments');
+                        $fotoNames[] = basename($fullTempPath);
+                    }
                 }
-                $gudangKeluar->update(['foto' => implode(',', $fotoNames)]);
+                if (!empty($fotoNames)) {
+                    $gudangKeluar->update(['foto' => implode(',', $fotoNames)]);
+                }
             }
 
             foreach ($request->input('items') as $item) {

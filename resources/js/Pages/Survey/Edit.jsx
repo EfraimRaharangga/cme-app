@@ -1,14 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
+import axios from 'axios';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Input from '../../Components/Input';
 import Button from '../../Components/Button';
+import ConfirmationModal from '../../Components/ConfirmationModal';
+import ImageUpload from '../../Components/ImageUpload';
 
 export default function Edit({ survey, templates }) {
     const [mapLoaded, setMapLoaded] = useState(false);
     const mapRef = useRef(null);
     const markerRef = useRef(null);
+    const [alertModal, setAlertModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'info'
+    });
 
     const { data, setData, post, processing, errors } = useForm({
         nama_site: survey.nama_site || '',
@@ -123,46 +132,43 @@ export default function Edit({ survey, templates }) {
         });
     };
 
-    const handleFileChange = (key, files) => {
+    const handleFileChange = async (key, files) => {
+        const fileList = Array.from(files);
+        const uploadedFiles = [];
+
+        for (const file of fileList) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await axios.post('/api/upload-temp', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                uploadedFiles.push({
+                    path: response.data.path,
+                    url: response.data.url,
+                    name: file.name
+                });
+            } catch (err) {
+                const msg = err.response?.data?.message || err.response?.data?.errors?.image?.[0] || 'Gagal mengunggah foto.';
+                setAlertModal({
+                    isOpen: true,
+                    title: 'Validasi Gambar Gagal',
+                    message: msg,
+                    type: 'danger'
+                });
+            }
+        }
+
         setData('photos', {
             ...data.photos,
-            [key]: Array.from(files),
+            [key]: [...(data.photos[key] || []), ...uploadedFiles]
         });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        const formData = new FormData();
-        formData.append('nama_site', data.nama_site);
-        formData.append('tanggal_survey', data.tanggal_survey);
-        formData.append('nama_surveyor', data.nama_surveyor);
-        formData.append('lokasi', data.lokasi);
-        formData.append('latitude', data.latitude);
-        formData.append('longitude', data.longitude);
-        formData.append('catatan_tambahan', data.catatan_tambahan);
-
-        Object.entries(data.items).forEach(([key, item]) => {
-            formData.append(`items[${key}][item_db_id]`, item.item_db_id || '');
-            formData.append(`items[${key}][kategori]`, item.kategori);
-            formData.append(`items[${key}][nomor]`, item.nomor);
-            formData.append(`items[${key}][nama]`, item.nama);
-            formData.append(`items[${key}][status]`, item.status);
-            formData.append(`items[${key}][kondisi]`, item.kondisi);
-            formData.append(`items[${key}][catatan]`, item.catatan);
-        });
-
-        Object.entries(data.photos).forEach(([key, fileList]) => {
-            fileList.forEach((file, idx) => {
-                formData.append(`photos[${key}][${idx}]`, file);
-            });
-        });
-
-        // Use standard POST instead of PUT because PHP doesn't support multipart files over PUT natively
-        post(`/survey/${survey.id}/edit`, {
-            data: formData,
-            forceFormData: true,
-        });
+        post(`/survey/${survey.id}/edit`);
     };
 
     // Group items by category to render sections
@@ -323,12 +329,14 @@ export default function Edit({ survey, templates }) {
                                                 <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">
                                                     Tambah Foto
                                                 </label>
-                                                <input
-                                                    type="file"
-                                                    multiple
-                                                    accept="image/*"
-                                                    onChange={(e) => handleFileChange(key, e.target.files)}
-                                                    className="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 transition"
+                                                <ImageUpload
+                                                    compact={true}
+                                                    multiple={true}
+                                                    value={data.photos[key] || []}
+                                                    onChange={(files) => setData('photos', {
+                                                        ...data.photos,
+                                                        [key]: files
+                                                    })}
                                                 />
                                             </div>
                                         </div>
@@ -366,6 +374,14 @@ export default function Edit({ survey, templates }) {
                     </Link>
                 </div>
             </form>
+
+            <ConfirmationModal
+                isOpen={alertModal.isOpen}
+                onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
+                title={alertModal.title}
+                message={alertModal.message}
+                type={alertModal.type}
+            />
         </>
     );
 }

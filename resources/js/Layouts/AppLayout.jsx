@@ -15,6 +15,7 @@ import {
     BookOpen
 } from 'lucide-react';
 import FlashMessage from '../Components/FlashMessage';
+import ConfirmationModal from '../Components/ConfirmationModal';
 
 export default function AppLayout({ children }) {
     const { props } = usePage();
@@ -23,6 +24,13 @@ export default function AppLayout({ children }) {
 
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [openMenus, setOpenMenus] = useState({});
+    const [confirmModal, setConfirmModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'info',
+        onConfirm: null
+    });
 
     // Load initial states from local storage
     useEffect(() => {
@@ -56,9 +64,13 @@ export default function AppLayout({ children }) {
     };
 
     const handleLogout = () => {
-        if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-            router.post('/logout');
-        }
+        setConfirmModal({
+            isOpen: true,
+            title: 'Konfirmasi Keluar',
+            message: 'Apakah Anda yakin ingin keluar dari sistem?',
+            type: 'warning',
+            onConfirm: () => router.post('/logout')
+        });
     };
 
     const hasRole = (roles) => {
@@ -265,6 +277,15 @@ export default function AppLayout({ children }) {
                     </footer>
                 </main>
             </div>
+
+            <ConfirmationModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                type={confirmModal.type}
+            />
         </div>
     );
 }
