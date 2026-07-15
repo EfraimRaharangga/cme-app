@@ -1,0 +1,44 @@
+import React, { useEffect, useState } from 'react';
+import { usePage } from '@inertiajs/react';
+import Alert from './Alert';
+
+export default function FlashMessage() {
+    const { props } = usePage();
+    const { flash } = props;
+    const [visible, setVisible] = useState(false);
+    const [type, setType] = useState('info');
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        if (flash?.success) {
+            setType('success');
+            setMessage(flash.success);
+            setVisible(true);
+        } else if (flash?.error) {
+            setType('error');
+            setMessage(flash.error);
+            setVisible(true);
+        } else if (flash?.warning) {
+            setType('warning');
+            setMessage(flash.warning);
+            setVisible(true);
+        }
+    }, [flash]);
+
+    useEffect(() => {
+        if (visible) {
+            const timer = setTimeout(() => {
+                setVisible(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [visible]);
+
+    if (!visible || !message) return null;
+
+    return (
+        <div className="fixed bottom-4 right-4 z-50 max-w-sm w-full animate-slide-in">
+            <Alert variant={type} message={message} className="shadow-lg border-opacity-70 bg-white" />
+        </div>
+    );
+}

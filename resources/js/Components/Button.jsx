@@ -1,0 +1,30 @@
+import React from 'react';
+
+export default function Button({
+    type = 'button',
+    className = '',
+    processing = false,
+    variant = 'primary',
+    children,
+    ...props
+}) {
+    const baseStyle = "inline-flex items-center justify-center px-4 py-2 border rounded-md font-semibold text-xs uppercase tracking-widest transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+    
+    const variants = {
+        primary: "bg-[#1A1A1A] border-transparent text-white hover:bg-black active:bg-black focus:ring-[#1A1A1A]",
+        secondary: "bg-[#00ADB5] border-transparent text-white hover:bg-[#008f96] active:bg-[#008f96] focus:ring-[#00ADB5]",
+        outline: "bg-white border-[#1A1A1A] text-[#1A1A1A] hover:bg-gray-100 active:bg-gray-100 focus:ring-[#1A1A1A]",
+        danger: "bg-red-600 border-transparent text-white hover:bg-red-700 active:bg-red-700 focus:ring-red-600",
+    };
+
+    return (
+        <button
+            {...props}
+            type={type}
+            className={`${baseStyle} ${variants[variant]} ${className}`}
+            disabled={processing}
+        >
+            {children}
+        </button>
+    );
+}
