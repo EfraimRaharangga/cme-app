@@ -203,7 +203,7 @@ export default function Edit({ survey, templates }) {
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* 1. SITE INFO */}
-                <Card title="📍 Informasi Site &amp; Koordinat">
+                <Card title="Informasi Site &amp; Koordinat">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-4">
                             <Input
@@ -263,7 +263,7 @@ export default function Edit({ survey, templates }) {
                                     onClick={getMyLocation}
                                     className="h-10 text-[10px]"
                                 >
-                                    📍 Get GPS
+                                    Get GPS
                                 </Button>
                             </div>
                         </div>
@@ -277,7 +277,7 @@ export default function Edit({ survey, templates }) {
 
                 {/* 2. DYNAMIC CHECKLIST EDITING */}
                 {Object.entries(groupedItems).map(([kat, items]) => (
-                    <Card key={kat} title={`📋 ${kat}`}>
+                    <Card key={kat} title={kat}>
                         <div className="space-y-6">
                             {items.map((item) => {
                                 const key = item.key;

@@ -59,7 +59,7 @@ export default function List({ records, filters }) {
                 <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
                     <Input
                         type="text"
-                        placeholder="🔍 Cari nama site, region, atau no. PO..."
+                        placeholder="Cari nama site, region, atau no. PO..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
@@ -87,15 +87,14 @@ export default function List({ records, filters }) {
                                 <td className="px-6 py-4 text-center font-medium text-gray-700">{row.no_po}</td>
                                 <td className="px-6 py-4 text-center">
                                     <span
-                                        className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
-                                            row.verdict === 'ACCEPT'
+                                        className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${row.verdict === 'ACCEPT'
                                                 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                                                 : row.verdict === 'CONDITIONAL'
-                                                ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                                                : row.verdict === 'REJECT'
-                                                ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                                                : 'bg-gray-50 text-gray-600 border border-gray-200'
-                                        }`}
+                                                    ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                                                    : row.verdict === 'REJECT'
+                                                        ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                                                        : 'bg-gray-50 text-gray-600 border border-gray-200'
+                                            }`}
                                     >
                                         {row.verdict || 'PENDING'}
                                     </span>

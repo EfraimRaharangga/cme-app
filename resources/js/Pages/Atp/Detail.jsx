@@ -139,7 +139,7 @@ export default function Detail({ record }) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Checklists table */}
                 <div className="lg:col-span-2 space-y-6">
-                    <Card title="📋 Checkpoint Parameter ATP">
+                    <Card title="Checkpoint Parameter ATP">
                         <Table headers={['Nama Parameter', 'Standard', 'Hasil', 'Status', 'Catatan']}>
                             {Object.entries(itemNames).map(([key, name]) => (
                                 <tr key={key} className="hover:bg-gray-50/50">
@@ -151,13 +151,12 @@ export default function Detail({ record }) {
                                     <td className="px-4 py-3 text-center font-semibold text-gray-700">{itemHasil[key] || '-'}</td>
                                     <td className="px-4 py-3 text-center">
                                         <span
-                                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
-                                                itemVals[key] === 'OK'
-                                                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                                                    : itemVals[key] === 'NG'
+                                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${itemVals[key] === 'OK'
+                                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                                : itemVals[key] === 'NG'
                                                     ? 'bg-rose-50 text-rose-800 border border-rose-200'
                                                     : 'bg-amber-50 text-amber-800 border border-amber-200'
-                                            }`}
+                                                }`}
                                         >
                                             {itemVals[key] || '-'}
                                         </span>
@@ -197,7 +196,7 @@ export default function Detail({ record }) {
 
                 {/* Sidebar details */}
                 <div className="space-y-6">
-                    <Card title="📍 Detail Site">
+                    <Card title="Detail Site">
                         <div className="space-y-3.5 text-xs text-gray-700">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -233,20 +232,19 @@ export default function Detail({ record }) {
                     </Card>
 
                     {/* Verdict */}
-                    <Card title="📊 Verdict Keputusan">
+                    <Card title="Verdict Keputusan">
                         <div className="space-y-3">
                             <div className="flex justify-between items-center">
                                 <span className="text-xs font-semibold text-gray-400 uppercase">Status Kelayakan</span>
                                 <span
-                                    className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
-                                        record.verdict === 'ACCEPT'
-                                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                                            : record.verdict === 'CONDITIONAL'
+                                    className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${record.verdict === 'ACCEPT'
+                                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                        : record.verdict === 'CONDITIONAL'
                                             ? 'bg-amber-50 text-amber-800 border border-amber-200'
                                             : record.verdict === 'REJECT'
-                                            ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                                            : 'bg-gray-50 text-gray-600 border border-gray-200'
-                                    }`}
+                                                ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                                                : 'bg-gray-50 text-gray-600 border border-gray-200'
+                                        }`}
                                 >
                                     {record.verdict || 'PENDING'}
                                 </span>

@@ -215,7 +215,7 @@ export default function New({ defaultTemplate, templates }) {
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* 1. INFORMASI SITE */}
-                <Card title="📍 Informasi Site &amp; Koordinat">
+                <Card title="Informasi Site &amp; Koordinat">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-4">
                             <Input
@@ -278,7 +278,7 @@ export default function New({ defaultTemplate, templates }) {
                                     onClick={getMyLocation}
                                     className="h-10 text-[10px]"
                                 >
-                                    📍 Get GPS
+                                    Get GPS
                                 </Button>
                             </div>
                         </div>
@@ -292,7 +292,7 @@ export default function New({ defaultTemplate, templates }) {
 
                 {/* 2. DYNAMIC CHECKLIST MODULE */}
                 {Object.entries(defaultTemplate).map(([kat, list]) => (
-                    <Card key={kat} title={`📋 ${kat}`}>
+                    <Card key={kat} title={kat}>
                         <div className="space-y-6">
                             {list.map((item, idx) => {
                                 const key = `${kat}_${idx}`;
@@ -360,19 +360,19 @@ export default function New({ defaultTemplate, templates }) {
                                             )}
 
                                             <div>
-                                                 <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">
-                                                     Unggah Foto
-                                                 </label>
-                                                 <ImageUpload
-                                                     compact={true}
-                                                     multiple={true}
-                                                     value={data.photos[key] || []}
-                                                     onChange={(files) => setData('photos', {
-                                                         ...data.photos,
-                                                         [key]: files
-                                                     })}
-                                                 />
-                                             </div>
+                                                <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">
+                                                    Unggah Foto
+                                                </label>
+                                                <ImageUpload
+                                                    compact={true}
+                                                    multiple={true}
+                                                    value={data.photos[key] || []}
+                                                    onChange={(files) => setData('photos', {
+                                                        ...data.photos,
+                                                        [key]: files
+                                                    })}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 );

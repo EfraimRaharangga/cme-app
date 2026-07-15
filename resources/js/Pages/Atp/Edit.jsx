@@ -187,7 +187,7 @@ export default function Edit({ record, templates }) {
         const keys = Object.keys(data.hasil_json.items);
         const total = keys.length;
         if (total === 0) return { pct: 0, total: 0, checked: 0 };
-        
+
         const checked = keys.filter(k => data.hasil_json.items[k] !== '').length;
         const pct = Math.round((checked / total) * 100);
         return { pct, total, checked };
@@ -245,7 +245,7 @@ export default function Edit({ record, templates }) {
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* 1. SITE INFO */}
-                <Card title="📍 Informasi Site &amp; PO">
+                <Card title="Informasi Site &amp; PO">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-4">
                             <Input
@@ -305,7 +305,7 @@ export default function Edit({ record, templates }) {
                                     onClick={getMyLocation}
                                     className="h-10 text-[10px]"
                                 >
-                                    📍 Get GPS
+                                    Get GPS
                                 </Button>
                             </div>
                         </div>
@@ -318,7 +318,7 @@ export default function Edit({ record, templates }) {
                 </Card>
 
                 {/* 2. DYNAMIC ATP CHECKLIST */}
-                <Card title="📋 Checkpoint Parameter ATP">
+                <Card title="Checkpoint Parameter ATP">
                     <div className="space-y-6">
                         {Object.entries(itemNames).map(([key, name]) => {
                             const checkVal = itemVals[key] || '';
@@ -341,15 +341,14 @@ export default function Edit({ record, templates }) {
                                                     key={st}
                                                     type="button"
                                                     onClick={() => handleCheckChange(key, st)}
-                                                    className={`px-3 py-1 text-xs font-bold transition ${
-                                                        checkVal === st
-                                                            ? st === 'OK'
-                                                                ? 'bg-emerald-500 text-white'
-                                                                : st === 'NG'
+                                                    className={`px-3 py-1 text-xs font-bold transition ${checkVal === st
+                                                        ? st === 'OK'
+                                                            ? 'bg-emerald-500 text-white'
+                                                            : st === 'NG'
                                                                 ? 'bg-red-500 text-white'
                                                                 : 'bg-amber-500 text-white'
-                                                            : 'bg-white text-gray-400 hover:bg-gray-50'
-                                                    }`}
+                                                        : 'bg-white text-gray-400 hover:bg-gray-50'
+                                                        }`}
                                                 >
                                                     {st}
                                                 </button>
@@ -438,7 +437,7 @@ export default function Edit({ record, templates }) {
                 </Card>
 
                 {/* 4. VERDICT */}
-                <Card title="📊 Hasil Verdict Audit">
+                <Card title="Hasil Verdict Audit">
                     <div className="space-y-4">
                         <div>
                             <label className="block font-medium text-xs text-gray-700 mb-2">Verdict Kelayakan</label>
@@ -448,15 +447,14 @@ export default function Edit({ record, templates }) {
                                         key={v}
                                         type="button"
                                         onClick={() => setData('verdict', v)}
-                                        className={`px-4 py-2 border rounded-md font-bold text-xs uppercase tracking-wider transition ${
-                                            data.verdict === v
-                                                ? v === 'ACCEPT'
-                                                    ? 'bg-emerald-500 border-transparent text-white'
-                                                    : v === 'CONDITIONAL'
+                                        className={`px-4 py-2 border rounded-md font-bold text-xs uppercase tracking-wider transition ${data.verdict === v
+                                            ? v === 'ACCEPT'
+                                                ? 'bg-emerald-500 border-transparent text-white'
+                                                : v === 'CONDITIONAL'
                                                     ? 'bg-amber-50 border-transparent text-white'
                                                     : 'bg-red-500 border-transparent text-white'
-                                                : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
-                                        }`}
+                                            : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                                            }`}
                                     >
                                         {v}
                                     </button>

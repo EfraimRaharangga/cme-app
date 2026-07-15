@@ -193,7 +193,7 @@ export default function Stock({ items, categories, totals, filters }) {
                 <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
                     <Input
                         type="text"
-                        placeholder="🔍 Cari nama barang, kategori, tipe..."
+                        placeholder="Cari nama barang, kategori, tipe..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />

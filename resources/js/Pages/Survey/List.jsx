@@ -59,7 +59,7 @@ export default function List({ surveys, filters }) {
                 <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
                     <Input
                         type="text"
-                        placeholder="🔍 Cari nama site, surveyor, atau lokasi..."
+                        placeholder="Cari nama site, surveyor, atau lokasi..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />

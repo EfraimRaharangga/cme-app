@@ -68,7 +68,7 @@ export default function AppLayout({ children }) {
             isOpen: true,
             title: 'Konfirmasi Keluar',
             message: 'Apakah Anda yakin ingin keluar dari sistem?',
-            type: 'warning',
+            type: 'danger',
             onConfirm: () => router.post('/logout')
         });
     };

@@ -39,7 +39,7 @@ export default function MasukList({ transactions, filters }) {
                 <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
                     <Input
                         type="text"
-                        placeholder="🔍 Cari nomor form, supplier, penerima..."
+                        placeholder="Cari nomor form, supplier, penerima..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />

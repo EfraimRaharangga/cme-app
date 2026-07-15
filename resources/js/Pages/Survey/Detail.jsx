@@ -14,7 +14,7 @@ export default function Detail({ survey }) {
                 const lat = parseFloat(survey.latitude);
                 const lng = parseFloat(survey.longitude);
                 const center = [lat, lng];
-                
+
                 const map = window.L.map('map-detail-el').setView(center, 14);
                 mapRef.current = map;
 
@@ -92,7 +92,7 @@ export default function Detail({ survey }) {
                 {/* Checklists reports detail */}
                 <div className="lg:col-span-2 space-y-6">
                     {Object.entries(groupedItems).map(([category, items]) => (
-                        <Card key={category} title={`📋 ${category}`}>
+                        <Card key={category} title={category}>
                             <Table headers={['No', 'Nama Checkpoint', 'Status', 'Catatan Kondisi']}>
                                 {items.map((it) => (
                                     <tr key={it.id} className="hover:bg-gray-50/50">
@@ -102,13 +102,12 @@ export default function Detail({ survey }) {
                                         <td className="px-4 py-3 font-bold text-gray-900">{it.nama_item}</td>
                                         <td className="px-4 py-3 text-center">
                                             <span
-                                                className={`inline-block px-2.5 py-0.5 rounded text-xs font-black ${
-                                                    it.status_check === 'checked'
-                                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                        : it.status_check === 'cross'
+                                                className={`inline-block px-2.5 py-0.5 rounded text-xs font-black ${it.status_check === 'checked'
+                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                    : it.status_check === 'cross'
                                                         ? 'bg-rose-50 text-rose-700 border border-rose-200'
                                                         : 'bg-gray-50 text-gray-400'
-                                                }`}
+                                                    }`}
                                             >
                                                 {it.status_check === 'checked' ? 'OK' : it.status_check === 'cross' ? 'NG' : '-'}
                                             </span>
@@ -130,7 +129,7 @@ export default function Detail({ survey }) {
 
                 {/* Info and location widget */}
                 <div className="space-y-6">
-                    <Card title="📍 Informasi Lokasi">
+                    <Card title="Informasi Lokasi">
                         <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>

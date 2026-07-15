@@ -39,7 +39,7 @@ export default function KeluarList({ transactions, filters }) {
                 <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
                     <Input
                         type="text"
-                        placeholder="🔍 Cari nomor form, pengambil, lokasi..."
+                        placeholder="Cari nomor form, pengambil, lokasi..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
