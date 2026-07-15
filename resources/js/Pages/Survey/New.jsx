@@ -20,7 +20,7 @@ export default function New({ defaultTemplate, templates }) {
         type: 'info'
     });
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, setError, clearErrors } = useForm({
         nama_site: '',
         tanggal_survey: new Date().toISOString().split('T')[0],
         nama_surveyor: '',
@@ -189,6 +189,52 @@ export default function New({ defaultTemplate, templates }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        clearErrors();
+
+        let hasError = false;
+        const newErrors = {};
+
+        if (!data.nama_site) {
+            newErrors.nama_site = 'Nama site wajib diisi.';
+            hasError = true;
+        }
+        if (!data.tanggal_survey) {
+            newErrors.tanggal_survey = 'Tanggal survey wajib diisi.';
+            hasError = true;
+        }
+        if (!data.nama_surveyor) {
+            newErrors.nama_surveyor = 'Nama surveyor wajib diisi.';
+            hasError = true;
+        }
+
+        Object.entries(data.items).forEach(([key, state]) => {
+            const namaItem = state.nama || key;
+            if (!state.status) {
+                newErrors[`items.${key}.status`] = `Status untuk item '${namaItem}' wajib dipilih (OK/NG).`;
+                hasError = true;
+            }
+            if (state.type === 'select' && !state.kondisi) {
+                newErrors[`items.${key}.kondisi`] = `Pilihan nilai untuk item '${namaItem}' wajib dipilih.`;
+                hasError = true;
+            }
+            const itemPhotos = data.photos[key] || [];
+            if (itemPhotos.length === 0) {
+                newErrors[`photos.${key}`] = `Foto untuk item '${namaItem}' wajib diunggah.`;
+                hasError = true;
+            }
+        });
+
+        if (hasError) {
+            setError(newErrors);
+            setAlertModal({
+                isOpen: true,
+                title: 'Validasi Gagal',
+                message: 'Silakan lengkapi semua field checklist, pilihan dropdown, dan foto yang wajib diisi.',
+                type: 'danger'
+            });
+            return;
+        }
+
         post('/survey/baru');
     };
 
@@ -302,71 +348,81 @@ export default function New({ defaultTemplate, templates }) {
                                                     {item[1]}
                                                 </span>
                                             </div>
+                                             {/* Checklist check controls depending on type */}
+                                             <div>
+                                                 <div className="flex border border-gray-200 rounded overflow-hidden w-fit mt-2">
+                                                     <button
+                                                         type="button"
+                                                         onClick={() => handleItemChange(key, 'status', 'checked')}
+                                                         className={`px-3 py-1 text-xs font-bold transition ${state.status === 'checked'
+                                                             ? 'bg-emerald-500 text-white'
+                                                             : 'bg-white text-gray-400 hover:bg-gray-50'
+                                                             }`}
+                                                     >
+                                                         OK
+                                                     </button>
+                                                     <button
+                                                         type="button"
+                                                         onClick={() => handleItemChange(key, 'status', 'cross')}
+                                                         className={`px-3 py-1 text-xs font-bold transition ${state.status === 'cross'
+                                                             ? 'bg-red-500 text-white'
+                                                             : 'bg-white text-gray-400 hover:bg-gray-50'
+                                                             }`}
+                                                     >
+                                                         NG
+                                                     </button>
+                                                 </div>
+                                                 {errors[`items.${key}.status`] && (
+                                                     <p className="text-red-500 text-[10px] mt-1">{errors[`items.${key}.status`]}</p>
+                                                 )}
+                                             </div>
+                                         </div>
 
-                                            {/* Checklist check controls depending on type */}
-                                            <div className="flex items-center gap-4 mt-2">
-                                                <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer select-none">
-                                                    <input
-                                                        type="radio"
-                                                        name={`status_${key}`}
-                                                        checked={state.status === 'checked'}
-                                                        onChange={() => handleItemChange(key, 'status', 'checked')}
-                                                        className="text-[#00ADB5] focus:ring-[#00ADB5]"
-                                                    />
-                                                    OK / Sesuai
-                                                </label>
-                                                <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer select-none">
-                                                    <input
-                                                        type="radio"
-                                                        name={`status_${key}`}
-                                                        checked={state.status === 'cross'}
-                                                        onChange={() => handleItemChange(key, 'status', 'cross')}
-                                                        className="text-[#00ADB5] focus:ring-[#00ADB5]"
-                                                    />
-                                                    NG / Perlu Perbaikan
-                                                </label>
-                                            </div>
-                                        </div>
+                                         <div className="w-full md:w-80 space-y-3">
+                                             {item[2] === 'select' ? (
+                                                 <div className="w-full">
+                                                     <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Pilihan Nilai</label>
+                                                     <select
+                                                         value={state.kondisi || ''}
+                                                         onChange={(e) => handleItemChange(key, 'kondisi', e.target.value)}
+                                                         className="w-full border-gray-300 rounded-md text-xs p-1.5 bg-white focus:border-[#00ADB5] focus:ring focus:ring-[#00ADB5]/20 outline-none"
+                                                     >
+                                                         <option value="">Pilih...</option>
+                                                         {item[3].map((opt, oIdx) => (
+                                                             <option key={oIdx} value={opt}>{opt}</option>
+                                                         ))}
+                                                     </select>
+                                                     {errors[`items.${key}.kondisi`] && (
+                                                         <p className="text-red-500 text-[10px] mt-1">{errors[`items.${key}.kondisi`]}</p>
+                                                     )}
+                                                 </div>
+                                             ) : (
+                                                 <Input
+                                                     label="Catatan Kondisi"
+                                                     placeholder="Kondisi riil lapangan"
+                                                     className="text-xs p-1.5"
+                                                     value={state.kondisi || ''}
+                                                     onChange={(e) => handleItemChange(key, 'kondisi', e.target.value)}
+                                                 />
+                                             )}
 
-                                        <div className="w-full md:w-80 space-y-3">
-                                            {item[2] === 'select' ? (
-                                                <div className="w-full">
-                                                    <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Pilihan Nilai</label>
-                                                    <select
-                                                        value={state.kondisi || ''}
-                                                        onChange={(e) => handleItemChange(key, 'kondisi', e.target.value)}
-                                                        className="w-full border-gray-300 rounded-md text-xs p-1.5 bg-white focus:border-[#00ADB5] focus:ring focus:ring-[#00ADB5]/20 outline-none"
-                                                    >
-                                                        <option value="">Pilih...</option>
-                                                        {item[3].map((opt, oIdx) => (
-                                                            <option key={oIdx} value={opt}>{opt}</option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-                                            ) : (
-                                                <Input
-                                                    label="Catatan Kondisi"
-                                                    placeholder="Kondisi riil lapangan"
-                                                    className="text-xs p-1.5"
-                                                    value={state.kondisi || ''}
-                                                    onChange={(e) => handleItemChange(key, 'kondisi', e.target.value)}
-                                                />
-                                            )}
-
-                                            <div>
-                                                <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">
-                                                    Unggah Foto
-                                                </label>
-                                                <ImageUpload
-                                                    compact={true}
-                                                    multiple={true}
-                                                    value={data.photos[key] || []}
-                                                    onChange={(files) => setData('photos', {
-                                                        ...data.photos,
-                                                        [key]: files
-                                                    })}
-                                                />
-                                            </div>
+                                             <div>
+                                                 <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">
+                                                     Unggah Foto
+                                                 </label>
+                                                 <ImageUpload
+                                                     compact={true}
+                                                     multiple={true}
+                                                     value={data.photos[key] || []}
+                                                     onChange={(files) => setData('photos', {
+                                                         ...data.photos,
+                                                         [key]: files
+                                                     })}
+                                                 />
+                                                 {errors[`photos.${key}`] && (
+                                                     <p className="text-red-500 text-[10px] mt-1">{errors[`photos.${key}`]}</p>
+                                                 )}
+                                             </div>
                                         </div>
                                     </div>
                                 );
