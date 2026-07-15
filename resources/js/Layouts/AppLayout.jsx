@@ -128,44 +128,18 @@ export default function AppLayout({ children }) {
                         }`}
                 >
                     <div className="flex-grow py-4 overflow-y-auto px-3 space-y-1">
-                        {/* Dashboard links based on role */}
                         {hasRole(['admin', 'staff_cme']) && (
-                            <Link href="/cme-dashboard" className={`${navItemStyle} ${usePage().url === '/cme-dashboard' ? activeClass : inactiveClass}`}>
+                            <Link href="/dashboard" className={`${navItemStyle} ${usePage().url === '/dashboard' ? activeClass : inactiveClass}`}>
                                 <LayoutDashboard className="h-4 w-4 stroke-[1.5]" />
                                 Dashboard CME
                             </Link>
                         )}
 
                         {hasRole(['admin', 'surveyor', 'staff_cme', 'vendor']) && (
-                            <div>
-                                <button
-                                    onClick={() => toggleMenu('survey')}
-                                    className={`w-full flex items-center justify-between ${navItemStyle} ${inactiveClass}`}
-                                >
-                                    <span className="flex items-center gap-3">
-                                        <ClipboardList className="h-4 w-4 stroke-[1.5]" />
-                                        Survey ODC
-                                    </span>
-                                    {openMenus['survey'] ? (
-                                        <ChevronDown className="h-3.5 w-3.5 text-gray-500" />
-                                    ) : (
-                                        <ChevronRight className="h-3.5 w-3.5 text-gray-500" />
-                                    )}
-                                </button>
-                                {openMenus['survey'] && (
-                                    <div className="pl-6 pr-2 py-1 space-y-1">
-                                        <Link href="/dashboard" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/dashboard' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            Dashboard Survey
-                                        </Link>
-                                        <Link href="/survey/baru" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/survey/baru' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            Survey Baru
-                                        </Link>
-                                        <Link href="/survey" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/survey' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            Riwayat Survey
-                                        </Link>
-                                    </div>
-                                )}
-                            </div>
+                            <Link href="/survey" className={`${navItemStyle} ${usePage().url.startsWith('/survey') ? activeClass : inactiveClass}`}>
+                                <ClipboardList className="h-4 w-4 stroke-[1.5]" />
+                                Survey ODC
+                            </Link>
                         )}
 
                         {hasRole(['admin', 'vendor', 'staff_cme']) && (

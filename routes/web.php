@@ -20,12 +20,11 @@ Route::middleware('custom_auth')->group(function () {
     Route::post('/api/upload-temp', [App\Http\Controllers\MediaController::class, 'uploadTemp']);
 
     // Dashboards
-    Route::get('/cme-dashboard', [DashboardController::class, 'cmeDashboard']);
-    Route::get('/dashboard', [DashboardController::class, 'surveyDashboard']);
+    Route::get('/dashboard', [DashboardController::class, 'cmeDashboard']);
     Route::get('/atp-dashboard', [DashboardController::class, 'atpDashboard']);
 
     // ODC Survey Module
-    Route::get('/survey', [SurveyController::class, 'index']);
+    Route::get('/survey', [DashboardController::class, 'surveyDashboard']);
     Route::get('/survey/baru', [SurveyController::class, 'create']);
     Route::post('/survey/baru', [SurveyController::class, 'store']);
     Route::get('/survey/custom', [SurveyController::class, 'custom']);

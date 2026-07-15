@@ -17,7 +17,7 @@ class LoginController extends Controller
     {
         if ($request->session()->has('user_id')) {
             $role = $request->session()->get('role');
-            $target = ($role === 'admin' || $role === 'staff_cme') ? '/cme-dashboard' : '/dashboard';
+            $target = ($role === 'admin' || $role === 'staff_cme') ? '/dashboard' : '/survey';
             return redirect($target);
         }
 
@@ -54,7 +54,7 @@ class LoginController extends Controller
                 'device' => $device,
             ]);
 
-            $target = ($user->role === 'admin' || $user->role === 'staff_cme') ? '/cme-dashboard' : '/dashboard';
+            $target = ($user->role === 'admin' || $user->role === 'staff_cme') ? '/dashboard' : '/survey';
             return redirect($target)->with('success', 'Selamat datang kembali, ' . $username . '!');
         }
 

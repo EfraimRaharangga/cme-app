@@ -16,7 +16,7 @@ class DashboardController extends Controller
     {
         $role = $request->session()->get('role');
         if ($role !== 'admin' && $role !== 'staff_cme') {
-            return redirect('/dashboard');
+            return redirect('/survey');
         }
 
         $userId = $request->session()->get('user_id');
@@ -83,7 +83,7 @@ class DashboardController extends Controller
         $userId = $request->session()->get('user_id');
 
         if ($role !== 'admin' && $role !== 'staff_cme' && $role !== 'vendor') {
-            return redirect('/dashboard');
+            return redirect('/survey');
         }
 
         $query = AtpRecord::query();

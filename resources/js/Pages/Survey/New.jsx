@@ -205,12 +205,6 @@ export default function New({ defaultTemplate, templates }) {
                         Input site checklist, koordinat lokasi, dan foto manual instruksi.
                     </p>
                 </div>
-                <Link
-                    href="/survey"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-black transition"
-                >
-                    &larr; Riwayat
-                </Link>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">

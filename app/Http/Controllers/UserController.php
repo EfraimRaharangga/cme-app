@@ -17,7 +17,7 @@ class UserController extends Controller
     {
         $role = $request->session()->get('role');
         if ($role !== 'admin') {
-            return redirect('/dashboard');
+            return redirect($role === 'staff_cme' ? '/dashboard' : '/survey');
         }
 
         $users = User::orderBy('id')->get();
@@ -29,7 +29,7 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $role = $request->session()->get('role');
-        if ($role !== 'admin') return redirect('/dashboard');
+        if ($role !== 'admin') return redirect($role === 'staff_cme' ? '/dashboard' : '/survey');
 
         User::create([
             'username' => trim($request->input('username')),
@@ -43,7 +43,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, $id)
     {
         $role = $request->session()->get('role');
-        if ($role !== 'admin') return redirect('/dashboard');
+        if ($role !== 'admin') return redirect($role === 'staff_cme' ? '/dashboard' : '/survey');
 
         $user = User::findOrFail($id);
 
@@ -64,7 +64,7 @@ class UserController extends Controller
         $role = $request->session()->get('role');
         $currentUserId = $request->session()->get('user_id');
 
-        if ($role !== 'admin') return redirect('/dashboard');
+        if ($role !== 'admin') return redirect($role === 'staff_cme' ? '/dashboard' : '/survey');
 
         if (intval($id) === intval($currentUserId)) {
             return redirect('/users')->with('error', 'Tidak dapat menghapus akun Anda sendiri!');
@@ -84,7 +84,7 @@ class UserController extends Controller
     {
         $role = $request->session()->get('role');
         if ($role !== 'admin') {
-            return redirect('/dashboard');
+            return redirect($role === 'staff_cme' ? '/dashboard' : '/survey');
         }
 
         $logs = LoginLog::orderBy('created_at', 'desc')->take(200)->get();

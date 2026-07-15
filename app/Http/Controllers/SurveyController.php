@@ -52,32 +52,7 @@ class SurveyController extends Controller
         ],
     ];
 
-    public function index(Request $request): Response
-    {
-        $role = $request->session()->get('role');
-        $userId = $request->session()->get('user_id');
-        $search = $request->input('cari');
 
-        $query = Survey::query();
-        if ($role === 'vendor') {
-            $query->where('created_by', $userId);
-        }
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_site', 'like', "%{$search}%")
-                  ->orWhere('nama_surveyor', 'like', "%{$search}%")
-                  ->orWhere('lokasi', 'like', "%{$search}%");
-            });
-        }
-
-        $surveys = $query->orderBy('tanggal_survey', 'desc')->get();
-
-        return Inertia::render('Survey/List', [
-            'surveys' => $surveys,
-            'filters' => $request->only(['cari']),
-        ]);
-    }
 
     public function create(Request $request): Response
     {
