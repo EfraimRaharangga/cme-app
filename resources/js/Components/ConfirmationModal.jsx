@@ -14,17 +14,17 @@ export default function ConfirmationModal({
     cancelText = 'Batal'
 }) {
     const icons = {
-        info: <Info className="h-6 w-6 text-[#00ADB5] stroke-[1.5]" />,
-        warning: <AlertCircle className="h-6 w-6 text-amber-500 stroke-[1.5]" />,
-        danger: <AlertCircle className="h-6 w-6 text-red-600 stroke-[1.5]" />,
-        success: <CheckCircle className="h-6 w-6 text-emerald-500 stroke-[1.5]" />
+        info: <Info className="h-6 w-6 text-primary stroke-[1.5]" />,
+        warning: <AlertCircle className="h-6 w-6 text-warning stroke-[1.5]" />,
+        danger: <AlertCircle className="h-6 w-6 text-ng stroke-[1.5]" />,
+        success: <CheckCircle className="h-6 w-6 text-ok stroke-[1.5]" />
     };
 
     const colors = {
-        info: 'border-t-4 border-[#00ADB5]',
-        warning: 'border-t-4 border-amber-500',
-        danger: 'border-t-4 border-red-600',
-        success: 'border-t-4 border-emerald-500'
+        info: 'border-t-4 border-primary',
+        warning: 'border-t-4 border-warning',
+        danger: 'border-t-4 border-ng',
+        success: 'border-t-4 border-ok'
     };
 
     return (

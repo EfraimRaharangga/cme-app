@@ -17,20 +17,20 @@ export default function Login({ status, message }) {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-body">
+        <div className="min-h-screen bg-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-body">
             <Head title="Login - Web CME" />
 
             <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-                <h2 className="text-3xl font-extrabold text-gray-900 font-headlines leading-tight">
+                <h2 className="text-3xl font-extrabold text-text font-headlines leading-tight">
                     CME App
                 </h2>
-                <p className="mt-2 text-sm text-gray-600 font-headlines">
+                <p className="mt-2 text-sm text-text/75 font-headlines">
                     Central Monitoring &amp; Evaluation
                 </p>
             </div>
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 border border-gray-200 sm:rounded-lg sm:px-10 shadow-sm">
+                <div className="bg-surface py-8 px-4 border border-border sm:rounded-lg sm:px-10 shadow-sm">
                     {/* Display session feedback alert */}
                     {message && (
                         <Alert

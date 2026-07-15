@@ -33,7 +33,7 @@ export default function Print({ survey }) {
                 <div className="flex gap-2">
                     <button
                         onClick={() => window.print()}
-                        className="px-4 py-1.5 bg-[#00ADB5] hover:bg-[#008f96] text-white text-xs font-bold uppercase tracking-wider rounded transition"
+                        className="px-4 py-1.5 bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase tracking-wider rounded transition"
                     >
                         Cetak Laporan
                     </button>
@@ -57,7 +57,7 @@ export default function Print({ survey }) {
                     </p>
                 </div>
                 <div className="text-right">
-                    <h3 className="font-bold text-sm text-[#00ADB5]">{survey.nama_site}</h3>
+                    <h3 className="font-bold text-sm text-primary">{survey.nama_site}</h3>
                     <p className="text-[9px] text-gray-400 font-mono mt-0.5">
                         ID Laporan: {survey.id} &bull; Date: {survey.tanggal_survey}
                     </p>
@@ -98,7 +98,7 @@ export default function Print({ survey }) {
             <div className="space-y-6">
                 {Object.entries(groupedItems).map(([category, items]) => (
                     <div key={category} className="break-inside-avoid">
-                        <div className="bg-gray-100 px-3 py-2 border-l-4 border-l-[#1A1A1A] font-bold text-xs uppercase tracking-wider text-gray-800 mb-2">
+                        <div className="bg-gray-100 px-3 py-2 border-l-4 border-l-primary font-bold text-xs uppercase tracking-wider text-gray-800 mb-2">
                             {category}
                         </div>
                         <table className="w-full border-collapse text-left text-[11px]">

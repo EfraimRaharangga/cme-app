@@ -20,9 +20,14 @@ The application is structured as a modern SPA-like monolithic application utiliz
 *   **Core:** React 18.x with Vite asset compilation.
 *   **Routing:** Inertia.js client-side router (SPA behavior, no page reloads).
 *   **Styling:** Tailwind CSS v4 custom color theme defined inside `@theme` tags in `resources/css/app.css`.
-    *   **Primary HSL:** `#1A1A1A` (Charcoal / Jet Black)
-    *   **Secondary HSL:** `#00ADB5` (Teal)
-    *   **Background:** `#FFFFFF` (Pure White)
+    *   **Primary (Trust):** `--color-primary: #2563EB` (Strong Blue)
+    *   **Background:** `--color-bg: #FFFFFF` (Pure White)
+    *   **Surface/Cards:** `--color-surface: #F8FAFC` (Very Light Gray)
+    *   **Text:** `--color-text: #1E293B` (Dark Slate)
+    *   **Status OK:** `--color-ok: #16A34A` (Emerald Green)
+    *   **Status NG:** `--color-ng: #DC2626` (Red)
+    *   **Status Warning:** `--color-warning: #CA8A04` (Amber)
+    *   **Border:** `--color-border: #E2E8F0` (Soft Gray)
 *   **Iconography:** `lucide-react` minimalist thin line-art icons (`stroke-[1.5]`).
 *   **Geolocation Map API:** Leaflet.js interactive maps for coordinate capture and pin placement.
 
@@ -144,9 +149,12 @@ To maintain visual cohesion, accessibility, and high performance across all view
 
 ### A. Design Tokens & Styling
 *   **Palette Enforcement:**
-    *   **Primary Charcoal (`#1A1A1A`):** Used for base text, headers, and side navigation background.
-    *   **Secondary Teal (`#00ADB5`):** Reserved for primary action buttons, hover states, active menu borders, markers, and accent colors.
-    *   **Background (`#FFFFFF`):** High contrast white workspace containers. Avoid gray backgrounds for main body containers.
+    *   **Primary Blue (`#2563EB`):** Used for brand logos, buttons, primary action triggers, active links, and focus states.
+    *   **Surface/Cards (`#F8FAFC`):** Background for cards, the sidebar panel, content wrappers, and side elements.
+    *   **Background (`#FFFFFF`):** Base screen background, table content, and dialog/modal layouts.
+    *   **Text (`#1E293B`):** Body texts, input characters, labels, and standard elements.
+    *   **Status Indicators:** Emerald Green (`#16A34A`) for OK/Success, Red (`#DC2626`) for NG/Danger, and Amber (`#CA8A04`) for Warning alerts.
+    *   **Border (`#E2E8F0`):** Soft gray divider line and grid outline structures.
 *   **Typography Hierarchy:**
     *   **Headings:** Montserrat or Inter (semi-bold/bold) with tracking-tight.
     *   **Body & Form Inputs:** Roboto or Open Sans for high readability and numeric scanability.
@@ -173,7 +181,7 @@ Ensure smooth transition timings and bounce parameters for interactive elements:
     transition={{ duration: 0.2 }}
     ```
 *   **Reusable Modals (`Modal.jsx`):** Employs standard spring physics (`type: 'spring', duration: 0.3, bounce: 0.15`) for backdrop fades and dialog scale-up/fade. Always include click-outside overlay and Escape-key listeners.
-*   **Flash Messages (`FlashMessage.jsx`):** Slide-in and slide-out spring animations positioned at the bottom-right corner.
+*   **Flash Messages (`FlashMessage.jsx`):** Slide down from the top and slide out animations positioned at the top-right corner.
 
 ### D. Asymmetrical Dashboard Layouts
 Maximize information hierarchy on large screens using a `2:1` grid system (`grid grid-cols-1 lg:grid-cols-3 gap-8`):
@@ -185,3 +193,7 @@ All action buttons rendering submits must bind a `processing` boolean:
 *   Keep the button disabled (`disabled={processing}`) to block duplicate requests.
 *   Render a revolving inline loading SVG spinner next to the text during execution.
 
+### F. Mobile-First Layout & Sidebar Overlays
+The application is designed using a mobile-first responsive layout paradigm:
+*   **Default Closed Sidebar:** The sidebar defaults to a closed state on screen widths smaller than 1024px to maximize mobile workspace.
+*   **Overlay Transition:** When toggled on mobile, the sidebar slides over the content using absolute/fixed positioning and a backdrop overlay layer (`bg-black/40` at `z-30`) instead of pushing or resizing the main container. Clicking the backdrop closes the sidebar.

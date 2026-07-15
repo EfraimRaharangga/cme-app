@@ -31,7 +31,7 @@ export default function Print({ record }) {
                 <div className="flex gap-2">
                     <button
                         onClick={() => window.print()}
-                        className="px-4 py-1.5 bg-[#00ADB5] hover:bg-[#008f96] text-white text-xs font-bold uppercase tracking-wider rounded transition"
+                        className="px-4 py-1.5 bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase tracking-wider rounded transition"
                     >
                         Cetak
                     </button>

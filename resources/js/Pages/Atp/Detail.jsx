@@ -117,13 +117,13 @@ export default function Detail({ record }) {
                 <div className="flex flex-wrap gap-2">
                     <Link
                         href={`/atp/${record.id}/edit`}
-                        className="px-3.5 py-2 bg-[#1A1A1A] hover:bg-black text-white text-xs font-bold uppercase rounded-lg transition"
+                        className="px-3.5 py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase rounded-lg transition"
                     >
                         Edit
                     </Link>
                     <Link
                         href={`/atp/${record.id}/print`}
-                        className="px-3.5 py-2 bg-[#00ADB5] hover:bg-[#008f96] text-white text-xs font-bold uppercase rounded-lg transition"
+                        className="px-3.5 py-2 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold uppercase rounded-lg transition"
                     >
                         Cetak ATP
                     </Link>
@@ -262,7 +262,7 @@ export default function Detail({ record }) {
                     <Card title="✍️ Pihak Otorisasi">
                         <div className="space-y-3.5 text-xs text-gray-700">
                             <div>
-                                <p className="font-bold text-[#00ADB5] mb-1">Pihak Pelaksana (Vendor)</p>
+                                <p className="font-bold text-primary mb-1">Pihak Pelaksana (Vendor)</p>
                                 <p className="font-semibold text-gray-900">{app.vendor_company || '-'}</p>
                                 <p className="text-gray-500 mt-0.5">{app.vendor_1_name} ({app.vendor_1_role})</p>
                             </div>
@@ -286,11 +286,11 @@ export default function Detail({ record }) {
                                 <div className="flex gap-1.5">
                                     {record.bal ? (
                                         <>
-                                            <Link href={`/atp/${record.id}/bal`} className="text-[#00ADB5] hover:underline text-xs font-semibold">Cetak</Link>
+                                            <Link href={`/atp/${record.id}/bal`} className="text-primary hover:underline text-xs font-semibold">Cetak</Link>
                                             <button onClick={() => setShowBalForm(true)} className="text-gray-500 hover:underline text-xs font-semibold">Edit</button>
                                         </>
                                     ) : (
-                                        <button onClick={() => setShowBalForm(true)} className="text-[#00ADB5] hover:underline text-xs font-semibold">+ Buat</button>
+                                        <button onClick={() => setShowBalForm(true)} className="text-primary hover:underline text-xs font-semibold">+ Buat</button>
                                     )}
                                 </div>
                             </div>
@@ -304,11 +304,11 @@ export default function Detail({ record }) {
                                 <div className="flex gap-1.5">
                                     {record.bastp ? (
                                         <>
-                                            <Link href={`/atp/${record.id}/bastp`} className="text-[#00ADB5] hover:underline text-xs font-semibold">Cetak</Link>
+                                            <Link href={`/atp/${record.id}/bastp`} className="text-primary hover:underline text-xs font-semibold">Cetak</Link>
                                             <button onClick={() => setShowBastpForm(true)} className="text-gray-500 hover:underline text-xs font-semibold">Edit</button>
                                         </>
                                     ) : (
-                                        <button onClick={() => setShowBastpForm(true)} className="text-[#00ADB5] hover:underline text-xs font-semibold">+ Buat</button>
+                                        <button onClick={() => setShowBastpForm(true)} className="text-primary hover:underline text-xs font-semibold">+ Buat</button>
                                     )}
                                 </div>
                             </div>
@@ -334,7 +334,7 @@ export default function Detail({ record }) {
                     </div>
                     <div className="grid grid-cols-2 gap-4 border-t pt-3">
                         <div>
-                            <h4 className="font-bold text-[#00ADB5] uppercase tracking-wider mb-2">Pihak I (Pelaksana)</h4>
+                            <h4 className="font-bold text-primary uppercase tracking-wider mb-2">Pihak I (Pelaksana)</h4>
                             <Input label="Nama Perusahaan" value={balForm.data.pihak1} onChange={(e) => balForm.setData('pihak1', e.target.value)} required />
                             <Input label="Nama Representative" value={balForm.data.nama1} onChange={(e) => balForm.setData('nama1', e.target.value)} required className="mt-2" />
                             <Input label="Jabatan Representative" value={balForm.data.jabatan1} onChange={(e) => balForm.setData('jabatan1', e.target.value)} required className="mt-2" />

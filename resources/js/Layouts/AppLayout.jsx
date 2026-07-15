@@ -78,42 +78,48 @@ export default function AppLayout({ children }) {
         return roles.includes(user.role);
     };
 
+    const handleLinkClick = () => {
+        if (window.innerWidth < 1024) {
+            setSidebarOpen(false);
+        }
+    };
+
     const navItemStyle = "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition duration-150 ease-in-out";
-    const activeClass = "bg-[#00ADB5]/15 text-[#00ADB5] font-semibold border-l-4 border-[#00ADB5]";
-    const inactiveClass = "text-gray-400 hover:bg-gray-800/50 hover:text-white";
+    const activeClass = "bg-primary/10 text-primary font-semibold border-l-4 border-primary";
+    const inactiveClass = "text-text/75 hover:bg-gray-100 hover:text-text";
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col font-body">
+        <div className="min-h-screen bg-bg flex flex-col font-body">
             <FlashMessage />
 
             {/* HEADER */}
-            <header className="h-14 bg-[#1A1A1A] border-b border-gray-800 text-white flex items-center justify-between px-6 sticky top-0 z-40">
+            <header className="h-14 bg-white border-b border-border text-text flex items-center justify-between px-6 sticky top-0 z-40">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={toggleSidebar}
-                        className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition"
+                        className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-text transition"
                     >
                         <Menu className="h-5 w-5 stroke-[1.5]" />
                     </button>
                     <div className="flex items-center gap-2">
                         <span className="text-lg font-bold tracking-wider font-headlines">
-                            CME <span className="text-[#00ADB5]">APP</span>
+                            CME <span className="text-primary">APP</span>
                         </span>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-4">
                     {user && (
-                        <div className="flex items-center gap-2 border-r border-gray-800 pr-4">
+                        <div className="flex items-center gap-2 border-r border-border pr-4">
                             <User className="h-4 w-4 text-gray-400 stroke-[1.5]" />
-                            <span className="text-xs text-gray-300 font-medium font-headlines">
-                                {user.username} <span className="text-gray-500">({user.role})</span>
+                            <span className="text-xs text-text font-medium font-headlines">
+                                {user.username} <span className="text-gray-400">({user.role})</span>
                             </span>
                         </div>
                     )}
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/20 text-red-400 hover:bg-red-950/40 hover:text-red-300 border border-red-900/30 text-xs font-semibold uppercase tracking-wider transition"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 border border-red-200 text-xs font-semibold uppercase tracking-wider transition"
                     >
                         <LogOut className="h-3.5 w-3.5 stroke-[1.5]" />
                         Logout
@@ -122,21 +128,29 @@ export default function AppLayout({ children }) {
             </header>
 
             <div className="flex flex-grow relative">
+                {/* Mobile Sidebar Backdrop Overlay */}
+                {sidebarOpen && (
+                    <div
+                        className="fixed inset-0 top-14 bg-black/40 z-30 lg:hidden"
+                        onClick={() => setSidebarOpen(false)}
+                    />
+                )}
+
                 {/* SIDEBAR */}
                 <aside
-                    className={`bg-[#1A1A1A] text-white border-r border-gray-800 transition-all duration-300 flex flex-col z-35 ${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden border-r-0'
+                    className={`fixed lg:static top-14 bottom-0 left-0 z-40 bg-surface border-r border-border text-text transition-all duration-300 flex flex-col ${sidebarOpen ? 'w-64 translate-x-0 lg:w-1/5 lg:shrink-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:overflow-hidden lg:border-r-0'
                         }`}
                 >
                     <div className="flex-grow py-4 overflow-y-auto px-3 space-y-1">
                         {hasRole(['admin', 'staff_cme']) && (
-                            <Link href="/dashboard" className={`${navItemStyle} ${usePage().url === '/dashboard' ? activeClass : inactiveClass}`}>
+                            <Link href="/dashboard" onClick={handleLinkClick} className={`${navItemStyle} ${usePage().url === '/dashboard' ? activeClass : inactiveClass}`}>
                                 <LayoutDashboard className="h-4 w-4 stroke-[1.5]" />
                                 Dashboard CME
                             </Link>
                         )}
 
                         {hasRole(['admin', 'surveyor', 'staff_cme', 'vendor']) && (
-                            <Link href="/survey" className={`${navItemStyle} ${usePage().url.startsWith('/survey') ? activeClass : inactiveClass}`}>
+                            <Link href="/survey" onClick={handleLinkClick} className={`${navItemStyle} ${usePage().url.startsWith('/survey') ? activeClass : inactiveClass}`}>
                                 <ClipboardList className="h-4 w-4 stroke-[1.5]" />
                                 Survey ODC
                             </Link>
@@ -160,13 +174,13 @@ export default function AppLayout({ children }) {
                                 </button>
                                 {openMenus['atp'] && (
                                     <div className="pl-6 pr-2 py-1 space-y-1">
-                                        <Link href="/atp-dashboard" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp-dashboard' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
+                                        <Link href="/atp-dashboard" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp-dashboard' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
                                             Dashboard ATP
                                         </Link>
-                                        <Link href="/atp/baru" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp/baru' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
+                                        <Link href="/atp/baru" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp/baru' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
                                             ATP Baru
                                         </Link>
-                                        <Link href="/atp" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
+                                        <Link href="/atp" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
                                             Riwayat ATP
                                         </Link>
                                     </div>
@@ -175,7 +189,7 @@ export default function AppLayout({ children }) {
                         )}
 
                         {hasRole(['admin', 'staff_cme', 'vendor']) && (
-                            <Link href="/instruction" className={`${navItemStyle} ${usePage().url.startsWith('/instruction') ? activeClass : inactiveClass}`}>
+                            <Link href="/instruction" onClick={handleLinkClick} className={`${navItemStyle} ${usePage().url.startsWith('/instruction') ? activeClass : inactiveClass}`}>
                                 <BookOpen className="h-4 w-4 stroke-[1.5]" />
                                 Panduan Teknis (SOW)
                             </Link>
@@ -199,13 +213,13 @@ export default function AppLayout({ children }) {
                                 </button>
                                 {openMenus['gudang'] && (
                                     <div className="pl-6 pr-2 py-1 space-y-1">
-                                        <Link href="/gudang" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
+                                        <Link href="/gudang" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
                                             Stok Barang
                                         </Link>
-                                        <Link href="/gudang/masuk-history" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang/masuk-history' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
+                                        <Link href="/gudang/masuk-history" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang/masuk-history' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
                                             Barang Masuk
                                         </Link>
-                                        <Link href="/gudang/keluar-history" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang/keluar-history' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
+                                        <Link href="/gudang/keluar-history" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang/keluar-history' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
                                             Barang Keluar
                                         </Link>
                                     </div>
@@ -215,12 +229,12 @@ export default function AppLayout({ children }) {
 
                         {/* Admin specific accounts management */}
                         {hasRole(['admin']) && (
-                            <div className="pt-4 mt-4 border-t border-gray-800/50 space-y-1">
-                                <Link href="/users" className={`${navItemStyle} ${usePage().url === '/users' ? activeClass : inactiveClass}`}>
+                            <div className="pt-4 mt-4 border-t border-border space-y-1">
+                                <Link href="/users" onClick={handleLinkClick} className={`${navItemStyle} ${usePage().url === '/users' ? activeClass : inactiveClass}`}>
                                     <Users className="h-4 w-4 stroke-[1.5]" />
                                     Kelola Pengguna
                                 </Link>
-                                <Link href="/users-logs" className={`${navItemStyle} ${usePage().url === '/users-logs' ? activeClass : inactiveClass}`}>
+                                <Link href="/users-logs" onClick={handleLinkClick} className={`${navItemStyle} ${usePage().url === '/users-logs' ? activeClass : inactiveClass}`}>
                                     <History className="h-4 w-4 stroke-[1.5]" />
                                     Log Aktivitas
                                 </Link>
@@ -230,7 +244,7 @@ export default function AppLayout({ children }) {
                 </aside>
 
                 {/* CONTENT AREA */}
-                <main className="flex-grow flex flex-col min-w-0 bg-white">
+                <main className={`flex-grow flex flex-col min-w-0 bg-bg transition-all duration-300 ${sidebarOpen ? 'lg:w-4/5' : 'lg:w-full'}`}>
                     <div className="flex-grow p-6 overflow-hidden">
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -246,7 +260,7 @@ export default function AppLayout({ children }) {
                     </div>
 
                     {/* FOOTER */}
-                    <footer className="h-10 bg-white border-t border-gray-100 flex items-center justify-center text-xs text-gray-500 select-none">
+                    <footer className="h-10 bg-bg border-t border-border flex items-center justify-center text-xs text-text/50 select-none">
                         &copy; {new Date().getFullYear()} PT. Integrasi Jaringan Ekosistem. All rights reserved.
                     </footer>
                 </main>

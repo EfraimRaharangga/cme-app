@@ -97,13 +97,13 @@ export default function ImageUpload({
                         />
                         {loading ? (
                             <div className="flex items-center gap-1.5 py-1 px-2 border border-gray-200 rounded bg-gray-50 text-[10px] text-gray-500 font-semibold">
-                                <Loader2 className="w-3 h-3 animate-spin text-[#00ADB5]" />
+                                <Loader2 className="w-3 h-3 animate-spin text-primary" />
                                 Mengunggah...
                             </div>
                         ) : (
                             <label
                                 htmlFor={`file-upload-compact-${uniqueId}`}
-                                className="inline-flex items-center gap-1 py-1 px-2 border border-dashed border-[#00ADB5] hover:bg-[#00ADB5]/5 rounded text-[10px] text-[#00ADB5] font-semibold cursor-pointer transition"
+                                className="inline-flex items-center gap-1 py-1 px-2 border border-dashed border-primary hover:bg-primary/5 rounded text-[10px] text-primary font-semibold cursor-pointer transition"
                             >
                                 <UploadCloud className="w-3.5 h-3.5" />
                                 {value.length > 0 ? 'Tambah Foto' : 'Unggah Foto'}
@@ -129,7 +129,7 @@ export default function ImageUpload({
                                 <button
                                     type="button"
                                     onClick={() => setPreviewIndex(null)}
-                                    className="absolute top-4 right-4 bg-[#1A1A1A] hover:bg-[#00ADB5] text-white p-2 rounded-full shadow-md transition-all duration-200 hover:scale-105 flex items-center justify-center"
+                                    className="absolute top-4 right-4 bg-primary hover:bg-primary/80 text-white p-2 rounded-full shadow-md transition-all duration-200 hover:scale-105 flex items-center justify-center"
                                 >
                                     <X className="w-4 h-4 stroke-[1.5]" />
                                 </button>
@@ -161,7 +161,7 @@ export default function ImageUpload({
                         {value.map((img, idx) => (
                             <div key={idx} className="relative aspect-video rounded-lg border border-gray-200 overflow-hidden bg-white shadow group">
                                 <img src={img.url} className="w-full h-full object-cover" alt="Preview" />
-                                <div className="absolute inset-0 bg-[#1A1A1A]/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3">
+                                <div className="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3">
                                     <button
                                         type="button"
                                         onClick={() => setPreviewIndex(idx)}
@@ -193,13 +193,13 @@ export default function ImageUpload({
                             />
                             {loading ? (
                                 <button type="button" disabled className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-500 font-bold bg-gray-50">
-                                    <Loader2 className="w-4 h-4 animate-spin text-[#00ADB5]" />
+                                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
                                     Memproses...
                                 </button>
                             ) : (
                                 <label
                                     htmlFor={`file-upload-large-${uniqueId}`}
-                                    className="inline-flex items-center gap-2 px-4 py-2 border border-dashed border-[#00ADB5] hover:bg-[#00ADB5]/5 rounded-lg text-sm text-[#00ADB5] font-bold cursor-pointer transition"
+                                    className="inline-flex items-center gap-2 px-4 py-2 border border-dashed border-primary hover:bg-primary/5 rounded-lg text-sm text-primary font-bold cursor-pointer transition"
                                 >
                                     <UploadCloud className="w-4 h-4" />
                                     Tambah Foto Lainnya
@@ -222,18 +222,18 @@ export default function ImageUpload({
                     />
                     <label
                         htmlFor={`file-upload-large-${uniqueId}`}
-                        className="flex flex-col items-center justify-center w-full h-64 bg-white hover:bg-gray-50 border border-dashed border-gray-300 hover:border-[#00ADB5] rounded-xl cursor-pointer transition group"
+                        className="flex flex-col items-center justify-center w-full h-64 bg-white hover:bg-gray-50 border border-dashed border-gray-300 hover:border-primary rounded-xl cursor-pointer transition group"
                     >
                         {loading ? (
                             <div className="flex flex-col items-center justify-center text-gray-500">
-                                <Loader2 className="w-8 h-8 animate-spin text-[#00ADB5] mb-2" />
+                                <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
                                 <p className="text-sm font-semibold">Mengunggah file...</p>
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                                <UploadCloud className="w-10 h-10 text-gray-400 group-hover:text-[#00ADB5] mb-3 transition" />
+                                <UploadCloud className="w-10 h-10 text-gray-400 group-hover:text-primary mb-3 transition" />
                                 <p className="mb-2 text-sm text-gray-600">
-                                    <span className="font-semibold text-[#00ADB5]">Click to upload</span> or drag and drop
+                                    <span className="font-semibold text-primary">Click to upload</span> or drag and drop
                                 </p>
                                 <p className="text-xs text-gray-400">
                                     PNG, JPG, JPEG or WEBP (MAX. 2MB)
@@ -261,7 +261,7 @@ export default function ImageUpload({
                             <button
                                 type="button"
                                 onClick={() => setPreviewIndex(null)}
-                                className="absolute top-4 right-4 bg-[#1A1A1A] hover:bg-[#00ADB5] text-white p-2 rounded-full shadow-md transition-all duration-200 hover:scale-105 flex items-center justify-center"
+                                className="absolute top-4 right-4 bg-primary hover:bg-primary/80 text-white p-2 rounded-full shadow-md transition-all duration-200 hover:scale-105 flex items-center justify-center"
                             >
                                 <X className="w-4 h-4 stroke-[1.5]" />
                             </button>

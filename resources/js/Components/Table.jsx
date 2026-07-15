@@ -7,9 +7,9 @@ export default function Table({
     ...props
 }) {
     return (
-        <div className={`overflow-x-auto w-full border border-gray-200 rounded-lg ${className}`}>
-            <table {...props} className="min-w-full divide-y divide-gray-200 text-sm text-left">
-                <thead className="bg-[#1A1A1A] text-white">
+        <div className={`overflow-x-auto w-full border border-border rounded-lg ${className}`}>
+            <table {...props} className="min-w-full divide-y divide-border text-sm text-left">
+                <thead className="bg-surface text-text border-b border-border">
                     <tr>
                         {headers.map((head, idx) => (
                             <th
@@ -22,7 +22,7 @@ export default function Table({
                         ))}
                     </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-100">
+                <tbody className="bg-white divide-y divide-border">
                     {children}
                 </tbody>
             </table>

@@ -25,7 +25,7 @@ export default function PrintBastp({ record }) {
                 <div className="flex gap-2">
                     <button
                         onClick={() => window.print()}
-                        className="px-4 py-1.5 bg-[#00ADB5] hover:bg-[#008f96] text-white text-xs font-bold uppercase tracking-wider rounded transition"
+                        className="px-4 py-1.5 bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase tracking-wider rounded transition"
                     >
                         Cetak BASTP
                     </button>
@@ -109,7 +109,7 @@ export default function PrintBastp({ record }) {
             {/* DUAL SIGNATURE */}
             <div className="grid grid-cols-2 gap-12 pt-8 text-center text-xs">
                 <div className="flex flex-col justify-between h-32 border border-gray-150 p-4 rounded bg-gray-50/50">
-                    <span className="font-bold uppercase tracking-wider text-[9px] text-[#00ADB5]">PIHAK PERTAMA</span>
+                    <span className="font-bold uppercase tracking-wider text-[9px] text-primary">PIHAK PERTAMA</span>
                     <span className="font-bold text-gray-900">{bastp.p1_nama || '........................'}</span>
                     <div className="h-10" />
                     <div>

@@ -39,10 +39,10 @@ export default function FlashMessage() {
         <AnimatePresence>
             {visible && message && (
                 <motion.div
-                    className="fixed bottom-4 right-4 z-50 max-w-sm w-full"
-                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                    className="fixed top-16 right-4 z-50 max-w-xs sm:max-w-sm w-[calc(100%-2rem)] sm:w-80"
+                    initial={{ opacity: 0, y: -50, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                    exit={{ opacity: 0, y: -20, scale: 0.95 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                 >
                     <Alert variant={type} message={message} className="shadow-lg border-opacity-70 bg-white" />

@@ -71,13 +71,13 @@ export default function Detail({ survey }) {
                 <div className="flex gap-2">
                     <Link
                         href={`/survey/${survey.id}/edit`}
-                        className="inline-flex items-center px-4 py-2 bg-[#1A1A1A] hover:bg-black text-white text-xs font-bold uppercase tracking-wider rounded-lg transition"
+                        className="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition"
                     >
                         Edit
                     </Link>
                     <Link
                         href={`/survey/${survey.id}/print`}
-                        className="inline-flex items-center px-4 py-2 bg-[#00ADB5] hover:bg-[#008f96] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition"
+                        className="inline-flex items-center px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider rounded-lg transition"
                     >
                         Cetak (A4)
                     </Link>

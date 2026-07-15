@@ -21,7 +21,7 @@ export default function PasswordField({
                     {...props}
                     type={visible ? 'text' : 'password'}
                     className={
-                        `w-full border-gray-300 rounded-md shadow-sm text-sm p-2 pr-10 focus:border-[#00ADB5] focus:ring focus:ring-[#00ADB5]/20 outline-none transition ` +
+                        `w-full border-border rounded-md shadow-sm text-sm p-2 pr-10 focus:border-primary focus:ring focus:ring-primary/20 outline-none transition ` +
                         (error ? 'border-red-500 focus:border-red-500' : '') +
                         ` ` +
                         className
@@ -30,7 +30,7 @@ export default function PasswordField({
                 <button
                     type="button"
                     onClick={() => setVisible(!visible)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-[#00ADB5]"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary"
                 >
                     {visible ? (
                         <EyeOff className="h-4 w-4 stroke-[1.5]" />

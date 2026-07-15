@@ -138,14 +138,14 @@ export default function Stock({ items, categories, totals, filters }) {
                 <div className="flex flex-wrap gap-2">
                     <button
                         onClick={() => setShowMasukModal(true)}
-                        className="inline-flex items-center gap-1 px-4 py-2 bg-[#00ADB5] hover:bg-[#008f96] text-white text-xs font-bold uppercase rounded-lg transition"
+                        className="inline-flex items-center gap-1 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase rounded-lg transition"
                     >
                         <ArrowUpRight className="h-4 w-4 stroke-[1.5]" />
                         Barang Masuk (BM)
                     </button>
                     <button
                         onClick={() => setShowKeluarModal(true)}
-                        className="inline-flex items-center gap-1 px-4 py-2 bg-gray-900 hover:bg-black text-white text-xs font-bold uppercase rounded-lg transition"
+                        className="inline-flex items-center gap-1 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold uppercase rounded-lg transition"
                     >
                         <ArrowDownLeft className="h-4 w-4 stroke-[1.5]" />
                         Barang Keluar (BK)
@@ -155,13 +155,13 @@ export default function Stock({ items, categories, totals, filters }) {
 
             {/* WAREHOUSE METRIC CARDS */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <Card className="border-l-4 border-l-[#00ADB5] p-2">
+                <Card className="border-l-4 border-l-primary p-2">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-semibold text-gray-400 uppercase">Kategori Aktif</p>
                             <h4 className="text-xl font-black text-gray-900 mt-0.5 font-headlines">{categories.length}</h4>
                         </div>
-                        <button onClick={() => setShowKatModal(true)} className="p-1.5 bg-[#00ADB5]/15 text-[#00ADB5] rounded hover:bg-[#00ADB5]/30 transition text-xs font-bold">
+                        <button onClick={() => setShowKatModal(true)} className="p-1.5 bg-primary/15 text-primary rounded hover:bg-primary/30 transition text-xs font-bold">
                             + Kat
                         </button>
                     </div>
@@ -177,12 +177,12 @@ export default function Stock({ items, categories, totals, filters }) {
                         </button>
                     </div>
                 </Card>
-                <Card className="border-l-4 border-l-[#00ADB5] p-2 col-span-2">
+                <Card className="border-l-4 border-l-primary p-2 col-span-2">
                     <div className="flex justify-between items-center text-xs">
                         <span className="font-semibold text-gray-500 uppercase">Akses Cepat Log:</span>
                         <div className="flex gap-2">
-                            <Link href="/gudang/masuk-history" className="text-[#00ADB5] hover:underline font-bold">Riwayat Masuk &rarr;</Link>
-                            <Link href="/gudang/keluar-history" className="text-gray-800 hover:underline font-bold">Riwayat Keluar &rarr;</Link>
+                            <Link href="/gudang/masuk-history" className="text-primary hover:underline font-bold">Riwayat Masuk &rarr;</Link>
+                            <Link href="/gudang/keluar-history" className="text-text hover:underline font-bold">Riwayat Keluar &rarr;</Link>
                         </div>
                     </div>
                 </Card>
