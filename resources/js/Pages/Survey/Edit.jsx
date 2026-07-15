@@ -175,7 +175,7 @@ export default function Edit({ survey, templates }) {
     });
 
     return (
-        <AppLayout>
+        <>
             <Head title={`Edit Survey - ${survey.nama_site}`} />
 
             <div className="mb-6 flex justify-between items-center">
@@ -366,6 +366,9 @@ export default function Edit({ survey, templates }) {
                     </Link>
                 </div>
             </form>
-        </AppLayout>
+        </>
     );
 }
+
+
+Edit.layout = page => <AppLayout children={page} />;

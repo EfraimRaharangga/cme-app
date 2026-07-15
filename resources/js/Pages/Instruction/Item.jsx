@@ -55,7 +55,7 @@ export default function Item({ kategori, spec, sow, images }) {
     const activeSow = sow || defaultSow[kategori] || [];
 
     return (
-        <AppLayout>
+        <>
             <Head title={`Panduan ${kategori} - Web CME`} />
 
             <div className="mb-6 flex justify-between items-center">
@@ -123,6 +123,9 @@ export default function Item({ kategori, spec, sow, images }) {
                     </Card>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+
+Item.layout = page => <AppLayout children={page} />;

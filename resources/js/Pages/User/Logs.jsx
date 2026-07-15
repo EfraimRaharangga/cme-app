@@ -6,7 +6,7 @@ import Table from '../../Components/Table';
 
 export default function Logs({ logs }) {
     return (
-        <AppLayout>
+        <>
             <Head title="Log Aktivitas - Web CME" />
 
             <div className="mb-6">
@@ -63,6 +63,9 @@ export default function Logs({ logs }) {
                     )}
                 </Table>
             </Card>
-        </AppLayout>
+        </>
     );
 }
+
+
+Logs.layout = page => <AppLayout children={page} />;

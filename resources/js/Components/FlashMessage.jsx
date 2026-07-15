@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Alert from './Alert';
 
 export default function FlashMessage() {
@@ -34,11 +35,19 @@ export default function FlashMessage() {
         }
     }, [visible]);
 
-    if (!visible || !message) return null;
-
     return (
-        <div className="fixed bottom-4 right-4 z-50 max-w-sm w-full animate-slide-in">
-            <Alert variant={type} message={message} className="shadow-lg border-opacity-70 bg-white" />
-        </div>
+        <AnimatePresence>
+            {visible && message && (
+                <motion.div
+                    className="fixed bottom-4 right-4 z-50 max-w-sm w-full"
+                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                >
+                    <Alert variant={type} message={message} className="shadow-lg border-opacity-70 bg-white" />
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 }

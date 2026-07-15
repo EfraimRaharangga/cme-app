@@ -21,7 +21,7 @@ export default function List({ surveys, filters }) {
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title="Riwayat Survey - Web CME" />
 
             <div className="mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
@@ -114,6 +114,9 @@ export default function List({ surveys, filters }) {
                     )}
                 </Table>
             </Card>
-        </AppLayout>
+        </>
     );
 }
+
+
+List.layout = page => <AppLayout children={page} />;

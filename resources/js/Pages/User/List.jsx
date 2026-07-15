@@ -68,7 +68,7 @@ export default function List({ users }) {
     ];
 
     return (
-        <AppLayout>
+        <>
             <Head title="Kelola Pengguna - Web CME" />
 
             <div className="mb-6">
@@ -193,6 +193,9 @@ export default function List({ users }) {
                     </Card>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+
+List.layout = page => <AppLayout children={page} />;

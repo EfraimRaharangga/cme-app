@@ -193,7 +193,7 @@ export default function Edit({ record, templates }) {
     const itemCatatan = data.hasil_json?.catatan || {};
 
     return (
-        <AppLayout>
+        <>
             <Head title={`Edit ATP - ${record.nama_site}`} />
 
             <div className="mb-6 flex justify-between items-center">
@@ -473,6 +473,9 @@ export default function Edit({ record, templates }) {
                     </Link>
                 </div>
             </form>
-        </AppLayout>
+        </>
     );
 }
+
+
+Edit.layout = page => <AppLayout children={page} />;

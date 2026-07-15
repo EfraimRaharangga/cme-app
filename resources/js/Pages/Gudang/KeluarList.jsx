@@ -15,7 +15,7 @@ export default function KeluarList({ transactions, filters }) {
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title="Riwayat Barang Keluar - Web CME" />
 
             <div className="mb-6 flex justify-between items-center">
@@ -83,6 +83,9 @@ export default function KeluarList({ transactions, filters }) {
                     )}
                 </Table>
             </Card>
-        </AppLayout>
+        </>
     );
 }
+
+
+KeluarList.layout = page => <AppLayout children={page} />;

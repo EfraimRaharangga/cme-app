@@ -4,14 +4,28 @@ import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Input from '../../Components/Input';
 import Button from '../../Components/Button';
+import ConfirmationModal from '../../Components/ConfirmationModal';
 
 export default function Custom({ defaultTemplate, templates }) {
     const [templateTitle, setTemplateTitle] = useState('');
+    const [confirmModal, setConfirmModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'info',
+        onConfirm: null
+    });
 
     const handleSaveTemplate = (e) => {
         e.preventDefault();
         if (!templateTitle) {
-            alert('Judul template harus diisi!');
+            setConfirmModal({
+                isOpen: true,
+                title: 'Judul Diperlukan',
+                message: 'Judul template harus diisi!',
+                type: 'warning',
+                onConfirm: null
+            });
             return;
         }
 
@@ -22,13 +36,17 @@ export default function Custom({ defaultTemplate, templates }) {
     };
 
     const handleDeleteTemplate = (id) => {
-        if (confirm('Apakah Anda yakin ingin menghapus template ATP ini?')) {
-            router.delete(`/atp/custom/${id}`);
-        }
+        setConfirmModal({
+            isOpen: true,
+            title: 'Hapus Template ATP',
+            message: 'Apakah Anda yakin ingin menghapus template ATP ini?',
+            type: 'danger',
+            onConfirm: () => router.delete(`/atp/custom/${id}`)
+        });
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title="Kustomisasi ATP - Web CME" />
 
             <div className="mb-6 flex justify-between items-center">
@@ -135,6 +153,18 @@ export default function Custom({ defaultTemplate, templates }) {
                     </Card>
                 </div>
             </div>
-        </AppLayout>
+
+            <ConfirmationModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                type={confirmModal.type}
+            />
+        </>
     );
 }
+
+
+Custom.layout = page => <AppLayout children={page} />;

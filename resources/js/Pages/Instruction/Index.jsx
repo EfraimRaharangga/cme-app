@@ -12,7 +12,7 @@ export default function Index() {
     ];
 
     return (
-        <AppLayout>
+        <>
             <Head title="Panduan Teknis (SOW) - Web CME" />
 
             <div className="mb-6">
@@ -43,6 +43,9 @@ export default function Index() {
                     </Card>
                 ))}
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+
+Index.layout = page => <AppLayout children={page} />;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Menu,
     User,
@@ -34,7 +35,7 @@ export default function AppLayout({ children }) {
             if (savedMenus !== null) {
                 setOpenMenus(JSON.parse(savedMenus));
             }
-        } catch (e) {}
+        } catch (e) { }
     }, []);
 
     // Save states to local storage
@@ -43,7 +44,7 @@ export default function AppLayout({ children }) {
         setSidebarOpen(next);
         try {
             localStorage.setItem('sidebar_open', JSON.stringify(next));
-        } catch (e) {}
+        } catch (e) { }
     };
 
     const toggleMenu = (name) => {
@@ -51,7 +52,7 @@ export default function AppLayout({ children }) {
         setOpenMenus(next);
         try {
             localStorage.setItem('sidebar_menus', JSON.stringify(next));
-        } catch (e) {}
+        } catch (e) { }
     };
 
     const handleLogout = () => {
@@ -83,8 +84,8 @@ export default function AppLayout({ children }) {
                         <Menu className="h-5 w-5 stroke-[1.5]" />
                     </button>
                     <div className="flex items-center gap-2">
-                        <span className="text-xl font-bold tracking-wider font-headlines">
-                            CME <span className="text-[#00ADB5]">SYSTEM</span>
+                        <span className="text-lg font-bold tracking-wider font-headlines">
+                            CME <span className="text-[#00ADB5]">APP</span>
                         </span>
                     </div>
                 </div>
@@ -111,9 +112,8 @@ export default function AppLayout({ children }) {
             <div className="flex flex-grow relative">
                 {/* SIDEBAR */}
                 <aside
-                    className={`bg-[#1A1A1A] text-white border-r border-gray-800 transition-all duration-300 flex flex-col z-35 ${
-                        sidebarOpen ? 'w-64' : 'w-0 overflow-hidden border-r-0'
-                    }`}
+                    className={`bg-[#1A1A1A] text-white border-r border-gray-800 transition-all duration-300 flex flex-col z-35 ${sidebarOpen ? 'w-64' : 'w-0 overflow-hidden border-r-0'
+                        }`}
                 >
                     <div className="flex-grow py-4 overflow-y-auto px-3 space-y-1">
                         {/* Dashboard links based on role */}
@@ -143,13 +143,13 @@ export default function AppLayout({ children }) {
                                 {openMenus['survey'] && (
                                     <div className="pl-6 pr-2 py-1 space-y-1">
                                         <Link href="/dashboard" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/dashboard' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            • Dashboard Survey
+                                            Dashboard Survey
                                         </Link>
                                         <Link href="/survey/baru" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/survey/baru' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            • Survey Baru
+                                            Survey Baru
                                         </Link>
                                         <Link href="/survey" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/survey' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            • Riwayat Survey
+                                            Riwayat Survey
                                         </Link>
                                     </div>
                                 )}
@@ -175,13 +175,13 @@ export default function AppLayout({ children }) {
                                 {openMenus['atp'] && (
                                     <div className="pl-6 pr-2 py-1 space-y-1">
                                         <Link href="/atp-dashboard" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp-dashboard' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            • Dashboard ATP
+                                            Dashboard ATP
                                         </Link>
                                         <Link href="/atp/baru" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp/baru' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            • ATP Baru
+                                            ATP Baru
                                         </Link>
                                         <Link href="/atp" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            • Riwayat ATP
+                                            Riwayat ATP
                                         </Link>
                                     </div>
                                 )}
@@ -214,13 +214,13 @@ export default function AppLayout({ children }) {
                                 {openMenus['gudang'] && (
                                     <div className="pl-6 pr-2 py-1 space-y-1">
                                         <Link href="/gudang" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            • Stok Barang
+                                            Stok Barang
                                         </Link>
                                         <Link href="/gudang/masuk-history" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang/masuk-history' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            • Barang Masuk
+                                            Barang Masuk
                                         </Link>
                                         <Link href="/gudang/keluar-history" className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang/keluar-history' ? 'text-[#00ADB5] font-medium' : 'text-gray-400 hover:text-white'}`}>
-                                            • Barang Keluar
+                                            Barang Keluar
                                         </Link>
                                     </div>
                                 )}
@@ -245,8 +245,18 @@ export default function AppLayout({ children }) {
 
                 {/* CONTENT AREA */}
                 <main className="flex-grow flex flex-col min-w-0 bg-white">
-                    <div className="flex-grow p-6">
-                        {children}
+                    <div className="flex-grow p-6 overflow-hidden">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={usePage().url}
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -15 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {children}
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
 
                     {/* FOOTER */}

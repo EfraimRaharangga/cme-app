@@ -21,7 +21,7 @@ export default function List({ records, filters }) {
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title="Riwayat ATP - Web CME" />
 
             <div className="mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
@@ -115,6 +115,9 @@ export default function List({ records, filters }) {
                     )}
                 </Table>
             </Card>
-        </AppLayout>
+        </>
     );
 }
+
+
+List.layout = page => <AppLayout children={page} />;

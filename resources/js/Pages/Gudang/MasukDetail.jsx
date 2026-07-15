@@ -9,7 +9,7 @@ export default function MasukDetail({ transaction }) {
     const photos = transaction.foto ? transaction.foto.split(',') : [];
 
     return (
-        <AppLayout>
+        <>
             <Head title={`Detail Masuk ${transaction.no_form} - Web CME`} />
 
             <div className="mb-6 flex justify-between items-center">
@@ -109,6 +109,9 @@ export default function MasukDetail({ transaction }) {
                     )}
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+
+MasukDetail.layout = page => <AppLayout children={page} />;

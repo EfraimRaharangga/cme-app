@@ -5,6 +5,7 @@ import Card from '../../Components/Card';
 import Table from '../../Components/Table';
 import Button from '../../Components/Button';
 import Input from '../../Components/Input';
+import Modal from '../../Components/Modal';
 
 export default function Detail({ record }) {
     const mapRef = useRef(null);
@@ -101,7 +102,7 @@ export default function Detail({ record }) {
     const itemCatatan = record.hasil_json?.catatan || {};
 
     return (
-        <AppLayout>
+        <>
             <Head title={`ATP Detail ${record.nama_site} - Web CME`} />
 
             <div className="mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
@@ -319,76 +320,69 @@ export default function Detail({ record }) {
             </div>
 
             {/* BAL DIALOG MODAL */}
-            {showBalForm && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-white rounded-lg max-w-2xl w-full p-6 space-y-4">
-                        <h3 className="font-bold text-lg text-gray-900 border-b pb-2">Buat / Edit Berita Acara Lapangan (BAL)</h3>
-                        <form onSubmit={handleSaveBal} className="space-y-4 text-xs">
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Nama Project" value={balForm.data.project} onChange={(e) => balForm.setData('project', e.target.value)} required />
-                                <Input label="Nomor PO" value={balForm.data.no_po} onChange={(e) => balForm.setData('no_po', e.target.value)} required />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Mulai Tanggal" type="date" value={balForm.data.tanggal_mulai} onChange={(e) => balForm.setData('tanggal_mulai', e.target.value)} required />
-                                <Input label="Selesai Tanggal" type="date" value={balForm.data.tanggal} onChange={(e) => balForm.setData('tanggal', e.target.value)} required />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Lokasi / Site" value={balForm.data.lokasi} onChange={(e) => balForm.setData('lokasi', e.target.value)} required />
-                                <Input label="Hasil Rekomendasi" value={balForm.data.hasil} onChange={(e) => balForm.setData('hasil', e.target.value)} />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 border-t pt-3">
-                                <div>
-                                    <h4 className="font-bold text-[#00ADB5] uppercase tracking-wider mb-2">Pihak I (Pelaksana)</h4>
-                                    <Input label="Nama Perusahaan" value={balForm.data.pihak1} onChange={(e) => balForm.setData('pihak1', e.target.value)} required />
-                                    <Input label="Nama Representative" value={balForm.data.nama1} onChange={(e) => balForm.setData('nama1', e.target.value)} required className="mt-2" />
-                                    <Input label="Jabatan Representative" value={balForm.data.jabatan1} onChange={(e) => balForm.setData('jabatan1', e.target.value)} required className="mt-2" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-gray-900 uppercase tracking-wider mb-2">Pihak II (Pengawas)</h4>
-                                    <Input label="Nama Perusahaan" value={balForm.data.pihak2} onChange={(e) => balForm.setData('pihak2', e.target.value)} required />
-                                    <Input label="Nama Representative" value={balForm.data.nama2} onChange={(e) => balForm.setData('nama2', e.target.value)} required className="mt-2" />
-                                    <Input label="Jabatan Representative" value={balForm.data.jabatan2} onChange={(e) => balForm.setData('jabatan2', e.target.value)} required className="mt-2" />
-                                </div>
-                            </div>
-                            <div className="flex gap-2 justify-end border-t pt-3">
-                                <Button type="submit" variant="secondary" processing={balForm.processing}>Simpan BAL</Button>
-                                <Button type="button" variant="outline" onClick={() => setShowBalForm(false)}>Batal</Button>
-                            </div>
-                        </form>
+            <Modal isOpen={showBalForm} onClose={() => setShowBalForm(false)} title="Buat / Edit Berita Acara Lapangan (BAL)" size="max-w-2xl">
+                <form onSubmit={handleSaveBal} className="space-y-4 text-xs">
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Nama Project" value={balForm.data.project} onChange={(e) => balForm.setData('project', e.target.value)} required />
+                        <Input label="Nomor PO" value={balForm.data.no_po} onChange={(e) => balForm.setData('no_po', e.target.value)} required />
                     </div>
-                </div>
-            )}
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Mulai Tanggal" type="date" value={balForm.data.tanggal_mulai} onChange={(e) => balForm.setData('tanggal_mulai', e.target.value)} required />
+                        <Input label="Selesai Tanggal" type="date" value={balForm.data.tanggal} onChange={(e) => balForm.setData('tanggal', e.target.value)} required />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Lokasi / Site" value={balForm.data.lokasi} onChange={(e) => balForm.setData('lokasi', e.target.value)} required />
+                        <Input label="Hasil Rekomendasi" value={balForm.data.hasil} onChange={(e) => balForm.setData('hasil', e.target.value)} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 border-t pt-3">
+                        <div>
+                            <h4 className="font-bold text-[#00ADB5] uppercase tracking-wider mb-2">Pihak I (Pelaksana)</h4>
+                            <Input label="Nama Perusahaan" value={balForm.data.pihak1} onChange={(e) => balForm.setData('pihak1', e.target.value)} required />
+                            <Input label="Nama Representative" value={balForm.data.nama1} onChange={(e) => balForm.setData('nama1', e.target.value)} required className="mt-2" />
+                            <Input label="Jabatan Representative" value={balForm.data.jabatan1} onChange={(e) => balForm.setData('jabatan1', e.target.value)} required className="mt-2" />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-gray-900 uppercase tracking-wider mb-2">Pihak II (Pengawas)</h4>
+                            <Input label="Nama Perusahaan" value={balForm.data.pihak2} onChange={(e) => balForm.setData('pihak2', e.target.value)} required />
+                            <Input label="Nama Representative" value={balForm.data.nama2} onChange={(e) => balForm.setData('nama2', e.target.value)} required className="mt-2" />
+                            <Input label="Jabatan Representative" value={balForm.data.jabatan2} onChange={(e) => balForm.setData('jabatan2', e.target.value)} required className="mt-2" />
+                        </div>
+                    </div>
+                    <div className="flex gap-2 justify-end border-t pt-3">
+                        <Button type="submit" variant="secondary" processing={balForm.processing}>Simpan BAL</Button>
+                        <Button type="button" variant="outline" onClick={() => setShowBalForm(false)}>Batal</Button>
+                    </div>
+                </form>
+            </Modal>
 
             {/* BASTP DIALOG MODAL */}
-            {showBastpForm && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-white rounded-lg max-w-2xl w-full p-6 space-y-4">
-                        <h3 className="font-bold text-lg text-gray-900 border-b pb-2">Buat / Edit BASTP (BA Serah Terima Pekerjaan)</h3>
-                        <form onSubmit={handleSaveBastp} className="space-y-4 text-xs">
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Nama Pihak I (Pelaksana)" value={bastpForm.data.p1_nama} onChange={(e) => bastpForm.setData('p1_nama', e.target.value)} required />
-                                <Input label="Alamat Pihak I" value={bastpForm.data.p1_alamat} onChange={(e) => bastpForm.setData('p1_alamat', e.target.value)} required />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Nama Pihak II (Pemberi Kerja)" value={bastpForm.data.p2_nama} onChange={(e) => bastpForm.setData('p2_nama', e.target.value)} required />
-                                <Input label="Jabatan Pihak II" value={bastpForm.data.p2_jabatan} onChange={(e) => bastpForm.setData('p2_jabatan', e.target.value)} required />
-                            </div>
-                            <div className="space-y-3">
-                                <Input label="Alamat Pihak II" value={bastpForm.data.p2_alamat} onChange={(e) => bastpForm.setData('p2_alamat', e.target.value)} required />
-                                <Input label="Nama Pekerjaan (BASTP)" value={bastpForm.data.pekerjaan} onChange={(e) => bastpForm.setData('pekerjaan', e.target.value)} required />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 border-t pt-3">
-                                <Input label="Mengetahui Pihak I (Nama/Jabatan)" value={bastpForm.data.mengetahui1} onChange={(e) => bastpForm.setData('mengetahui1', e.target.value)} placeholder="Nama Pemeriksa I" />
-                                <Input label="Mengetahui Pihak II (Nama/Jabatan)" value={bastpForm.data.mengetahui2} onChange={(e) => bastpForm.setData('mengetahui2', e.target.value)} placeholder="Nama Pemeriksa II" />
-                            </div>
-                            <div className="flex gap-2 justify-end border-t pt-3">
-                                <Button type="submit" variant="secondary" processing={bastpForm.processing}>Simpan BASTP</Button>
-                                <Button type="button" variant="outline" onClick={() => setShowBastpForm(false)}>Batal</Button>
-                            </div>
-                        </form>
+            <Modal isOpen={showBastpForm} onClose={() => setShowBastpForm(false)} title="Buat / Edit BASTP (BA Serah Terima Pekerjaan)" size="max-w-2xl">
+                <form onSubmit={handleSaveBastp} className="space-y-4 text-xs">
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Nama Pihak I (Pelaksana)" value={bastpForm.data.p1_nama} onChange={(e) => bastpForm.setData('p1_nama', e.target.value)} required />
+                        <Input label="Alamat Pihak I" value={bastpForm.data.p1_alamat} onChange={(e) => bastpForm.setData('p1_alamat', e.target.value)} required />
                     </div>
-                </div>
-            )}
-        </AppLayout>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Nama Pihak II (Pemberi Kerja)" value={bastpForm.data.p2_nama} onChange={(e) => bastpForm.setData('p2_nama', e.target.value)} required />
+                        <Input label="Jabatan Pihak II" value={bastpForm.data.p2_jabatan} onChange={(e) => bastpForm.setData('p2_jabatan', e.target.value)} required />
+                    </div>
+                    <div className="space-y-3">
+                        <Input label="Alamat Pihak II" value={bastpForm.data.p2_alamat} onChange={(e) => bastpForm.setData('p2_alamat', e.target.value)} required />
+                        <Input label="Nama Pekerjaan (BASTP)" value={bastpForm.data.pekerjaan} onChange={(e) => bastpForm.setData('pekerjaan', e.target.value)} required />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 border-t pt-3">
+                        <Input label="Mengetahui Pihak I (Nama/Jabatan)" value={bastpForm.data.mengetahui1} onChange={(e) => bastpForm.setData('mengetahui1', e.target.value)} placeholder="Nama Pemeriksa I" />
+                        <Input label="Mengetahui Pihak II (Nama/Jabatan)" value={bastpForm.data.mengetahui2} onChange={(e) => bastpForm.setData('mengetahui2', e.target.value)} placeholder="Nama Pemeriksa II" />
+                    </div>
+                    <div className="flex gap-2 justify-end border-t pt-3">
+                        <Button type="submit" variant="secondary" processing={bastpForm.processing}>Simpan BASTP</Button>
+                        <Button type="button" variant="outline" onClick={() => setShowBastpForm(false)}>Batal</Button>
+                    </div>
+                </form>
+            </Modal>
+        </>
     );
 }
+
+
+Detail.layout = page => <AppLayout children={page} />;

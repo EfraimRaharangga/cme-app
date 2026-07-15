@@ -21,29 +21,12 @@ export default function Login({ status, message }) {
             <Head title="Login - Web CME" />
 
             <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-                <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-[#00ADB5]/10 text-[#00ADB5] mb-4">
-                    <svg
-                        className="h-6 w-6 stroke-[1.5]"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
-                        />
-                    </svg>
-                </div>
                 <h2 className="text-3xl font-extrabold text-gray-900 font-headlines leading-tight">
-                    Web CME
+                    CME App
                 </h2>
                 <p className="mt-2 text-sm text-gray-600 font-headlines">
                     Central Monitoring &amp; Evaluation
                 </p>
-                <div className="mt-3 inline-block bg-[#00ADB5]/10 border border-[#00ADB5]/20 rounded-full px-4 py-1 text-xs font-semibold text-[#00ADB5] uppercase tracking-wider">
-                    Sistem Aktif
-                </div>
             </div>
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -92,7 +75,7 @@ export default function Login({ status, message }) {
                         </div>
                     </form>
 
-                    <div className="mt-6 border-t border-gray-150 pt-4 text-center">
+                    <div className="mt-6 pt-4 text-center">
                         <span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">
                             &copy; {new Date().getFullYear()} PT. Integrasi Jaringan Ekosistem
                         </span>

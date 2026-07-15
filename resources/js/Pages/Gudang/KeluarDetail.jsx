@@ -8,7 +8,7 @@ export default function KeluarDetail({ transaction }) {
     const photos = transaction.foto ? transaction.foto.split(',') : [];
 
     return (
-        <AppLayout>
+        <>
             <Head title={`Detail Keluar ${transaction.no_form} - Web CME`} />
 
             <div className="mb-6 flex justify-between items-center">
@@ -119,6 +119,9 @@ export default function KeluarDetail({ transaction }) {
                     )}
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+
+KeluarDetail.layout = page => <AppLayout children={page} />;

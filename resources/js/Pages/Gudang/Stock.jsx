@@ -6,6 +6,7 @@ import Table from '../../Components/Table';
 import Button from '../../Components/Button';
 import Input from '../../Components/Input';
 import Select from '../../Components/Select';
+import Modal from '../../Components/Modal';
 import { Package, ArrowUpRight, ArrowDownLeft, ChevronDown, ChevronRight, Plus } from 'lucide-react';
 
 export default function Stock({ items, categories, totals, filters }) {
@@ -120,7 +121,7 @@ export default function Stock({ items, categories, totals, filters }) {
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title="Stok Gudang - Web CME" />
 
             <div className="mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
@@ -273,166 +274,149 @@ export default function Stock({ items, categories, totals, filters }) {
             </div>
 
             {/* BARANG MASUK MODAL */}
-            {showMasukModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-white rounded-lg max-w-3xl w-full p-6 space-y-4">
-                        <h3 className="font-bold text-lg text-gray-900 border-b pb-2">Catat Barang Masuk (BM)</h3>
-                        <form onSubmit={handleMasukSubmit} className="space-y-4 text-xs">
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Judul Transaksi / Batch" value={masukForm.data.judul} onChange={(e) => masukForm.setData('judul', e.target.value)} placeholder="e.g. Supply MCB Q2" />
-                                <Input label="Tanggal Terima" type="date" value={masukForm.data.tanggal} onChange={(e) => masukForm.setData('tanggal', e.target.value)} required />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Supplier / Vendor Pengirim" value={masukForm.data.supplier} onChange={(e) => masukForm.setData('supplier', e.target.value)} required placeholder="PT. Supplier Metal" />
-                                <Input label="Penerima Gudang" value={masukForm.data.penerima} onChange={(e) => masukForm.setData('penerima', e.target.value)} required placeholder="Nama checker" />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Lokasi Rak / Blok" value={masukForm.data.lokasi} onChange={(e) => masukForm.setData('lokasi', e.target.value)} placeholder="Rak A1" />
-                                <div className="w-full">
-                                    <label className="block font-medium text-xs text-gray-700 mb-1">Keterangan / Memo</label>
-                                    <textarea value={masukForm.data.keterangan} onChange={(e) => masukForm.setData('keterangan', e.target.value)} className="w-full border border-gray-300 rounded p-1.5" />
-                                </div>
-                            </div>
-
-                            {/* Multiple items adding grid */}
-                            <div className="border-t pt-3 space-y-2">
-                                <div className="flex justify-between items-center mb-2">
-                                    <h4 className="font-bold text-gray-900">List Barang Masuk</h4>
-                                    <button type="button" onClick={addMasukItem} className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 rounded text-xs font-bold text-gray-700">+ Tambah Baris</button>
-                                </div>
-                                {masukForm.data.items.map((item, idx) => (
-                                    <div key={idx} className="flex gap-2 items-center bg-gray-50 p-2 rounded">
-                                        <Select label="Kategori" value={item.kategori} onChange={(e) => {
-                                            const items = [...masukForm.data.items];
-                                            items[idx].kategori = e.target.value;
-                                            masukForm.setData('items', items);
-                                        }} options={categories} placeholder="Pilih..." />
-
-                                        <Input label="Tipe / Spesifikasi" value={item.tipe} onChange={(e) => {
-                                            const items = [...masukForm.data.items];
-                                            items[idx].tipe = e.target.value;
-                                            masukForm.setData('items', items);
-                                        }} placeholder="e.g. 1P 16A" required />
-
-                                        <Input label="Jumlah" type="number" min="1" value={item.jumlah} onChange={(e) => {
-                                            const items = [...masukForm.data.items];
-                                            items[idx].jumlah = e.target.value;
-                                            masukForm.setData('items', items);
-                                        }} required className="w-20" />
-
-                                        {masukForm.data.items.length > 1 && (
-                                            <button type="button" onClick={() => removeMasukItem(idx)} className="mt-4 p-1 text-red-500 hover:text-red-700 font-bold">X</button>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="border-t pt-3 flex justify-end gap-2">
-                                <Button type="submit" variant="secondary" processing={masukForm.processing}>Simpan Transaksi</Button>
-                                <Button type="button" variant="outline" onClick={() => setShowMasukModal(false)}>Batal</Button>
-                            </div>
-                        </form>
+            <Modal isOpen={showMasukModal} onClose={() => setShowMasukModal(false)} title="Catat Barang Masuk (BM)" size="max-w-3xl">
+                <form onSubmit={handleMasukSubmit} className="space-y-4 text-xs">
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Judul Transaksi / Batch" value={masukForm.data.judul} onChange={(e) => masukForm.setData('judul', e.target.value)} placeholder="e.g. Supply MCB Q2" />
+                        <Input label="Tanggal Terima" type="date" value={masukForm.data.tanggal} onChange={(e) => masukForm.setData('tanggal', e.target.value)} required />
                     </div>
-                </div>
-            )}
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Supplier / Vendor Pengirim" value={masukForm.data.supplier} onChange={(e) => masukForm.setData('supplier', e.target.value)} required placeholder="PT. Supplier Metal" />
+                        <Input label="Penerima Gudang" value={masukForm.data.penerima} onChange={(e) => masukForm.setData('penerima', e.target.value)} required placeholder="Nama checker" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Lokasi Rak / Blok" value={masukForm.data.lokasi} onChange={(e) => masukForm.setData('lokasi', e.target.value)} placeholder="Rak A1" />
+                        <div className="w-full">
+                            <label className="block font-medium text-xs text-gray-700 mb-1">Keterangan / Memo</label>
+                            <textarea value={masukForm.data.keterangan} onChange={(e) => masukForm.setData('keterangan', e.target.value)} className="w-full border border-gray-300 rounded p-1.5" />
+                        </div>
+                    </div>
+
+                    {/* Multiple items adding grid */}
+                    <div className="border-t pt-3 space-y-2">
+                        <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-bold text-gray-900">List Barang Masuk</h4>
+                            <button type="button" onClick={addMasukItem} className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 rounded text-xs font-bold text-gray-700">+ Tambah Baris</button>
+                        </div>
+                        {masukForm.data.items.map((item, idx) => (
+                            <div key={idx} className="flex gap-2 items-center bg-gray-50 p-2 rounded">
+                                <Select label="Kategori" value={item.kategori} onChange={(e) => {
+                                    const items = [...masukForm.data.items];
+                                    items[idx].kategori = e.target.value;
+                                    masukForm.setData('items', items);
+                                }} options={categories} placeholder="Pilih..." />
+
+                                <Input label="Tipe / Spesifikasi" value={item.tipe} onChange={(e) => {
+                                    const items = [...masukForm.data.items];
+                                    items[idx].tipe = e.target.value;
+                                    masukForm.setData('items', items);
+                                }} placeholder="e.g. 1P 16A" required />
+
+                                <Input label="Jumlah" type="number" min="1" value={item.jumlah} onChange={(e) => {
+                                    const items = [...masukForm.data.items];
+                                    items[idx].jumlah = e.target.value;
+                                    masukForm.setData('items', items);
+                                }} required className="w-20" />
+
+                                {masukForm.data.items.length > 1 && (
+                                    <button type="button" onClick={() => removeMasukItem(idx)} className="mt-4 p-1 text-red-500 hover:text-red-700 font-bold">X</button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="border-t pt-3 flex justify-end gap-2">
+                        <Button type="submit" variant="secondary" processing={masukForm.processing}>Simpan Transaksi</Button>
+                        <Button type="button" variant="outline" onClick={() => setShowMasukModal(false)}>Batal</Button>
+                    </div>
+                </form>
+            </Modal>
 
             {/* BARANG KELUAR MODAL */}
-            {showKeluarModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-white rounded-lg max-w-3xl w-full p-6 space-y-4">
-                        <h3 className="font-bold text-lg text-gray-900 border-b pb-2">Catat Barang Keluar (BK)</h3>
-                        <form onSubmit={handleKeluarSubmit} className="space-y-4 text-xs">
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Judul Pekerjaan / Proyek" value={keluarForm.data.judul} onChange={(e) => keluarForm.setData('judul', e.target.value)} placeholder="Pekerjaan Genset Site Jagakarsa" />
-                                <Input label="Tanggal Rilis" type="date" value={keluarForm.data.tanggal} onChange={(e) => keluarForm.setData('tanggal', e.target.value)} required />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Nama Pengambil / Koordinator" value={keluarForm.data.pengambil} onChange={(e) => keluarForm.setData('pengambil', e.target.value)} required placeholder="Budi Santoso" />
-                                <Input label="Jabatan Pengambil" value={keluarForm.data.jabatan} onChange={(e) => keluarForm.setData('jabatan', e.target.value)} placeholder="Subcon Lead" />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Input label="Site Tujuan / Delivery" value={keluarForm.data.lokasi_tujuan} onChange={(e) => keluarForm.setData('lokasi_tujuan', e.target.value)} required placeholder="Site JGK-012" />
-                                <div className="w-full">
-                                    <label className="block font-medium text-xs text-gray-700 mb-1">Keperluan / Keterangan</label>
-                                    <textarea value={keluarForm.data.keterangan} onChange={(e) => keluarForm.setData('keterangan', e.target.value)} className="w-full border border-gray-300 rounded p-1.5" />
-                                </div>
-                            </div>
-
-                            {/* Release list */}
-                            <div className="border-t pt-3 space-y-2">
-                                <div className="flex justify-between items-center mb-2">
-                                    <h4 className="font-bold text-gray-900">List Barang Keluar</h4>
-                                    <button type="button" onClick={addKeluarItem} className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 rounded text-xs font-bold text-gray-700">+ Tambah Baris</button>
-                                </div>
-                                {keluarForm.data.items.map((item, idx) => (
-                                    <div key={idx} className="flex gap-2 items-center bg-gray-50 p-2 rounded">
-                                        <Select label="Kategori" value={item.kategori} onChange={(e) => {
-                                            const items = [...keluarForm.data.items];
-                                            items[idx].kategori = e.target.value;
-                                            keluarForm.setData('items', items);
-                                        }} options={categories} placeholder="Pilih..." />
-
-                                        <Input label="Tipe / Spesifikasi" value={item.tipe} onChange={(e) => {
-                                            const items = [...keluarForm.data.items];
-                                            items[idx].tipe = e.target.value;
-                                            keluarForm.setData('items', items);
-                                        }} placeholder="e.g. 1P 16A" required />
-
-                                        <Input label="Jumlah Rilis" type="number" min="1" value={item.jumlah} onChange={(e) => {
-                                            const items = [...keluarForm.data.items];
-                                            items[idx].jumlah = e.target.value;
-                                            keluarForm.setData('items', items);
-                                        }} required className="w-20" />
-
-                                        {keluarForm.data.items.length > 1 && (
-                                            <button type="button" onClick={() => removeKeluarItem(idx)} className="mt-4 p-1 text-red-500 hover:text-red-700 font-bold">X</button>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="border-t pt-3 flex justify-end gap-2">
-                                <Button type="submit" variant="secondary" processing={keluarForm.processing}>Simpan Transaksi</Button>
-                                <Button type="button" variant="outline" onClick={() => setShowKeluarModal(false)}>Batal</Button>
-                            </div>
-                        </form>
+            <Modal isOpen={showKeluarModal} onClose={() => setShowKeluarModal(false)} title="Catat Barang Keluar (BK)" size="max-w-3xl">
+                <form onSubmit={handleKeluarSubmit} className="space-y-4 text-xs">
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Judul Pekerjaan / Proyek" value={keluarForm.data.judul} onChange={(e) => keluarForm.setData('judul', e.target.value)} placeholder="Pekerjaan Genset Site Jagakarsa" />
+                        <Input label="Tanggal Rilis" type="date" value={keluarForm.data.tanggal} onChange={(e) => keluarForm.setData('tanggal', e.target.value)} required />
                     </div>
-                </div>
-            )}
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Nama Pengambil / Koordinator" value={keluarForm.data.pengambil} onChange={(e) => keluarForm.setData('pengambil', e.target.value)} required placeholder="Budi Santoso" />
+                        <Input label="Jabatan Pengambil" value={keluarForm.data.jabatan} onChange={(e) => keluarForm.setData('jabatan', e.target.value)} placeholder="Subcon Lead" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Site Tujuan / Delivery" value={keluarForm.data.lokasi_tujuan} onChange={(e) => keluarForm.setData('lokasi_tujuan', e.target.value)} required placeholder="Site JGK-012" />
+                        <div className="w-full">
+                            <label className="block font-medium text-xs text-gray-700 mb-1">Keperluan / Keterangan</label>
+                            <textarea value={keluarForm.data.keterangan} onChange={(e) => keluarForm.setData('keterangan', e.target.value)} className="w-full border border-gray-300 rounded p-1.5" />
+                        </div>
+                    </div>
+
+                    {/* Release list */}
+                    <div className="border-t pt-3 space-y-2">
+                        <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-bold text-gray-900">List Barang Keluar</h4>
+                            <button type="button" onClick={addKeluarItem} className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 rounded text-xs font-bold text-gray-700">+ Tambah Baris</button>
+                        </div>
+                        {keluarForm.data.items.map((item, idx) => (
+                            <div key={idx} className="flex gap-2 items-center bg-gray-50 p-2 rounded">
+                                <Select label="Kategori" value={item.kategori} onChange={(e) => {
+                                    const items = [...keluarForm.data.items];
+                                    items[idx].kategori = e.target.value;
+                                    keluarForm.setData('items', items);
+                                }} options={categories} placeholder="Pilih..." />
+
+                                <Input label="Tipe / Spesifikasi" value={item.tipe} onChange={(e) => {
+                                    const items = [...keluarForm.data.items];
+                                    items[idx].tipe = e.target.value;
+                                    keluarForm.setData('items', items);
+                                }} placeholder="e.g. 1P 16A" required />
+
+                                <Input label="Jumlah Rilis" type="number" min="1" value={item.jumlah} onChange={(e) => {
+                                    const items = [...keluarForm.data.items];
+                                    items[idx].jumlah = e.target.value;
+                                    keluarForm.setData('items', items);
+                                }} required className="w-20" />
+
+                                {keluarForm.data.items.length > 1 && (
+                                    <button type="button" onClick={() => removeKeluarItem(idx)} className="mt-4 p-1 text-red-500 hover:text-red-700 font-bold">X</button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="border-t pt-3 flex justify-end gap-2">
+                        <Button type="submit" variant="secondary" processing={keluarForm.processing}>Simpan Transaksi</Button>
+                        <Button type="button" variant="outline" onClick={() => setShowKeluarModal(false)}>Batal</Button>
+                    </div>
+                </form>
+            </Modal>
 
             {/* ADD CATEGORY MODAL */}
-            {showKatModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg max-w-md w-full p-6 space-y-4">
-                        <h3 className="font-bold text-base text-gray-900 border-b pb-2">Tambah Kategori Baru</h3>
-                        <form onSubmit={handleKatSubmit} className="space-y-4 text-xs">
-                            <Input label="Nama Kategori" value={katForm.data.kategori} onChange={(e) => katForm.setData('kategori', e.target.value)} required placeholder="e.g. Splicer" />
-                            <Input label="Satuan Default" value={katForm.data.satuan} onChange={(e) => katForm.setData('satuan', e.target.value)} required placeholder="Pcs / Unit / Roll" />
-                            <div className="flex justify-end gap-2 pt-2">
-                                <Button type="submit" variant="secondary" processing={katForm.processing}>Simpan</Button>
-                                <Button type="button" variant="outline" onClick={() => setShowKatModal(false)}>Batal</Button>
-                            </div>
-                        </form>
+            <Modal isOpen={showKatModal} onClose={() => setShowKatModal(false)} title="Tambah Kategori Baru" size="max-w-md">
+                <form onSubmit={handleKatSubmit} className="space-y-4 text-xs">
+                    <Input label="Nama Kategori" value={katForm.data.kategori} onChange={(e) => katForm.setData('kategori', e.target.value)} required placeholder="e.g. Splicer" />
+                    <Input label="Satuan Default" value={katForm.data.satuan} onChange={(e) => katForm.setData('satuan', e.target.value)} required placeholder="Pcs / Unit / Roll" />
+                    <div className="flex justify-end gap-2 pt-2">
+                        <Button type="submit" variant="secondary" processing={katForm.processing}>Simpan</Button>
+                        <Button type="button" variant="outline" onClick={() => setShowKatModal(false)}>Batal</Button>
                     </div>
-                </div>
-            )}
+                </form>
+            </Modal>
 
             {/* ADD SPEC-TYPE MODAL */}
-            {showTipeModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg max-w-md w-full p-6 space-y-4">
-                        <h3 className="font-bold text-base text-gray-900 border-b pb-2">Tambah Tipe Baru</h3>
-                        <form onSubmit={handleTipeSubmit} className="space-y-4 text-xs">
-                            <Select label="Kategori" value={tipeForm.data.kategori} onChange={(e) => tipeForm.setData('kategori', e.target.value)} options={categories} placeholder="Pilih..." required />
-                            <Input label="Nama Tipe / Spesifikasi" value={tipeForm.data.tipe} onChange={(e) => tipeForm.setData('tipe', e.target.value)} required placeholder="e.g. 1P 16A" />
-                            <div className="flex justify-end gap-2 pt-2">
-                                <Button type="submit" variant="secondary" processing={tipeForm.processing}>Simpan</Button>
-                                <Button type="button" variant="outline" onClick={() => setShowTipeModal(false)}>Batal</Button>
-                            </div>
-                        </form>
+            <Modal isOpen={showTipeModal} onClose={() => setShowTipeModal(false)} title="Tambah Tipe Baru" size="max-w-md">
+                <form onSubmit={handleTipeSubmit} className="space-y-4 text-xs">
+                    <Select label="Kategori" value={tipeForm.data.kategori} onChange={(e) => tipeForm.setData('kategori', e.target.value)} options={categories} placeholder="Pilih..." required />
+                    <Input label="Nama Tipe / Spesifikasi" value={tipeForm.data.tipe} onChange={(e) => tipeForm.setData('tipe', e.target.value)} required placeholder="e.g. 1P 16A" />
+                    <div className="flex justify-end gap-2 pt-2">
+                        <Button type="submit" variant="secondary" processing={tipeForm.processing}>Simpan</Button>
+                        <Button type="button" variant="outline" onClick={() => setShowTipeModal(false)}>Batal</Button>
                     </div>
-                </div>
-            )}
-        </AppLayout>
+                </form>
+            </Modal>
+        </>
     );
 }
+
+
+Stock.layout = page => <AppLayout children={page} />;

@@ -54,7 +54,7 @@ export default function Detail({ survey }) {
     });
 
     return (
-        <AppLayout>
+        <>
             <Head title={`Survey ${survey.nama_site} - Web CME`} />
 
             <div className="mb-6 flex justify-between items-center">
@@ -197,6 +197,9 @@ export default function Detail({ survey }) {
                     )}
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+
+Detail.layout = page => <AppLayout children={page} />;

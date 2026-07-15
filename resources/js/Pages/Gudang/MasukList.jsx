@@ -15,7 +15,7 @@ export default function MasukList({ transactions, filters }) {
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title="Riwayat Barang Masuk - Web CME" />
 
             <div className="mb-6 flex justify-between items-center">
@@ -79,6 +79,9 @@ export default function MasukList({ transactions, filters }) {
                     )}
                 </Table>
             </Card>
-        </AppLayout>
+        </>
     );
 }
+
+
+MasukList.layout = page => <AppLayout children={page} />;

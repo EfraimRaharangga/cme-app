@@ -7,12 +7,12 @@ import { ClipboardCheck, FileSpreadsheet, HardDrive, Users, CheckCircle, Clock }
 
 export default function CmeDashboard({ stats, recentAtp }) {
     return (
-        <AppLayout>
+        <>
             <Head title="CME Dashboard - Web CME" />
 
             <div className="mb-8">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">
-                    Selamat pagi, CME Administrator 👋
+                    Dashboard Page
                 </h1>
                 <p className="text-sm text-gray-500 font-headlines mt-1">
                     Web CME — Central Monitoring &amp; Evaluation Overview
@@ -86,7 +86,7 @@ export default function CmeDashboard({ stats, recentAtp }) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* RECENT ATP TABLES */}
                 <div className="lg:col-span-2 space-y-6">
-                    <Card title="📋 ATP Terbaru">
+                    <Card title="ATP Terbaru">
                         <Table headers={['Nama Site', 'Tanggal', 'Verdict', 'Aksi']}>
                             {recentAtp.length === 0 ? (
                                 <tr>
@@ -101,15 +101,14 @@ export default function CmeDashboard({ stats, recentAtp }) {
                                         <td className="px-6 py-4 text-center text-gray-500">{record.tanggal}</td>
                                         <td className="px-6 py-4 text-center">
                                             <span
-                                                className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
-                                                    record.verdict === 'ACCEPT'
-                                                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                                                        : record.verdict === 'CONDITIONAL'
+                                                className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${record.verdict === 'ACCEPT'
+                                                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                                    : record.verdict === 'CONDITIONAL'
                                                         ? 'bg-amber-50 text-amber-800 border border-amber-200'
                                                         : record.verdict === 'REJECT'
-                                                        ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                                                        : 'bg-gray-50 text-gray-600 border border-gray-200'
-                                                }`}
+                                                            ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                                                            : 'bg-gray-50 text-gray-600 border border-gray-200'
+                                                    }`}
                                             >
                                                 {record.verdict || 'PENDING'}
                                             </span>
@@ -131,33 +130,7 @@ export default function CmeDashboard({ stats, recentAtp }) {
 
                 {/* QUICK LINKS & SUMMARY */}
                 <div className="space-y-6">
-                    <Card title="🔗 Akses Cepat">
-                        <div className="grid grid-cols-1 gap-3">
-                            <Link
-                                href="/atp/baru"
-                                className="flex items-center justify-between p-3.5 border border-gray-100 rounded-lg hover:border-[#00ADB5] hover:bg-gray-50/20 transition group"
-                            >
-                                <span className="font-semibold text-sm text-gray-800 group-hover:text-black">📝 Buat ATP Baru</span>
-                                <span className="text-gray-400 group-hover:text-[#00ADB5]">&rarr;</span>
-                            </Link>
-                            <Link
-                                href="/survey/baru"
-                                className="flex items-center justify-between p-3.5 border border-gray-100 rounded-lg hover:border-[#00ADB5] hover:bg-gray-50/20 transition group"
-                            >
-                                <span className="font-semibold text-sm text-gray-800 group-hover:text-black">📋 Buat Survey Baru</span>
-                                <span className="text-gray-400 group-hover:text-[#00ADB5]">&rarr;</span>
-                            </Link>
-                            <Link
-                                href="/gudang"
-                                className="flex items-center justify-between p-3.5 border border-gray-100 rounded-lg hover:border-[#00ADB5] hover:bg-gray-50/20 transition group"
-                            >
-                                <span className="font-semibold text-sm text-gray-800 group-hover:text-black">📦 Kelola Stok Gudang</span>
-                                <span className="text-gray-400 group-hover:text-[#00ADB5]">&rarr;</span>
-                            </Link>
-                        </div>
-                    </Card>
-
-                    <Card title="📊 Ringkasan Kelayakan">
+                    <Card title="Ringkasan Kelayakan">
                         <div className="space-y-3">
                             <div className="flex items-center justify-between p-3 bg-emerald-50/30 border border-emerald-100 rounded-lg">
                                 <span className="flex items-center gap-2 text-xs font-semibold text-emerald-800 uppercase tracking-wider">
@@ -177,6 +150,9 @@ export default function CmeDashboard({ stats, recentAtp }) {
                     </Card>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+
+CmeDashboard.layout = page => <AppLayout children={page} />;

@@ -5,11 +5,18 @@ import Card from '../../Components/Card';
 import Input from '../../Components/Input';
 import Button from '../../Components/Button';
 import Alert from '../../Components/Alert';
+import ConfirmationModal from '../../Components/ConfirmationModal';
 
 export default function New({ defaultTemplate, templates }) {
     const [mapLoaded, setMapLoaded] = useState(false);
     const mapRef = useRef(null);
     const markerRef = useRef(null);
+    const [alertModal, setAlertModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'info'
+    });
 
     const { data, setData, post, processing, errors } = useForm({
         nama_site: '',
@@ -116,11 +123,21 @@ export default function New({ defaultTemplate, templates }) {
                     }
                 },
                 (err) => {
-                    alert('Gagal mengambil lokasi: ' + err.message);
+                    setAlertModal({
+                        isOpen: true,
+                        title: 'Error Geolocation',
+                        message: 'Gagal mengambil lokasi: ' + err.message,
+                        type: 'danger'
+                    });
                 }
             );
         } else {
-            alert('Browser Anda tidak mendukung Geolocation.');
+            setAlertModal({
+                isOpen: true,
+                title: 'Tidak Didukung',
+                message: 'Browser Anda tidak mendukung Geolocation.',
+                type: 'warning'
+            });
         }
     };
 
@@ -176,7 +193,7 @@ export default function New({ defaultTemplate, templates }) {
     };
 
     return (
-        <AppLayout>
+        <>
             <Head title="Survey Baru - Web CME" />
 
             <div className="mb-6 flex justify-between items-center">
@@ -394,6 +411,17 @@ export default function New({ defaultTemplate, templates }) {
                     </Link>
                 </div>
             </form>
-        </AppLayout>
+
+            <ConfirmationModal
+                isOpen={alertModal.isOpen}
+                onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
+                title={alertModal.title}
+                message={alertModal.message}
+                type={alertModal.type}
+            />
+        </>
     );
 }
+
+
+New.layout = page => <AppLayout children={page} />;

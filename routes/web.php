@@ -6,6 +6,7 @@ use App\Http\Controllers\GudangController;
 use App\Http\Controllers\InstructionController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SurveyController;
 use Illuminate\Support\Facades\Route;
 
 // Guest Authentication Routes
