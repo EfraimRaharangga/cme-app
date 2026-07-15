@@ -169,6 +169,7 @@ class SurveyController extends Controller
         return Inertia::render('Survey/Edit', [
             'survey' => $survey,
             'templates' => $templates,
+            'defaultTemplate' => $this->defaultCategories,
         ]);
     }
 
@@ -178,47 +179,59 @@ class SurveyController extends Controller
 
         DB::beginTransaction();
         try {
-            $survey->update([
-                'nama_site' => $request->input('nama_site'),
-                'tanggal_survey' => $request->input('tanggal_survey'),
-                'nama_surveyor' => $request->input('nama_surveyor'),
-                'lokasi' => $request->input('lokasi') ?? '',
-                'latitude' => $request->input('latitude') ?? '',
-                'longitude' => $request->input('longitude') ?? '',
-                'catatan_tambahan' => $request->input('catatan_tambahan'),
-            ]);
+            // Only update fields that are present in the request
+            $updateData = [];
+            if ($request->has('nama_site')) $updateData['nama_site'] = $request->input('nama_site');
+            if ($request->has('tanggal_survey')) $updateData['tanggal_survey'] = $request->input('tanggal_survey');
+            if ($request->has('nama_surveyor')) $updateData['nama_surveyor'] = $request->input('nama_surveyor');
+            if ($request->has('lokasi')) $updateData['lokasi'] = $request->input('lokasi') ?? '';
+            if ($request->has('latitude')) $updateData['latitude'] = $request->input('latitude') ?? '';
+            if ($request->has('longitude')) $updateData['longitude'] = $request->input('longitude') ?? '';
+            if ($request->has('catatan_tambahan')) $updateData['catatan_tambahan'] = $request->input('catatan_tambahan');
 
+            if (!empty($updateData)) {
+                $survey->update($updateData);
+            }
+
+            // Only update submitted checklist items
             $items = $request->input('items', []);
-            foreach ($items as $item) {
-                $status = $item['status'] ?? '';
-                $kondisi = $item['kondisi'] ?? '';
-                if (isset($item['kondisi_1_jenis']) || isset($item['kondisi_1_kondisi'])) {
-                    $parts = [];
-                    if (!empty($item['kondisi_1_jenis']) || !empty($item['kondisi_1_kondisi'])) {
-                        $parts[] = '1. ' . ($item['kondisi_1_jenis'] ?? '-') . ($item['kondisi_1_kondisi'] ? ' [' . $item['kondisi_1_kondisi'] . ']' : '');
-                    }
-                    if (!empty($item['kondisi_2_jenis']) || !empty($item['kondisi_2_kondisi'])) {
-                        $parts[] = '2. ' . ($item['kondisi_2_jenis'] ?? '-') . ($item['kondisi_2_kondisi'] ? ' [' . $item['kondisi_2_kondisi'] . ']' : '');
-                    }
-                    $kondisi = implode("\n", $parts);
-                }
+            foreach ($items as $nomorItem => $item) {
+                $ri = SurveyItem::where('survey_id', $survey->id)->where('nomor_item', $nomorItem)->first();
+                if (!$ri) continue;
 
-                if (!empty($item['item_db_id'])) {
-                    SurveyItem::where('id', $item['item_db_id'])->update([
-                        'status_check' => $status,
-                        'kondisi_nilai' => $kondisi,
-                        'catatan' => $item['catatan'] ?? '',
-                    ]);
+                $itemUpdate = [];
+                if (isset($item['status'])) $itemUpdate['status_check'] = $item['status'];
+                if (isset($item['kondisi'])) $itemUpdate['kondisi_nilai'] = $item['kondisi'];
+                if (isset($item['catatan'])) $itemUpdate['catatan'] = $item['catatan'];
+
+                if (!empty($itemUpdate)) {
+                    $ri->update($itemUpdate);
                 }
             }
 
-            // Handle uploads
+            // Handle deleted photos
+            $deletedPhotoIds = $request->input('deleted_photo_ids', []);
+            if (!empty($deletedPhotoIds)) {
+                foreach ($deletedPhotoIds as $photoId) {
+                    $photo = SurveyPhoto::where('survey_id', $survey->id)->find($photoId);
+                    if ($photo) {
+                        $photo->delete(); // Spatie MediaLibrary handles local file removal automatically
+                    }
+                }
+            }
+
+            // Handle new photo uploads
             if ($request->has('photos')) {
-                foreach ($request->input('photos') as $key => $fileList) {
-                    $ri = SurveyItem::where('survey_id', $survey->id)->where('nomor_item', $key)->first();
+                foreach ($request->input('photos') as $nomorItem => $fileList) {
+                    $ri = SurveyItem::where('survey_id', $survey->id)->where('nomor_item', $nomorItem)->first();
                     if (!$ri) continue;
 
                     foreach ($fileList as $idx => $fileData) {
+                        // Skip existing images
+                        if (!empty($fileData['isExisting'])) {
+                            continue;
+                        }
+
                         $tempPath = $fileData['path'] ?? null;
                         if (!$tempPath) continue;
 

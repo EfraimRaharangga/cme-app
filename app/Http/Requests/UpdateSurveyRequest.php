@@ -13,16 +13,28 @@ class UpdateSurveyRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'nama_site' => 'required|string',
-            'tanggal_survey' => 'required|date',
-            'nama_surveyor' => 'required|string',
+        $rules = [
+            'nama_site' => 'sometimes|required|string',
+            'tanggal_survey' => 'sometimes|required|date',
+            'nama_surveyor' => 'sometimes|required|string',
             'lokasi' => 'nullable|string',
             'latitude' => 'nullable|string',
             'longitude' => 'nullable|string',
             'catatan_tambahan' => 'nullable|string',
-            'items' => 'required|array',
+            'items' => 'sometimes|required|array',
             'photos' => 'nullable|array',
+            'deleted_photo_ids' => 'nullable|array',
+            'deleted_photo_ids.*' => 'integer',
         ];
+
+        // Validate items if present
+        $items = $this->input('items', []);
+        foreach ($items as $key => $item) {
+            $rules["items.{$key}.status"] = 'sometimes|required|in:checked,cross';
+            $rules["items.{$key}.kondisi"] = 'nullable|string';
+            $rules["items.{$key}.catatan"] = 'nullable|string';
+        }
+
+        return $rules;
     }
 }

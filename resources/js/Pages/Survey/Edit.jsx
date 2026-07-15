@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, router } from '@inertiajs/react';
 import axios from 'axios';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
@@ -8,7 +8,7 @@ import Button from '../../Components/Button';
 import ConfirmationModal from '../../Components/ConfirmationModal';
 import ImageUpload from '../../Components/ImageUpload';
 
-export default function Edit({ survey, templates }) {
+export default function Edit({ survey, templates, defaultTemplate }) {
     const [mapLoaded, setMapLoaded] = useState(false);
     const mapRef = useRef(null);
     const markerRef = useRef(null);
@@ -19,7 +19,7 @@ export default function Edit({ survey, templates }) {
         type: 'info'
     });
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, setError, clearErrors } = useForm({
         nama_site: survey.nama_site || '',
         tanggal_survey: survey.tanggal_survey || '',
         nama_surveyor: survey.nama_surveyor || '',
@@ -34,23 +34,50 @@ export default function Edit({ survey, templates }) {
     // Populate checklist state with existing values from database
     useEffect(() => {
         const initialItems = {};
+        const initialPhotos = {};
+
         survey.items.forEach((item) => {
             const key = item.nomor_item;
+
+            // Find type and options from defaultTemplate
+            let type = 'text';
+            let options = [];
+            Object.values(defaultTemplate).forEach((list) => {
+                const matched = list.find(d => d[0] === item.nomor_item);
+                if (matched) {
+                    type = matched[2];
+                    options = matched[3];
+                }
+            });
+
             initialItems[key] = {
                 item_db_id: item.id,
                 kategori: item.kategori,
                 nomor: item.nomor_item,
                 nama: item.nama_item,
+                type: type,
+                options: options,
                 status: item.status_check,
                 kondisi: item.kondisi_nilai,
                 catatan: item.catatan || '',
             };
+
+            const itemPhotos = survey.photos.filter((p) => p.item_id === item.id);
+            initialPhotos[key] = itemPhotos.map((p) => ({
+                id: p.id,
+                path: p.file_path,
+                url: p.file_url,
+                name: p.file_path,
+                isExisting: true,
+            }));
         });
+
         setData((prev) => ({
             ...prev,
             items: initialItems,
+            photos: initialPhotos,
         }));
-    }, [survey]);
+    }, [survey, defaultTemplate]);
 
     // Initialize Leaflet map
     useEffect(() => {
@@ -131,6 +158,8 @@ export default function Edit({ survey, templates }) {
             },
         });
     };
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [pendingPayload, setPendingPayload] = useState(null);
 
     const handleFileChange = async (key, files) => {
         const fileList = Array.from(files);
@@ -168,7 +197,124 @@ export default function Edit({ survey, templates }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(`/survey/${survey.id}/edit`);
+        if (clearErrors) clearErrors();
+
+        let hasError = false;
+        const newErrors = {};
+
+        if (!data.nama_site) {
+            newErrors.nama_site = 'Nama site wajib diisi.';
+            hasError = true;
+        }
+        if (!data.tanggal_survey) {
+            newErrors.tanggal_survey = 'Tanggal survey wajib diisi.';
+            hasError = true;
+        }
+        if (!data.nama_surveyor) {
+            newErrors.nama_surveyor = 'Nama surveyor wajib diisi.';
+            hasError = true;
+        }
+
+        Object.entries(data.items).forEach(([key, state]) => {
+            const namaItem = state.nama || key;
+            if (!state.status) {
+                newErrors[`items.${key}.status`] = `Status untuk item '${namaItem}' wajib dipilih (OK/NG).`;
+                hasError = true;
+            }
+            if (state.type === 'select' && !state.kondisi) {
+                newErrors[`items.${key}.kondisi`] = `Pilihan nilai untuk item '${namaItem}' wajib dipilih.`;
+                hasError = true;
+            }
+            const itemPhotos = data.photos[key] || [];
+            if (itemPhotos.length === 0) {
+                newErrors[`photos.${key}`] = `Foto untuk item '${namaItem}' wajib diunggah.`;
+                hasError = true;
+            }
+        });
+
+        if (hasError) {
+            setError(newErrors);
+            setAlertModal({
+                isOpen: true,
+                title: 'Validasi Gagal',
+                message: 'Silakan lengkapi semua field checklist, pilihan dropdown, dan foto yang wajib diisi.',
+                type: 'danger'
+            });
+            return;
+        }
+
+        const payload = {};
+
+        // 1. Basic details (only if changed)
+        if (data.nama_site !== survey.nama_site) payload.nama_site = data.nama_site;
+        if (data.tanggal_survey !== survey.tanggal_survey) payload.tanggal_survey = data.tanggal_survey;
+        if (data.nama_surveyor !== survey.nama_surveyor) payload.nama_surveyor = data.nama_surveyor;
+        if (data.lokasi !== survey.lokasi) payload.lokasi = data.lokasi;
+        if (data.latitude !== survey.latitude) payload.latitude = data.latitude;
+        if (data.longitude !== survey.longitude) payload.longitude = data.longitude;
+        if (data.catatan_tambahan !== (survey.catatan_tambahan || '')) payload.catatan_tambahan = data.catatan_tambahan;
+
+        // 2. Checklist items (only changed ones)
+        const changedItems = {};
+        Object.entries(data.items).forEach(([key, item]) => {
+            const originalItem = survey.items.find(it => it.nomor_item === key);
+            if (originalItem) {
+                const isStatusChanged = item.status !== originalItem.status_check;
+                const isKondisiChanged = item.kondisi !== originalItem.kondisi_nilai;
+                const isCatatanChanged = item.catatan !== (originalItem.catatan || '');
+                if (isStatusChanged || isKondisiChanged || isCatatanChanged) {
+                    changedItems[key] = {
+                        item_db_id: item.item_db_id,
+                        status: item.status,
+                        kondisi: item.kondisi,
+                        catatan: item.catatan,
+                    };
+                }
+            }
+        });
+        if (Object.keys(changedItems).length > 0) {
+            payload.items = changedItems;
+        }
+
+        // 3. Photo attachments (only if modified)
+        const changedPhotos = {};
+        const deletedPhotoIds = [];
+
+        survey.items.forEach((item) => {
+            const key = item.nomor_item;
+            const originalItemPhotos = survey.photos.filter(p => p.item_id === item.id);
+            const currentItemPhotos = data.photos[key] || [];
+
+            const originalUrls = originalItemPhotos.map(p => p.file_url).sort();
+            const currentUrls = currentItemPhotos.map(p => p.url).sort();
+
+            const isPhotosChanged = JSON.stringify(originalUrls) !== JSON.stringify(currentUrls);
+            if (isPhotosChanged) {
+                changedPhotos[key] = currentItemPhotos;
+
+                originalItemPhotos.forEach(op => {
+                    if (!currentItemPhotos.some(cp => cp.id === op.id)) {
+                        deletedPhotoIds.push(op.id);
+                    }
+                });
+            }
+        });
+
+        if (Object.keys(changedPhotos).length > 0) {
+            payload.photos = changedPhotos;
+        }
+        if (deletedPhotoIds.length > 0) {
+            payload.deleted_photo_ids = deletedPhotoIds;
+        }
+
+        setPendingPayload(payload);
+        setShowConfirm(true);
+    };
+
+    const confirmSubmit = () => {
+        if (pendingPayload) {
+            router.post(`/survey/${survey.id}/edit`, pendingPayload);
+        }
     };
 
     // Group items by category to render sections
@@ -293,41 +439,66 @@ export default function Edit({ survey, templates }) {
                                                 </span>
                                             </div>
 
-                                            <div className="flex items-center gap-4 mt-2">
-                                                <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer select-none">
-                                                    <input
-                                                        type="radio"
-                                                        name={`status_${key}`}
-                                                        checked={item.status === 'checked'}
-                                                        onChange={() => handleItemChange(key, 'status', 'checked')}
-                                                        className="text-[#00ADB5] focus:ring-[#00ADB5]"
-                                                    />
-                                                    OK / Sesuai
-                                                </label>
-                                                <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer select-none">
-                                                    <input
-                                                        type="radio"
-                                                        name={`status_${key}`}
-                                                        checked={item.status === 'cross'}
-                                                        onChange={() => handleItemChange(key, 'status', 'cross')}
-                                                        className="text-[#00ADB5] focus:ring-[#00ADB5]"
-                                                    />
-                                                    NG / Perlu Perbaikan
-                                                </label>
+                                            <div>
+                                                <div className="flex border border-gray-200 rounded overflow-hidden w-fit mt-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleItemChange(key, 'status', 'checked')}
+                                                        className={`px-3 py-1 text-xs font-bold transition ${item.status === 'checked'
+                                                            ? 'bg-emerald-500 text-white'
+                                                            : 'bg-white text-gray-400 hover:bg-gray-50'
+                                                            }`}
+                                                    >
+                                                        OK
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleItemChange(key, 'status', 'cross')}
+                                                        className={`px-3 py-1 text-xs font-bold transition ${item.status === 'cross'
+                                                            ? 'bg-red-500 text-white'
+                                                            : 'bg-white text-gray-400 hover:bg-gray-50'
+                                                            }`}
+                                                    >
+                                                        NG
+                                                    </button>
+                                                </div>
+                                                {errors[`items.${key}.status`] && (
+                                                    <p className="text-red-500 text-[10px] mt-1">{errors[`items.${key}.status`]}</p>
+                                                )}
                                             </div>
                                         </div>
 
                                         <div className="w-full md:w-80 space-y-3">
-                                            <Input
-                                                label="Catatan Kondisi"
-                                                placeholder="Kondisi lapangan"
-                                                className="text-xs p-1.5"
-                                                value={item.kondisi || ''}
-                                                onChange={(e) => handleItemChange(key, 'kondisi', e.target.value)}
-                                            />
+                                            {item.type === 'select' ? (
+                                                <div className="w-full">
+                                                    <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Pilihan Nilai</label>
+                                                    <select
+                                                        value={item.kondisi || ''}
+                                                        onChange={(e) => handleItemChange(key, 'kondisi', e.target.value)}
+                                                        className="w-full border-gray-300 rounded-md text-xs p-1.5 bg-white focus:border-[#00ADB5] focus:ring focus:ring-[#00ADB5]/20 outline-none"
+                                                    >
+                                                        <option value="">Pilih...</option>
+                                                        {item.options && item.options.map((opt, oIdx) => (
+                                                            <option key={oIdx} value={opt}>{opt}</option>
+                                                        ))}
+                                                    </select>
+                                                    {errors[`items.${key}.kondisi`] && (
+                                                        <p className="text-red-500 text-[10px] mt-1">{errors[`items.${key}.kondisi`]}</p>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <Input
+                                                    label="Catatan Kondisi"
+                                                    placeholder="Kondisi lapangan"
+                                                    className="text-xs p-1.5"
+                                                    value={item.kondisi || ''}
+                                                    onChange={(e) => handleItemChange(key, 'kondisi', e.target.value)}
+                                                />
+                                            )}
+
                                             <div>
                                                 <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">
-                                                    Tambah Foto
+                                                    Tambah/Kelola Foto
                                                 </label>
                                                 <ImageUpload
                                                     compact={true}
@@ -338,6 +509,9 @@ export default function Edit({ survey, templates }) {
                                                         [key]: files
                                                     })}
                                                 />
+                                                {errors[`photos.${key}`] && (
+                                                    <p className="text-red-500 text-[10px] mt-1">{errors[`photos.${key}`]}</p>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -381,6 +555,16 @@ export default function Edit({ survey, templates }) {
                 title={alertModal.title}
                 message={alertModal.message}
                 type={alertModal.type}
+            />
+
+            <ConfirmationModal
+                isOpen={showConfirm}
+                onClose={() => setShowConfirm(false)}
+                onConfirm={confirmSubmit}
+                title="Konfirmasi Perubahan"
+                message="Apakah Anda yakin ingin menyimpan perubahan laporan survey ini?"
+                type="warning"
+                confirmText="Ya, Simpan"
             />
         </>
     );

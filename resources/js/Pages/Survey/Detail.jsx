@@ -1,11 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Table from '../../Components/Table';
+import Modal from '../../Components/Modal';
 
 export default function Detail({ survey }) {
     const mapRef = useRef(null);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     // Initialize map coordinates view
     useEffect(() => {
@@ -88,48 +90,10 @@ export default function Detail({ survey }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Checklists reports detail */}
-                <div className="lg:col-span-2 space-y-6">
-                    {Object.entries(groupedItems).map(([category, items]) => (
-                        <Card key={category} title={category}>
-                            <Table headers={['No', 'Nama Checkpoint', 'Status', 'Catatan Kondisi']}>
-                                {items.map((it) => (
-                                    <tr key={it.id} className="hover:bg-gray-50/50">
-                                        <td className="px-4 py-3 font-mono font-bold text-xs text-center text-gray-400">
-                                            {it.nomor_item}
-                                        </td>
-                                        <td className="px-4 py-3 font-bold text-gray-900">{it.nama_item}</td>
-                                        <td className="px-4 py-3 text-center">
-                                            <span
-                                                className={`inline-block px-2.5 py-0.5 rounded text-xs font-black ${it.status_check === 'checked'
-                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                    : it.status_check === 'cross'
-                                                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                                                        : 'bg-gray-50 text-gray-400'
-                                                    }`}
-                                            >
-                                                {it.status_check === 'checked' ? 'OK' : it.status_check === 'cross' ? 'NG' : '-'}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3 text-gray-600 whitespace-pre-wrap">
-                                            {it.kondisi_nilai || '-'}
-                                            {it.catatan && (
-                                                <div className="text-[10px] text-gray-400 mt-1 italic">
-                                                    Catatan: {it.catatan}
-                                                </div>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </Table>
-                        </Card>
-                    ))}
-                </div>
-
-                {/* Info and location widget */}
-                <div className="space-y-6">
-                    <Card title="Informasi Lokasi">
+            <div className="space-y-6">
+                {/* 1. INFORMASI LOKASI (Moved above the checklists) */}
+                <Card title="Informasi Lokasi">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -148,21 +112,83 @@ export default function Detail({ survey }) {
                             </div>
 
                             {survey.latitude && (
-                                <div className="pt-2">
-                                    <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2">Peta Koordinat</p>
-                                    <div
-                                        id="map-detail-el"
-                                        className="h-[200px] w-full border border-gray-200 rounded-lg overflow-hidden z-10"
-                                    />
-                                    <div className="mt-2 text-center">
-                                        <code className="text-xs bg-gray-100 px-2.5 py-0.5 rounded text-gray-500 font-mono">
-                                            {survey.latitude}, {survey.longitude}
-                                        </code>
-                                    </div>
+                                <div>
+                                    <p className="text-[10px] font-semibold text-gray-400 uppercase">Peta Koordinat</p>
+                                    <code className="text-xs bg-gray-100 px-2.5 py-0.5 rounded text-gray-500 font-mono inline-block mt-1">
+                                        {survey.latitude}, {survey.longitude}
+                                    </code>
                                 </div>
                             )}
                         </div>
-                    </Card>
+
+                        {survey.latitude && (
+                            <div className="h-[200px] w-full border border-gray-200 rounded-lg overflow-hidden z-10">
+                                <div id="map-detail-el" className="h-full w-full" />
+                            </div>
+                        )}
+                    </div>
+                </Card>
+
+                {/* 2. CHECKLIST REPORT DETAIL */}
+                <div className="space-y-6">
+                    {Object.entries(groupedItems).map(([category, items]) => (
+                        <Card key={category} title={category}>
+                            <Table headers={['No', 'Nama Checkpoint', 'Status', 'Catatan Kondisi', 'Dokumentasi']}>
+                                {items.map((it) => {
+                                    const itemPhotos = survey.photos.filter(p => p.item_id === it.id);
+                                    return (
+                                        <tr key={it.id} className="hover:bg-gray-50/50">
+                                            <td className="px-4 py-3 font-mono font-bold text-xs text-center text-gray-400">
+                                                {it.nomor_item}
+                                            </td>
+                                            <td className="px-4 py-3 font-bold text-gray-900">{it.nama_item}</td>
+                                            <td className="px-4 py-3 text-center">
+                                                <span
+                                                    className={`inline-block px-2.5 py-0.5 rounded text-xs font-black ${it.status_check === 'checked'
+                                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                        : it.status_check === 'cross'
+                                                            ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                                            : 'bg-gray-50 text-gray-400'
+                                                        }`}
+                                                >
+                                                    {it.status_check === 'checked' ? 'OK' : it.status_check === 'cross' ? 'NG' : '-'}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3 text-gray-600 whitespace-pre-wrap">
+                                                {it.kondisi_nilai || '-'}
+                                                {it.catatan && (
+                                                    <div className="text-[10px] text-gray-400 mt-1 italic">
+                                                        Catatan: {it.catatan}
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {itemPhotos.map((photo) => (
+                                                        <div
+                                                            key={photo.id}
+                                                            className="relative w-10 h-10 rounded border border-gray-200 overflow-hidden bg-white shadow-sm hover:border-[#00ADB5] transition cursor-pointer"
+                                                            onClick={() => setSelectedImage(photo.file_url)}
+                                                        >
+                                                            <img
+                                                                src={photo.file_url}
+                                                                alt={it.nama_item}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    e.target.src = 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=400&q=85';
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                    {itemPhotos.length === 0 && <span className="text-gray-400 text-xs">-</span>}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </Table>
+                        </Card>
+                    ))}
 
                     {survey.catatan_tambahan && (
                         <Card title="📝 Catatan Tambahan">
@@ -171,31 +197,27 @@ export default function Detail({ survey }) {
                             </p>
                         </Card>
                     )}
-
-                    {/* PHOTO ATTACHMENTS */}
-                    {survey.photos.length > 0 && (
-                        <Card title="📸 Galeri Foto Lapangan">
-                            <div className="grid grid-cols-2 gap-3">
-                                {survey.photos.map((photo) => (
-                                    <div
-                                        key={photo.id}
-                                        className="border border-gray-100 rounded-lg overflow-hidden bg-gray-50 hover:shadow-sm transition"
-                                    >
-                                        <img
-                                            src={photo.file_url}
-                                            alt="Survey Check"
-                                            className="w-full h-32 object-cover"
-                                            onError={(e) => {
-                                                e.target.src = 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=400&q=85';
-                                            }}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </Card>
-                    )}
                 </div>
             </div>
+
+            {/* Photo Preview Zoom Modal */}
+            <Modal
+                isOpen={!!selectedImage}
+                onClose={() => setSelectedImage(null)}
+                title="Pratinjau Foto Dokumentasi"
+                size="max-w-2xl"
+            >
+                <div className="flex justify-center items-center p-2 bg-gray-900 rounded-lg">
+                    <img
+                        src={selectedImage}
+                        alt="Zoomed Preview"
+                        className="max-w-full max-h-[70vh] object-contain rounded"
+                        onError={(e) => {
+                            e.target.src = 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=400&q=85';
+                        }}
+                    />
+                </div>
+            </Modal>
         </>
     );
 }
