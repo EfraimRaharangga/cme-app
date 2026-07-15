@@ -1,6 +1,6 @@
 import React, { useState, useRef, useId } from 'react';
 import axios from 'axios';
-import { UploadCloud, X, Loader2, ZoomIn } from 'lucide-react';
+import { UploadCloud, X, Loader2, ZoomIn, Trash2 } from 'lucide-react';
 import ConfirmationModal from './ConfirmationModal';
 import Modal from './Modal';
 
@@ -13,7 +13,7 @@ export default function ImageUpload({
 }) {
     const uniqueId = useId();
     const [loading, setLoading] = useState(false);
-    const [previewImage, setPreviewImage] = useState(null);
+    const [previewIndex, setPreviewIndex] = useState(null);
     const [deleteIndex, setDeleteIndex] = useState(null);
     const fileInputRef = useRef(null);
 
@@ -65,6 +65,7 @@ export default function ImageUpload({
         nextFiles.splice(deleteIndex, 1);
         onChange(nextFiles);
         setDeleteIndex(null);
+        setPreviewIndex(null);
     };
 
     // Render Compact Style for Tables/Checklists
@@ -76,7 +77,7 @@ export default function ImageUpload({
                     <div className="flex flex-wrap gap-1.5">
                         {value.map((img, idx) => (
                             <div key={idx} className="relative w-12 h-12 rounded border border-gray-200 overflow-hidden bg-white shadow-sm group">
-                                <img src={img.url} className="w-full h-full object-cover cursor-pointer" onClick={() => setPreviewImage(img.url)} alt="Preview" />
+                                <img src={img.url} className="w-full h-full object-cover cursor-pointer" onClick={() => setPreviewIndex(idx)} alt="Preview" />
                             </div>
                         ))}
                     </div>
@@ -112,9 +113,28 @@ export default function ImageUpload({
                 )}
 
                 {/* Detail View Modal */}
-                <Modal isOpen={!!previewImage} onClose={() => setPreviewImage(null)} size="max-w-xl">
+                <Modal isOpen={previewIndex !== null} onClose={() => setPreviewIndex(null)} size="max-w-xl">
                     <div className="relative p-1">
-                        <img src={previewImage} className="w-full h-auto rounded" alt="Large Preview" />
+                        {previewIndex !== null && value[previewIndex] && (
+                            <>
+                                <img src={value[previewIndex].url} className="w-full h-auto rounded" alt="Large Preview" />
+                                <button
+                                    type="button"
+                                    onClick={() => confirmDelete(previewIndex)}
+                                    className="absolute top-4 left-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg shadow-md transition duration-200 flex items-center gap-1.5 text-xs font-bold px-3 hover:scale-105"
+                                >
+                                    <Trash2 className="w-3.5 h-3.5 stroke-[1.5]" />
+                                    Hapus
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setPreviewIndex(null)}
+                                    className="absolute top-4 right-4 bg-[#1A1A1A] hover:bg-[#00ADB5] text-white p-2 rounded-full shadow-md transition-all duration-200 hover:scale-105 flex items-center justify-center"
+                                >
+                                    <X className="w-4 h-4 stroke-[1.5]" />
+                                </button>
+                            </>
+                        )}
                     </div>
                 </Modal>
 
@@ -144,7 +164,7 @@ export default function ImageUpload({
                                 <div className="absolute inset-0 bg-[#1A1A1A]/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3">
                                     <button
                                         type="button"
-                                        onClick={() => setPreviewImage(img.url)}
+                                        onClick={() => setPreviewIndex(idx)}
                                         className="p-1.5 bg-white text-gray-800 rounded-full hover:bg-gray-100 transition"
                                     >
                                         <ZoomIn className="w-4 h-4" />
@@ -225,9 +245,28 @@ export default function ImageUpload({
             )}
 
             {/* Detail View Modal */}
-            <Modal isOpen={!!previewImage} onClose={() => setPreviewImage(null)} size="max-w-3xl">
+            <Modal isOpen={previewIndex !== null} onClose={() => setPreviewIndex(null)} size="max-w-3xl">
                 <div className="relative p-1">
-                    <img src={previewImage} className="w-full h-auto rounded" alt="Large Preview" />
+                    {previewIndex !== null && value[previewIndex] && (
+                        <>
+                            <img src={value[previewIndex].url} className="w-full h-auto rounded shadow-sm" alt="Large Preview" />
+                            <button
+                                type="button"
+                                onClick={() => confirmDelete(previewIndex)}
+                                className="absolute top-4 left-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg shadow-md transition duration-200 flex items-center gap-1.5 text-xs font-bold px-3 hover:scale-105"
+                            >
+                                <Trash2 className="w-3.5 h-3.5 stroke-[1.5]" />
+                                Hapus
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setPreviewIndex(null)}
+                                className="absolute top-4 right-4 bg-[#1A1A1A] hover:bg-[#00ADB5] text-white p-2 rounded-full shadow-md transition-all duration-200 hover:scale-105 flex items-center justify-center"
+                            >
+                                <X className="w-4 h-4 stroke-[1.5]" />
+                            </button>
+                        </>
+                    )}
                 </div>
             </Modal>
 
