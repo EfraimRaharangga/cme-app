@@ -114,24 +114,17 @@ export default function ImageUpload({
 
                 {/* Detail View Modal */}
                 <Modal isOpen={previewIndex !== null} onClose={() => setPreviewIndex(null)} size="max-w-xl">
-                    <div className="relative p-1">
+                    <div className="p-1 flex flex-col items-center gap-4">
                         {previewIndex !== null && value[previewIndex] && (
                             <>
                                 <img src={value[previewIndex].url} className="w-full h-auto rounded" alt="Large Preview" />
                                 <button
                                     type="button"
                                     onClick={() => confirmDelete(previewIndex)}
-                                    className="absolute top-4 left-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg shadow-md transition duration-200 flex items-center gap-1.5 text-xs font-bold px-3 hover:scale-105"
+                                    className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg shadow-md transition duration-200 flex items-center gap-1.5 text-xs font-bold px-3 hover:scale-105"
                                 >
                                     <Trash2 className="w-3.5 h-3.5 stroke-[1.5]" />
                                     Hapus
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setPreviewIndex(null)}
-                                    className="absolute top-4 right-4 bg-primary hover:bg-primary/80 text-white p-2 rounded-full shadow-md transition-all duration-200 hover:scale-105 flex items-center justify-center"
-                                >
-                                    <X className="w-4 h-4 stroke-[1.5]" />
                                 </button>
                             </>
                         )}

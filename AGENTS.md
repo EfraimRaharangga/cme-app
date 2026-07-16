@@ -138,6 +138,15 @@ To support flexible checklists without database schema bloat:
 *   The Eloquent attributes are defined as `protected $casts = ['hasil_json' => 'array']`, automatically converting database strings to and from arrays.
 *   On client-side render, the React frontend maps these arrays into form fields.
 
+### ATP Check Validation & Conditional Logic
+To ensure data completeness and check validation standards:
+1.  **Checklist Status Requirements:** Users must select `'OK'`, `'NG'`, or `'NA'` for each checklist item. Both frontend and backend validate that a status is selected for every checkpoint parameter.
+2.  **Photo Attachments:** If `'OK'` or `'NG'` is selected, the application enforces that at least one photo is uploaded.
+3.  **NA Selection Behavior:** If `'NA'` (Not Available) is selected:
+    *   The Image Attachment, Measurement Result (`hasil`), and Audit Notes (`catatan`) inputs are automatically disabled and their values are cleared/reset.
+    *   The Audit Notes value is automatically populated with `"Not Available"`.
+    *   Muted styling (`opacity-40 select-none bg-gray-100` / `pointer-events-none`) is applied to indicate the inactive state of the inputs.
+
 ### Printing Optimization
 Printed layouts (BAL, BASTP, survey print) use clean A4-optimized CSS media queries (`@media print` and `@page`) to suppress sidebars, footers, headers, and scale tables precisely.
 

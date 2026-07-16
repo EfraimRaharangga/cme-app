@@ -21,7 +21,7 @@ Route::middleware('custom_auth')->group(function () {
 
     // Dashboards
     Route::get('/dashboard', [DashboardController::class, 'cmeDashboard']);
-    Route::get('/atp-dashboard', [DashboardController::class, 'atpDashboard']);
+    Route::get('/atp', [DashboardController::class, 'atpDashboard']);
 
     // ODC Survey Module
     Route::get('/survey', [DashboardController::class, 'surveyDashboard']);
@@ -37,7 +37,6 @@ Route::middleware('custom_auth')->group(function () {
     Route::get('/survey/{id}/print', [SurveyController::class, 'print']);
 
     // ATP Module
-    Route::get('/atp', [AtpController::class, 'index']);
     Route::get('/atp/baru', [AtpController::class, 'create']);
     Route::post('/atp/baru', [AtpController::class, 'store']);
     Route::get('/atp/custom', [AtpController::class, 'custom']);

@@ -18,8 +18,8 @@ export default function Edit({ record, templates }) {
         message: '',
         type: 'info'
     });
-
-    const { data, setData, post, processing, errors } = useForm({
+    const [showConfirm, setShowConfirm] = useState(false);
+    const { data, setData, post, processing, errors, setError, clearErrors } = useForm({
         nama_site: record.nama_site || '',
         tanggal: record.tanggal || '',
         region: record.region || '',
@@ -118,13 +118,30 @@ export default function Edit({ record, templates }) {
     };
 
     const handleCheckChange = (key, val) => {
-        setData('hasil_json', {
-            ...data.hasil_json,
-            items: {
-                ...data.hasil_json.items,
-                [key]: val,
+        const nextItems = {
+            ...data.hasil_json.items,
+            [key]: val,
+        };
+        const nextHasil = { ...data.hasil_json.hasil };
+        const nextCatatan = { ...data.hasil_json.catatan };
+        const nextFotos = { ...data.fotos_item };
+
+        if (val === 'NA') {
+            nextHasil[key] = '';
+            nextCatatan[key] = 'Not Available';
+            nextFotos[key] = [];
+        }
+
+        setData((prev) => ({
+            ...prev,
+            hasil_json: {
+                ...prev.hasil_json,
+                items: nextItems,
+                hasil: nextHasil,
+                catatan: nextCatatan,
             },
-        });
+            fotos_item: nextFotos,
+        }));
     };
 
     const handleTextChange = (field, key, val) => {
@@ -195,6 +212,59 @@ export default function Edit({ record, templates }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        clearErrors();
+
+        let hasError = false;
+        const newErrors = {};
+
+        if (!data.nama_site) {
+            newErrors.nama_site = 'Nama site wajib diisi.';
+            hasError = true;
+        }
+        if (!data.tanggal) {
+            newErrors.tanggal = 'Tanggal pemeriksaan wajib diisi.';
+            hasError = true;
+        }
+        if (!data.no_po) {
+            newErrors.no_po = 'Nomor PO / SPK wajib diisi.';
+            hasError = true;
+        }
+
+        const items = data.hasil_json?.items || {};
+        const itemNames = data.hasil_json?.itemNames || {};
+
+        Object.entries(itemNames).forEach(([key, name]) => {
+            const status = items[key];
+            const namaItem = name || key;
+
+            if (!status) {
+                newErrors[`hasil_json.items.${key}`] = `Status untuk '${namaItem}' wajib dipilih.`;
+                hasError = true;
+            } else if (status === 'OK' || status === 'NG') {
+                const photos = data.fotos_item[key] || [];
+                if (photos.length === 0) {
+                    newErrors[`fotos_item.${key}`] = `Foto untuk '${namaItem}' wajib diunggah.`;
+                    hasError = true;
+                }
+            }
+        });
+
+        if (hasError) {
+            setError(newErrors);
+            setAlertModal({
+                isOpen: true,
+                title: 'Validasi Gagal',
+                message: 'Silakan lengkapi semua field checklist dan foto yang wajib diunggah.',
+                type: 'danger'
+            });
+            return;
+        }
+
+        setShowConfirm(true);
+    };
+
+    const confirmSubmit = () => {
+        setShowConfirm(false);
         post(`/atp/${record.id}/edit`);
     };
 
@@ -334,53 +404,68 @@ export default function Edit({ record, templates }) {
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-wrap items-center gap-3">
-                                        <div className="flex border border-gray-200 rounded overflow-hidden">
-                                            {['OK', 'NG', 'NA'].map((st) => (
-                                                <button
-                                                    key={st}
-                                                    type="button"
-                                                    onClick={() => handleCheckChange(key, st)}
-                                                    className={`px-3 py-1 text-xs font-bold transition ${checkVal === st
-                                                        ? st === 'OK'
-                                                            ? 'bg-emerald-500 text-white'
-                                                            : st === 'NG'
-                                                                ? 'bg-red-500 text-white'
-                                                                : 'bg-amber-500 text-white'
-                                                        : 'bg-white text-gray-400 hover:bg-gray-50'
-                                                        }`}
-                                                >
-                                                    {st}
-                                                </button>
-                                            ))}
+                                        <div className="flex flex-col gap-1.5">
+                                            <div className="flex flex-wrap items-center gap-3">
+                                                {/* Results OK/NG/NA toggles */}
+                                                <div>
+                                                    <div className="flex border border-gray-200 rounded overflow-hidden">
+                                                        {['OK', 'NG', 'NA'].map((st) => (
+                                                            <button
+                                                                key={st}
+                                                                type="button"
+                                                                onClick={() => handleCheckChange(key, st)}
+                                                                className={`px-3 py-1 text-xs font-bold transition ${checkVal === st
+                                                                    ? st === 'OK'
+                                                                        ? 'bg-emerald-500 text-white'
+                                                                        : st === 'NG'
+                                                                            ? 'bg-red-500 text-white'
+                                                                            : 'bg-amber-500 text-white'
+                                                                    : 'bg-white text-gray-400 hover:bg-gray-50'
+                                                                    }`}
+                                                            >
+                                                                {st}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                    {errors[`hasil_json.items.${key}`] && (
+                                                        <p className="text-red-500 text-[10px] mt-1">{errors[`hasil_json.items.${key}`]}</p>
+                                                    )}
+                                                </div>
+
+                                                <Input
+                                                    placeholder="Hasil Pengukuran"
+                                                    className={`text-xs p-1.5 w-32 transition-all ${checkVal === 'NA' ? 'opacity-40 bg-gray-100 cursor-not-allowed select-none' : ''}`}
+                                                    value={hasilVal}
+                                                    onChange={(e) => handleTextChange('hasil', key, e.target.value)}
+                                                    disabled={checkVal === 'NA'}
+                                                />
+
+                                                <Input
+                                                    placeholder="Catatan Audit"
+                                                    className={`text-xs p-1.5 w-44 transition-all ${checkVal === 'NA' ? 'opacity-40 bg-gray-100 cursor-not-allowed select-none' : ''}`}
+                                                    value={catatanVal}
+                                                    onChange={(e) => handleTextChange('catatan', key, e.target.value)}
+                                                    disabled={checkVal === 'NA'}
+                                                />
+
+                                                <div className="w-40">
+                                                    <div className={`transition-all ${checkVal === 'NA' ? 'opacity-40 pointer-events-none cursor-not-allowed select-none' : ''}`}>
+                                                        <ImageUpload
+                                                            compact={true}
+                                                            multiple={true}
+                                                            value={data.fotos_item[key] || []}
+                                                            onChange={(files) => setData('fotos_item', {
+                                                                ...data.fotos_item,
+                                                                [key]: files
+                                                            })}
+                                                        />
+                                                    </div>
+                                                    {errors[`fotos_item.${key}`] && (
+                                                        <p className="text-red-500 text-[10px] mt-1">{errors[`fotos_item.${key}`]}</p>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
-
-                                        <Input
-                                            placeholder="Hasil Pengukuran"
-                                            className="text-xs p-1.5 w-32"
-                                            value={hasilVal}
-                                            onChange={(e) => handleTextChange('hasil', key, e.target.value)}
-                                        />
-
-                                        <Input
-                                            placeholder="Catatan Audit"
-                                            className="text-xs p-1.5 w-44"
-                                            value={catatanVal}
-                                            onChange={(e) => handleTextChange('catatan', key, e.target.value)}
-                                        />
-
-                                        <div className="w-40">
-                                            <ImageUpload
-                                                compact={true}
-                                                multiple={true}
-                                                value={data.fotos_item[key] || []}
-                                                onChange={(files) => setData('fotos_item', {
-                                                    ...data.fotos_item,
-                                                    [key]: files
-                                                })}
-                                            />
-                                        </div>
-                                    </div>
                                 </div>
                             );
                         })}
@@ -495,6 +580,16 @@ export default function Edit({ record, templates }) {
                 title={alertModal.title}
                 message={alertModal.message}
                 type={alertModal.type}
+            />
+
+            <ConfirmationModal
+                isOpen={showConfirm}
+                onClose={() => setShowConfirm(false)}
+                onConfirm={confirmSubmit}
+                title="Konfirmasi Perubahan ATP"
+                message="Apakah Anda yakin ingin menyimpan perubahan laporan ATP ini?"
+                type="warning"
+                confirmText="Ya, Simpan"
             />
         </>
     );

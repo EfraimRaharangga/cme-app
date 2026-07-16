@@ -157,35 +157,10 @@ export default function AppLayout({ children }) {
                         )}
 
                         {hasRole(['admin', 'vendor', 'staff_cme']) && (
-                            <div>
-                                <button
-                                    onClick={() => toggleMenu('atp')}
-                                    className={`w-full flex items-center justify-between ${navItemStyle} ${inactiveClass}`}
-                                >
-                                    <span className="flex items-center gap-3">
-                                        <ClipboardList className="h-4 w-4 stroke-[1.5]" />
-                                        ATP Check
-                                    </span>
-                                    {openMenus['atp'] ? (
-                                        <ChevronDown className="h-3.5 w-3.5 text-gray-500" />
-                                    ) : (
-                                        <ChevronRight className="h-3.5 w-3.5 text-gray-500" />
-                                    )}
-                                </button>
-                                {openMenus['atp'] && (
-                                    <div className="pl-6 pr-2 py-1 space-y-1">
-                                        <Link href="/atp-dashboard" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp-dashboard' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
-                                            Dashboard ATP
-                                        </Link>
-                                        <Link href="/atp/baru" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp/baru' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
-                                            ATP Baru
-                                        </Link>
-                                        <Link href="/atp" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/atp' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
-                                            Riwayat ATP
-                                        </Link>
-                                    </div>
-                                )}
-                            </div>
+                            <Link href="/atp" onClick={handleLinkClick} className={`${navItemStyle} ${usePage().url.startsWith('/atp') ? activeClass : inactiveClass}`}>
+                                <ClipboardList className="h-4 w-4 stroke-[1.5]" />
+                                ATP Check
+                            </Link>
                         )}
 
                         {hasRole(['admin', 'staff_cme', 'vendor']) && (
