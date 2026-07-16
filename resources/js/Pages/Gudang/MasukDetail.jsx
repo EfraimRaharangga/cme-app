@@ -90,7 +90,7 @@ export default function MasukDetail({ transaction }) {
 
                     {/* ATTACHMENT NOTES PICTURES */}
                     {photos.length > 0 && (
-                        <Card title="📸 Nota &amp; Surat Jalan Fisik">
+                        <Card title=" Nota &amp; Surat Jalan Fisik">
                             <div className="grid grid-cols-2 gap-3">
                                 {photos.map((ph, idx) => (
                                     <div key={idx} className="border border-gray-150 rounded-lg overflow-hidden bg-gray-50">

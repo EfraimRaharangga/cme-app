@@ -404,68 +404,68 @@ export default function Edit({ record, templates }) {
                                         </div>
                                     </div>
 
-                                        <div className="flex flex-col gap-1.5">
-                                            <div className="flex flex-wrap items-center gap-3">
-                                                {/* Results OK/NG/NA toggles */}
-                                                <div>
-                                                    <div className="flex border border-gray-200 rounded overflow-hidden">
-                                                        {['OK', 'NG', 'NA'].map((st) => (
-                                                            <button
-                                                                key={st}
-                                                                type="button"
-                                                                onClick={() => handleCheckChange(key, st)}
-                                                                className={`px-3 py-1 text-xs font-bold transition ${checkVal === st
-                                                                    ? st === 'OK'
-                                                                        ? 'bg-emerald-500 text-white'
-                                                                        : st === 'NG'
-                                                                            ? 'bg-red-500 text-white'
-                                                                            : 'bg-amber-500 text-white'
-                                                                    : 'bg-white text-gray-400 hover:bg-gray-50'
-                                                                    }`}
-                                                            >
-                                                                {st}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                    {errors[`hasil_json.items.${key}`] && (
-                                                        <p className="text-red-500 text-[10px] mt-1">{errors[`hasil_json.items.${key}`]}</p>
-                                                    )}
+                                    <div className="flex flex-col gap-1.5">
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            {/* Results OK/NG/NA toggles */}
+                                            <div>
+                                                <div className="flex border border-gray-200 rounded overflow-hidden">
+                                                    {['OK', 'NG', 'NA'].map((st) => (
+                                                        <button
+                                                            key={st}
+                                                            type="button"
+                                                            onClick={() => handleCheckChange(key, st)}
+                                                            className={`px-3 py-1 text-xs font-bold transition ${checkVal === st
+                                                                ? st === 'OK'
+                                                                    ? 'bg-emerald-500 text-white'
+                                                                    : st === 'NG'
+                                                                        ? 'bg-red-500 text-white'
+                                                                        : 'bg-amber-500 text-white'
+                                                                : 'bg-white text-gray-400 hover:bg-gray-50'
+                                                                }`}
+                                                        >
+                                                            {st}
+                                                        </button>
+                                                    ))}
                                                 </div>
+                                                {errors[`hasil_json.items.${key}`] && (
+                                                    <p className="text-red-500 text-[10px] mt-1">{errors[`hasil_json.items.${key}`]}</p>
+                                                )}
+                                            </div>
 
-                                                <Input
-                                                    placeholder="Hasil Pengukuran"
-                                                    className={`text-xs p-1.5 w-32 transition-all ${checkVal === 'NA' ? 'opacity-40 bg-gray-100 cursor-not-allowed select-none' : ''}`}
-                                                    value={hasilVal}
-                                                    onChange={(e) => handleTextChange('hasil', key, e.target.value)}
-                                                    disabled={checkVal === 'NA'}
-                                                />
+                                            <Input
+                                                placeholder="Hasil Pengukuran"
+                                                className={`text-xs p-1.5 w-32 transition-all ${checkVal === 'NA' ? 'opacity-40 bg-gray-100 cursor-not-allowed select-none' : ''}`}
+                                                value={hasilVal}
+                                                onChange={(e) => handleTextChange('hasil', key, e.target.value)}
+                                                disabled={checkVal === 'NA'}
+                                            />
 
-                                                <Input
-                                                    placeholder="Catatan Audit"
-                                                    className={`text-xs p-1.5 w-44 transition-all ${checkVal === 'NA' ? 'opacity-40 bg-gray-100 cursor-not-allowed select-none' : ''}`}
-                                                    value={catatanVal}
-                                                    onChange={(e) => handleTextChange('catatan', key, e.target.value)}
-                                                    disabled={checkVal === 'NA'}
-                                                />
+                                            <Input
+                                                placeholder="Catatan Audit"
+                                                className={`text-xs p-1.5 w-44 transition-all ${checkVal === 'NA' ? 'opacity-40 bg-gray-100 cursor-not-allowed select-none' : ''}`}
+                                                value={catatanVal}
+                                                onChange={(e) => handleTextChange('catatan', key, e.target.value)}
+                                                disabled={checkVal === 'NA'}
+                                            />
 
-                                                <div className="w-40">
-                                                    <div className={`transition-all ${checkVal === 'NA' ? 'opacity-40 pointer-events-none cursor-not-allowed select-none' : ''}`}>
-                                                        <ImageUpload
-                                                            compact={true}
-                                                            multiple={true}
-                                                            value={data.fotos_item[key] || []}
-                                                            onChange={(files) => setData('fotos_item', {
-                                                                ...data.fotos_item,
-                                                                [key]: files
-                                                            })}
-                                                        />
-                                                    </div>
-                                                    {errors[`fotos_item.${key}`] && (
-                                                        <p className="text-red-500 text-[10px] mt-1">{errors[`fotos_item.${key}`]}</p>
-                                                    )}
+                                            <div className="w-40">
+                                                <div className={`transition-all ${checkVal === 'NA' ? 'opacity-40 pointer-events-none cursor-not-allowed select-none' : ''}`}>
+                                                    <ImageUpload
+                                                        compact={true}
+                                                        multiple={true}
+                                                        value={data.fotos_item[key] || []}
+                                                        onChange={(files) => setData('fotos_item', {
+                                                            ...data.fotos_item,
+                                                            [key]: files
+                                                        })}
+                                                    />
                                                 </div>
+                                                {errors[`fotos_item.${key}`] && (
+                                                    <p className="text-red-500 text-[10px] mt-1">{errors[`fotos_item.${key}`]}</p>
+                                                )}
                                             </div>
                                         </div>
+                                    </div>
                                 </div>
                             );
                         })}
@@ -473,7 +473,7 @@ export default function Edit({ record, templates }) {
                 </Card>
 
                 {/* 3. APPROVAL METADATA */}
-                <Card title="✍️ Tanda Tangan &amp; Otorisasi">
+                <Card title="Tanda Tangan &amp; Otorisasi">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* VENDOR */}
                         <div className="space-y-3 p-4 border border-gray-150 rounded-lg">

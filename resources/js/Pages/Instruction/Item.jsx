@@ -103,7 +103,7 @@ export default function Item({ kategori, spec, sow, images }) {
 
                 {/* Blueprint Drawing graphics if any */}
                 <div>
-                    <Card title="📸 Drawing Blueprint Layout">
+                    <Card title=" Drawing Blueprint Layout">
                         {images.length === 0 ? (
                             <div className="border border-gray-200 border-dashed rounded-lg p-8 text-center text-gray-400 bg-gray-50/50">
                                 <svg className="mx-auto h-8 w-8 stroke-[1.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">

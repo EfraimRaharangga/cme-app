@@ -49,26 +49,26 @@ export default function PrintBal({ record }) {
                 <p>
                     Pada hari ini, tanggal <b>{bal.tanggal || record.tanggal || '........................'}</b>, bertempat di site <b>{bal.lokasi || record.nama_site || '-'}</b>, yang bertanda tangan di bawah ini menerangkan bahwa telah selesai dilaksanakan pemeriksaan lapangan (Acceptance Test Procedure) untuk:
                 </p>
-                
+
                 <table className="w-full border-collapse text-xs">
                     <tbody>
                         <tr>
-                            <td className="w-32 py-1 font-bold text-gray-500">Nama Project</td>
+                            <td className="w-32 py-1 font-bold">Nama Project</td>
                             <td className="w-4 py-1">:</td>
                             <td className="py-1 text-gray-900 font-semibold">{bal.project || '-'}</td>
                         </tr>
                         <tr>
-                            <td className="py-1 font-bold text-gray-500">Lokasi / Site</td>
+                            <td className="py-1 font-bold">Lokasi / Site</td>
                             <td className="py-1">:</td>
                             <td className="py-1 text-gray-900 font-semibold">{bal.lokasi || record.nama_site || '-'}</td>
                         </tr>
                         <tr>
-                            <td className="py-1 font-bold text-gray-500">Pelaksana Pekerjaan</td>
+                            <td className="py-1 font-bold">Pelaksana Pekerjaan</td>
                             <td className="py-1">:</td>
                             <td className="py-1 text-gray-900 font-semibold">{bal.pelaksana || '-'}</td>
                         </tr>
                         <tr>
-                            <td className="py-1 font-bold text-gray-500">Tanggal Pemeriksaan</td>
+                            <td className="py-1 font-bold">Tanggal Pemeriksaan</td>
                             <td className="py-1">:</td>
                             <td className="py-1 text-gray-900 font-semibold">
                                 {bal.tanggal_mulai || '-'} s.d. {bal.tanggal || '-'}
@@ -113,7 +113,8 @@ export default function PrintBal({ record }) {
                 </div>
             </div>
 
-            <style dangerouslySetInnerHTML={{__html: `
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @media print {
                     body { background: white; margin: 0; padding: 0; }
                     .print\\:hidden { display: none !important; }

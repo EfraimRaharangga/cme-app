@@ -100,7 +100,7 @@ export default function KeluarDetail({ transaction }) {
 
                     {/* PHOTOS */}
                     {photos.length > 0 && (
-                        <Card title="📸 Bukti Rilis / Surat Jalan">
+                        <Card title=" Bukti Rilis / Surat Jalan">
                             <div className="grid grid-cols-2 gap-3">
                                 {photos.map((ph, idx) => (
                                     <div key={idx} className="border border-gray-150 rounded-lg overflow-hidden bg-gray-50">

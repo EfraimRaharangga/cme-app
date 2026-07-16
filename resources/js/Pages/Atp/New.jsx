@@ -546,7 +546,7 @@ export default function New({ defaultTemplate, templates }) {
                 </Card>
 
                 {/* 3. SIGNATURE APPROVAL METADATA */}
-                <Card title="✍️ Tanda Tangan &amp; Otorisasi">
+                <Card title="Tanda Tangan &amp; Otorisasi">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* VENDOR */}
                         <div className="space-y-3 p-4 border border-gray-150 rounded-lg">

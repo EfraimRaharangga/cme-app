@@ -93,7 +93,7 @@ export default function AppLayout({ children }) {
             <FlashMessage />
 
             {/* HEADER */}
-            <header className="h-14 bg-white border-b border-border text-text flex items-center justify-between px-6 sticky top-0 z-40">
+            <header className="h-14 bg-white border-b border-border text-text flex items-center justify-between px-6 sticky top-0 z-60">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={toggleSidebar}

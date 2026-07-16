@@ -156,7 +156,8 @@ export default function Print({ record }) {
                 </div>
             </div>
 
-            <style dangerouslySetInnerHTML={{__html: `
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @media print {
                     body { background: white; margin: 0; padding: 0; }
                     .print\\:hidden { display: none !important; }

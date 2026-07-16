@@ -11,10 +11,11 @@ export default function Detail({ record }) {
     const mapRef = useRef(null);
     const [showBalForm, setShowBalForm] = useState(false);
     const [showBastpForm, setShowBastpForm] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     // Initial forms states for BAL
     const balForm = useForm({
-        project: record.bal?.project || '',
+        project: record.bal?.nama_site || record.nama_site || '',
         no_po: record.bal?.no_po || record.no_po || '',
         tanggal_mulai: record.bal?.tanggal_mulai || '',
         tanggal: record.bal?.tanggal || record.tanggal || '',
@@ -127,21 +128,56 @@ export default function Detail({ record }) {
                     >
                         Cetak ATP
                     </Link>
-                    <Link
-                        href="/atp"
-                        className="px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-black transition"
-                    >
-                        &larr; Riwayat
-                    </Link>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Checklists table */}
-                <div className="lg:col-span-2 space-y-6">
-                    <Card title="Checkpoint Parameter ATP">
-                        <Table headers={['Nama Parameter', 'Standard', 'Hasil', 'Status', 'Catatan']}>
-                            {Object.entries(itemNames).map(([key, name]) => (
+            <div className="space-y-6 max-w-5xl mx-auto">
+                {/* 1. Detail Site Card */}
+                <Card title="Detail Site">
+                    <div className="space-y-3.5 text-xs text-gray-700">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-[10px] font-semibold text-gray-400 uppercase">Tanggal Audit</p>
+                                        <p className="font-bold text-gray-900 mt-0.5">{record.tanggal}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-semibold text-gray-400 uppercase">No. PO / SPK</p>
+                                        <p className="font-bold text-gray-900 mt-0.5">{record.no_po}</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p className="text-[10px] font-semibold text-gray-400 uppercase">Wilayah / Region</p>
+                                    <p className="font-bold text-gray-900 mt-0.5">{record.region || '-'}</p>
+                                </div>
+
+                                {record.latitude && (
+                                    <div className="pt-2">
+                                        <p className="text-[10px] font-semibold text-gray-400 uppercase">Koordinat GPS</p>
+                                        <code className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-0.5 rounded inline-block mt-1">
+                                            {record.latitude}, {record.longitude}
+                                        </code>
+                                    </div>
+                                )}
+                            </div>
+
+                            {record.latitude && (
+                                <div className="h-[200px] w-full border border-gray-200 rounded-lg overflow-hidden z-10">
+                                    <div id="map-atp-detail" className="h-full w-full" />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </Card>
+
+                {/* 2. Checkpoint Table Card */}
+                <Card title="Checkpoint Parameter ATP">
+                    <Table headers={['Nama Parameter', 'Standard', 'Hasil', 'Status', 'Catatan', 'Dokumentasi']}>
+                        {Object.entries(itemNames).map(([key, name]) => {
+                            const itemPhotos = record.photos.filter(p => String(p.item_id) === String(key));
+                            return (
                                 <tr key={key} className="hover:bg-gray-50/50">
                                     <td className="px-4 py-3 font-bold text-gray-900">
                                         {name}
@@ -162,159 +198,116 @@ export default function Detail({ record }) {
                                         </span>
                                     </td>
                                     <td className="px-4 py-3 text-gray-600 text-xs">{itemCatatan[key] || '-'}</td>
-                                </tr>
-                            ))}
-                        </Table>
-                    </Card>
-
-                    {/* PHOTOS */}
-                    {record.photos.length > 0 && (
-                        <Card title="📸 Foto Lampangan Verifikasi ATP">
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                {record.photos.map((photo) => {
-                                    const pName = itemNames[photo.item_id] || 'Checkpoint ' + photo.item_id;
-                                    return (
-                                        <div key={photo.id} className="border border-gray-150 rounded-lg overflow-hidden bg-gray-50 hover:shadow-sm transition">
-                                            <img
-                                                src={photo.file_url}
-                                                alt={pName}
-                                                className="w-full h-36 object-cover"
-                                                onError={(e) => {
-                                                    e.target.src = 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=400&q=85';
-                                                }}
-                                            />
-                                            <div className="p-2 border-t border-gray-100 bg-white">
-                                                <p className="text-[10px] font-semibold text-gray-900 truncate">{pName}</p>
-                                            </div>
+                                    <td className="px-4 py-3">
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {itemPhotos.map((photo) => (
+                                                <div
+                                                    key={photo.id}
+                                                    className="relative w-10 h-10 rounded border border-gray-200 overflow-hidden bg-white shadow-sm hover:border-[#00ADB5] transition cursor-pointer"
+                                                    onClick={() => setSelectedImage(photo.file_url)}
+                                                >
+                                                    <img
+                                                        src={photo.file_url}
+                                                        alt={name}
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e) => {
+                                                            e.target.src = 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=400&q=85';
+                                                        }}
+                                                    />
+                                                </div>
+                                            ))}
+                                            {itemPhotos.length === 0 && <span className="text-gray-400 text-xs">-</span>}
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        </Card>
-                    )}
-                </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </Table>
+                </Card>
 
-                {/* Sidebar details */}
-                <div className="space-y-6">
-                    <Card title="Detail Site">
-                        <div className="space-y-3.5 text-xs text-gray-700">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-[10px] font-semibold text-gray-400 uppercase">Tanggal Audit</p>
-                                    <p className="font-bold text-gray-900 mt-0.5">{record.tanggal}</p>
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-semibold text-gray-400 uppercase">No. PO / SPK</p>
-                                    <p className="font-bold text-gray-900 mt-0.5">{record.no_po}</p>
-                                </div>
+                {/* 3. Verdict Keputusan Card */}
+                <Card title="Verdict Keputusan">
+                    <div className="space-y-3 text-xs">
+                        <div className="flex justify-between items-center">
+                            <span className="font-semibold text-gray-400 uppercase">Status Kelayakan</span>
+                            <span
+                                className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${record.verdict === 'ACCEPT'
+                                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                    : record.verdict === 'CONDITIONAL'
+                                        ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                                        : record.verdict === 'REJECT'
+                                            ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                                            : 'bg-gray-50 text-gray-600 border border-gray-200'
+                                    }`}
+                            >
+                                {record.verdict || 'PENDING'}
+                            </span>
+                        </div>
+                        {record.verdict_notes && (
+                            <div className="p-3 bg-gray-50 border border-gray-200 rounded text-gray-600">
+                                <p className="font-bold text-gray-700 mb-1">Catatan Verdict:</p>
+                                {record.verdict_notes}
                             </div>
+                        )}
+                    </div>
+                </Card>
 
+                {/* 4. Pihak Otorisasi Card */}
+                <Card title="Pihak Otorisasi">
+                    <div className="space-y-3.5 text-xs text-gray-700">
+                        <div>
+                            <p className="font-bold text-primary mb-1">Pihak Pelaksana (Vendor)</p>
+                            <p className="font-semibold text-gray-900">{app.vendor_company || '-'}</p>
+                            <p className="text-gray-500 mt-0.5">{app.vendor_1_name} ({app.vendor_1_role})</p>
+                        </div>
+                        <div className="pt-2.5 border-t border-gray-100">
+                            <p className="font-bold text-gray-900 mb-1">Tim Evaluasi (CME Team)</p>
+                            <p className="font-semibold text-gray-900">{app.cme_company || '-'}</p>
+                            <p className="text-gray-500 mt-0.5">{app.cme_1_name} ({app.cme_1_role})</p>
+                        </div>
+                    </div>
+                </Card>
+
+                {/* 5. Berita Acara & Handover Card */}
+                <Card title="Siapkan Dokumen">
+                    <div className="space-y-3">
+                        {/* BAL */}
+                        <div className="border border-gray-100 p-3 rounded-lg flex items-center justify-between">
                             <div>
-                                <p className="text-[10px] font-semibold text-gray-400 uppercase">Wilayah / Region</p>
-                                <p className="font-bold text-gray-900 mt-0.5">{record.region || '-'}</p>
+                                <p className="text-xs font-bold text-gray-800">Berita Acara Lapangan (BAL)</p>
+                                <p className="text-[10px] text-gray-400">{record.bal ? 'Selesai dibuat' : 'Belum dibuat'}</p>
                             </div>
-
-                            {record.latitude && (
-                                <div className="pt-2">
-                                    <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2">Peta Lokasi</p>
-                                    <div
-                                        id="map-atp-detail"
-                                        className="h-[180px] w-full border border-gray-200 rounded-lg overflow-hidden z-10"
-                                    />
-                                    <div className="mt-2 text-center">
-                                        <code className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-0.5 rounded">
-                                            {record.latitude}, {record.longitude}
-                                        </code>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
-                    {/* Verdict */}
-                    <Card title="Verdict Keputusan">
-                        <div className="space-y-3">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs font-semibold text-gray-400 uppercase">Status Kelayakan</span>
-                                <span
-                                    className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${record.verdict === 'ACCEPT'
-                                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                                        : record.verdict === 'CONDITIONAL'
-                                            ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                                            : record.verdict === 'REJECT'
-                                                ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                                                : 'bg-gray-50 text-gray-600 border border-gray-200'
-                                        }`}
-                                >
-                                    {record.verdict || 'PENDING'}
-                                </span>
+                            <div className="flex gap-1.5">
+                                {record.bal ? (
+                                    <>
+                                        <Link href={`/atp/${record.id}/bal`} className="text-primary hover:underline text-xs font-semibold">Cetak</Link>
+                                        <button onClick={() => setShowBalForm(true)} className="text-gray-500 hover:underline text-xs font-semibold">Edit</button>
+                                    </>
+                                ) : (
+                                    <button onClick={() => setShowBalForm(true)} className="text-primary hover:underline text-xs font-semibold">+ Buat</button>
+                                )}
                             </div>
-                            {record.verdict_notes && (
-                                <div className="p-3 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">
-                                    <p className="font-bold text-gray-700 mb-1">Catatan Verdict:</p>
-                                    {record.verdict_notes}
-                                </div>
-                            )}
                         </div>
-                    </Card>
 
-                    {/* Tim Evaluator */}
-                    <Card title="✍️ Pihak Otorisasi">
-                        <div className="space-y-3.5 text-xs text-gray-700">
+                        {/* BASTP */}
+                        <div className="border border-gray-100 p-3 rounded-lg flex items-center justify-between">
                             <div>
-                                <p className="font-bold text-primary mb-1">Pihak Pelaksana (Vendor)</p>
-                                <p className="font-semibold text-gray-900">{app.vendor_company || '-'}</p>
-                                <p className="text-gray-500 mt-0.5">{app.vendor_1_name} ({app.vendor_1_role})</p>
+                                <p className="text-xs font-bold text-gray-800">BASTP / Handover</p>
+                                <p className="text-[10px] text-gray-400">{record.bastp ? 'Selesai dibuat' : 'Belum dibuat'}</p>
                             </div>
-                            <div className="pt-2.5 border-t border-gray-100">
-                                <p className="font-bold text-gray-900 mb-1">Tim Evaluasi (CME Team)</p>
-                                <p className="font-semibold text-gray-900">{app.cme_company || '-'}</p>
-                                <p className="text-gray-500 mt-0.5">{app.cme_1_name} ({app.cme_1_role})</p>
-                            </div>
-                        </div>
-                    </Card>
-
-                    {/* BAL / BASTP REPORT SHORTCUTS */}
-                    <Card title="📄 Berita Acara &amp; Handover">
-                        <div className="space-y-3">
-                            {/* BAL */}
-                            <div className="border border-gray-100 p-3 rounded-lg flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs font-bold text-gray-800">Berita Acara Lapangan (BAL)</p>
-                                    <p className="text-[10px] text-gray-400">{record.bal ? 'Selesai dibuat' : 'Belum dibuat'}</p>
-                                </div>
-                                <div className="flex gap-1.5">
-                                    {record.bal ? (
-                                        <>
-                                            <Link href={`/atp/${record.id}/bal`} className="text-primary hover:underline text-xs font-semibold">Cetak</Link>
-                                            <button onClick={() => setShowBalForm(true)} className="text-gray-500 hover:underline text-xs font-semibold">Edit</button>
-                                        </>
-                                    ) : (
-                                        <button onClick={() => setShowBalForm(true)} className="text-primary hover:underline text-xs font-semibold">+ Buat</button>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* BASTP */}
-                            <div className="border border-gray-100 p-3 rounded-lg flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs font-bold text-gray-800">BASTP / Handover</p>
-                                    <p className="text-[10px] text-gray-400">{record.bastp ? 'Selesai dibuat' : 'Belum dibuat'}</p>
-                                </div>
-                                <div className="flex gap-1.5">
-                                    {record.bastp ? (
-                                        <>
-                                            <Link href={`/atp/${record.id}/bastp`} className="text-primary hover:underline text-xs font-semibold">Cetak</Link>
-                                            <button onClick={() => setShowBastpForm(true)} className="text-gray-500 hover:underline text-xs font-semibold">Edit</button>
-                                        </>
-                                    ) : (
-                                        <button onClick={() => setShowBastpForm(true)} className="text-primary hover:underline text-xs font-semibold">+ Buat</button>
-                                    )}
-                                </div>
+                            <div className="flex gap-1.5">
+                                {record.bastp ? (
+                                    <>
+                                        <Link href={`/atp/${record.id}/bastp`} className="text-primary hover:underline text-xs font-semibold">Cetak</Link>
+                                        <button onClick={() => setShowBastpForm(true)} className="text-gray-500 hover:underline text-xs font-semibold">Edit</button>
+                                    </>
+                                ) : (
+                                    <button onClick={() => setShowBastpForm(true)} className="text-primary hover:underline text-xs font-semibold">+ Buat</button>
+                                )}
                             </div>
                         </div>
-                    </Card>
-                </div>
+                    </div>
+                </Card>
             </div>
 
             {/* BAL DIALOG MODAL */}
@@ -377,6 +370,25 @@ export default function Detail({ record }) {
                         <Button type="button" variant="outline" onClick={() => setShowBastpForm(false)}>Batal</Button>
                     </div>
                 </form>
+            </Modal>
+
+            {/* Photo Preview Zoom Modal */}
+            <Modal
+                isOpen={!!selectedImage}
+                onClose={() => setSelectedImage(null)}
+                title="Pratinjau Foto Dokumentasi"
+                size="max-w-2xl"
+            >
+                <div className="flex justify-center items-center p-2 bg-gray-900 rounded-lg">
+                    <img
+                        src={selectedImage}
+                        alt="Zoomed Preview"
+                        className="max-w-full max-h-[70vh] object-contain rounded"
+                        onError={(e) => {
+                            e.target.src = 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=400&q=85';
+                        }}
+                    />
+                </div>
             </Modal>
         </>
     );
