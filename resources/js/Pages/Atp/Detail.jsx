@@ -13,6 +13,8 @@ export default function Detail({ record }) {
     const mapRef = useRef(null);
     const [showBalForm, setShowBalForm] = useState(false);
     const [showBastpForm, setShowBastpForm] = useState(false);
+    const [deletingBal, setDeletingBal] = useState(false);
+    const [deletingBastp, setDeletingBastp] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [confirmModal, setConfirmModal] = useState({
         isOpen: false,
@@ -61,6 +63,15 @@ export default function Detail({ record }) {
     useEffect(() => {
         if (typeof window !== 'undefined' && record.latitude && record.longitude) {
             const initMap = () => {
+                if (mapRef.current) {
+                    mapRef.current.remove();
+                    mapRef.current = null;
+                }
+                const container = document.getElementById('map-atp-detail');
+                if (container && container._leaflet_id) {
+                    container._leaflet_id = null;
+                }
+
                 const lat = parseFloat(record.latitude);
                 const lng = parseFloat(record.longitude);
                 const center = [lat, lng];
@@ -92,6 +103,13 @@ export default function Detail({ record }) {
                 document.body.appendChild(script);
             }
         }
+
+        return () => {
+            if (mapRef.current) {
+                mapRef.current.remove();
+                mapRef.current = null;
+            }
+        };
     }, [record]);
 
     const handleSaveBal = (e) => {
@@ -124,26 +142,38 @@ export default function Detail({ record }) {
         });
     };
 
-    const handleDeleteBal = () => {
+    const handleDeleteBal = (e) => {
+        if (e) e.preventDefault();
         setConfirmModal({
             isOpen: true,
             title: 'Hapus Berita Acara Lapangan (BAL)',
             message: 'Apakah Anda yakin ingin menghapus dokumen BAL ini? Tindakan ini tidak dapat dibatalkan.',
             type: 'danger',
             onConfirm: () => {
-                router.delete(`/atp/${record.id}/bal`);
+                setDeletingBal(true);
+                router.delete(`/atp/${record.id}/bal`, {
+                    preserveScroll: true,
+                    preserveState: true,
+                    onFinish: () => setDeletingBal(false)
+                });
             }
         });
     };
 
-    const handleDeleteBastp = () => {
+    const handleDeleteBastp = (e) => {
+        if (e) e.preventDefault();
         setConfirmModal({
             isOpen: true,
             title: 'Hapus BASTP / Handover',
             message: 'Apakah Anda yakin ingin menghapus dokumen BASTP ini? Tindakan ini tidak dapat dibatalkan.',
             type: 'danger',
             onConfirm: () => {
-                router.delete(`/atp/${record.id}/bastp`);
+                setDeletingBastp(true);
+                router.delete(`/atp/${record.id}/bastp`, {
+                    preserveScroll: true,
+                    preserveState: true,
+                    onFinish: () => setDeletingBastp(false)
+                });
             }
         });
     };
@@ -358,6 +388,7 @@ export default function Detail({ record }) {
                                             variant="danger"
                                             onClick={handleDeleteBal}
                                             className="px-3 py-2"
+                                            processing={deletingBal}
                                         >
                                             <Trash2 className="h-3.5 w-3.5 stroke-[1.5]" />
                                             Hapus
@@ -411,6 +442,7 @@ export default function Detail({ record }) {
                                             variant="danger"
                                             onClick={handleDeleteBastp}
                                             className="px-3 py-2"
+                                            processing={deletingBastp}
                                         >
                                             <Trash2 className="h-3.5 w-3.5 stroke-[1.5]" />
                                             Hapus
