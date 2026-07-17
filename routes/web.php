@@ -7,6 +7,7 @@ use App\Http\Controllers\InstructionController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // Guest Authentication Routes
@@ -76,4 +77,8 @@ Route::middleware('custom_auth')->group(function () {
     Route::post('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'delete']);
     Route::get('/users-logs', [UserController::class, 'logs']);
+
+    // User Profile Module
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::post('/profile/change-password', [ProfileController::class, 'changePassword']);
 });

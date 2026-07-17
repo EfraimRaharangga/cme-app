@@ -55,14 +55,6 @@ export default function AppLayout({ children }) {
         } catch (e) { }
     };
 
-    const toggleMenu = (name) => {
-        const next = { ...openMenus, [name]: !openMenus[name] };
-        setOpenMenus(next);
-        try {
-            localStorage.setItem('sidebar_menus', JSON.stringify(next));
-        } catch (e) { }
-    };
-
     const handleLogout = () => {
         setConfirmModal({
             isOpen: true,
@@ -110,12 +102,15 @@ export default function AppLayout({ children }) {
 
                 <div className="flex items-center gap-4">
                     {user && (
-                        <div className="flex items-center gap-2 border-r border-border pr-4">
-                            <User className="h-4 w-4 text-gray-400 stroke-[1.5]" />
-                            <span className="text-xs text-text font-medium font-headlines">
+                        <Link
+                            href="/profile"
+                            className="flex items-center gap-2 border-r border-border pr-4 text-text hover:text-primary transition group"
+                        >
+                            <User className="h-4 w-4 text-gray-400 group-hover:text-primary transition stroke-[1.5]" />
+                            <span className="text-xs font-medium font-headlines">
                                 {user.username} <span className="text-gray-400">({user.role})</span>
                             </span>
-                        </div>
+                        </Link>
                     )}
                     <button
                         onClick={handleLogout}
@@ -138,7 +133,7 @@ export default function AppLayout({ children }) {
 
                 {/* SIDEBAR */}
                 <aside
-                    className={`fixed lg:static top-14 bottom-0 left-0 z-40 bg-surface border-r border-border text-text transition-all duration-300 flex flex-col ${sidebarOpen ? 'w-64 translate-x-0 lg:w-1/5 lg:shrink-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:overflow-hidden lg:border-r-0'
+                    className={`sticky top-14 lg:top-14 bottom-0 lg:bottom-auto left-0 z-40 bg-surface border-r border-border text-text transition-all duration-300 flex flex-col lg:h-[calc(100vh-3.5rem)] ${sidebarOpen ? 'w-64 translate-x-0 lg:w-1/5 lg:shrink-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:overflow-hidden lg:border-r-0'
                         }`}
                 >
                     <div className="flex-grow py-4 overflow-y-auto px-3 space-y-1">
@@ -171,37 +166,23 @@ export default function AppLayout({ children }) {
                         )}
 
                         {hasRole(['admin', 'staff_cme']) && (
-                            <div>
-                                <button
-                                    onClick={() => toggleMenu('gudang')}
-                                    className={`w-full flex items-center justify-between ${navItemStyle} ${inactiveClass}`}
-                                >
-                                    <span className="flex items-center gap-3">
-                                        <Package className="h-4 w-4 stroke-[1.5]" />
-                                        Gudang
-                                    </span>
-                                    {openMenus['gudang'] ? (
-                                        <ChevronDown className="h-3.5 w-3.5 text-gray-500" />
-                                    ) : (
-                                        <ChevronRight className="h-3.5 w-3.5 text-gray-500" />
-                                    )}
-                                </button>
-                                {openMenus['gudang'] && (
-                                    <div className="pl-6 pr-2 py-1 space-y-1">
-                                        <Link href="/gudang" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
-                                            Stok Barang
-                                        </Link>
-                                        <Link href="/gudang/history" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang/history' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
-                                            Riwayat Transaksi
-                                        </Link>
-                                    </div>
-                                )}
-                            </div>
+                            <Link href="/gudang" onClick={handleLinkClick} className={`${navItemStyle} ${usePage().url.startsWith('/gudang') ? activeClass : inactiveClass}`}>
+                                <Package className="h-4 w-4 stroke-[1.5]" />
+                                Gudang
+                            </Link>
                         )}
+
+                        {/* Profile link visible to all authenticated roles, separated by a divider */}
+                        <div className="border-t border-border my-2 pt-2">
+                            <Link href="/profile" onClick={handleLinkClick} className={`${navItemStyle} ${usePage().url === '/profile' ? activeClass : inactiveClass}`}>
+                                <User className="h-4 w-4 stroke-[1.5]" />
+                                Profil Saya
+                            </Link>
+                        </div>
 
                         {/* Admin specific accounts management */}
                         {hasRole(['admin']) && (
-                            <div className="pt-4 mt-4 border-t border-border space-y-1">
+                            <div className="space-y-1">
                                 <Link href="/users" onClick={handleLinkClick} className={`${navItemStyle} ${usePage().url === '/users' ? activeClass : inactiveClass}`}>
                                     <Users className="h-4 w-4 stroke-[1.5]" />
                                     Kelola Pengguna
