@@ -62,9 +62,8 @@ Route::middleware('custom_auth')->group(function () {
     Route::post('/gudang/tipe', [GudangController::class, 'storeTipe']);
     Route::post('/gudang/masuk', [GudangController::class, 'storeMasuk']);
     Route::post('/gudang/keluar', [GudangController::class, 'storeKeluar']);
-    Route::get('/gudang/masuk-history', [GudangController::class, 'masukList']);
+    Route::get('/gudang/history', [GudangController::class, 'history']);
     Route::get('/gudang/masuk-history/{id}', [GudangController::class, 'masukDetail']);
-    Route::get('/gudang/keluar-history', [GudangController::class, 'keluarList']);
     Route::get('/gudang/keluar-history/{id}', [GudangController::class, 'keluarDetail']);
 
     // Scope of Work Spec Guides Reference Module

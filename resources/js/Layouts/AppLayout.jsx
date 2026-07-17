@@ -191,11 +191,8 @@ export default function AppLayout({ children }) {
                                         <Link href="/gudang" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
                                             Stok Barang
                                         </Link>
-                                        <Link href="/gudang/masuk-history" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang/masuk-history' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
-                                            Barang Masuk
-                                        </Link>
-                                        <Link href="/gudang/keluar-history" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang/keluar-history' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
-                                            Barang Keluar
+                                        <Link href="/gudang/history" onClick={handleLinkClick} className={`block px-3 py-2 rounded-md text-xs transition ${usePage().url === '/gudang/history' ? 'text-primary font-medium bg-primary/5' : 'text-text/75 hover:text-text hover:bg-gray-100'}`}>
+                                            Riwayat Transaksi
                                         </Link>
                                     </div>
                                 )}

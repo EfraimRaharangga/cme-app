@@ -74,6 +74,8 @@ class GudangController extends Controller
             'categories' => $categories,
             'totals' => $categoryTotals,
             'filters' => $request->only(['cari', 'kategori']),
+            'totalMasukCount' => GudangMasuk::count(),
+            'totalKeluarCount' => GudangKeluar::count(),
         ]);
     }
 
@@ -279,22 +281,77 @@ class GudangController extends Controller
         }
     }
 
-    public function masukList(Request $request): Response
+    public function history(Request $request): Response
     {
-        $search = $request->input('cari');
-        $query = GudangMasuk::query();
-
-        if ($search) {
-            $query->where('no_form', 'like', "%{$search}%")
-                  ->orWhere('supplier', 'like', "%{$search}%")
-                  ->orWhere('penerima', 'like', "%{$search}%");
+        $role = $request->session()->get('role');
+        if ($role !== 'admin' && $role !== 'staff_cme') {
+            return redirect('/dashboard');
         }
 
-        $list = $query->orderBy('tanggal', 'desc')->get();
+        $search = $request->input('cari');
+        $typeFilter = $request->input('type');
 
-        return Inertia::render('Gudang/MasukList', [
-            'transactions' => $list,
-            'filters' => $request->only(['cari']),
+        $masukList = [];
+        $keluarList = [];
+
+        if (!$typeFilter || $typeFilter === 'masuk') {
+            $masukQuery = GudangMasuk::query();
+            if ($search) {
+                $masukQuery->where(function($q) use ($search) {
+                    $q->where('no_form', 'like', "%{$search}%")
+                      ->orWhere('judul', 'like', "%{$search}%")
+                      ->orWhere('supplier', 'like', "%{$search}%")
+                      ->orWhere('penerima', 'like', "%{$search}%")
+                      ->orWhere('lokasi', 'like', "%{$search}%");
+                });
+            }
+            $masukList = $masukQuery->orderBy('tanggal', 'desc')->get()->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'no_form' => $item->no_form,
+                    'type' => 'masuk',
+                    'tanggal' => $item->tanggal,
+                    'judul' => $item->judul,
+                    'pihak' => $item->supplier,
+                    'penerima_pengambil' => $item->penerima,
+                    'lokasi' => $item->lokasi ?: '-',
+                ];
+            })->toArray();
+        }
+
+        if (!$typeFilter || $typeFilter === 'keluar') {
+            $keluarQuery = GudangKeluar::query();
+            if ($search) {
+                $keluarQuery->where(function($q) use ($search) {
+                    $q->where('no_form', 'like', "%{$search}%")
+                      ->orWhere('judul', 'like', "%{$search}%")
+                      ->orWhere('pengambil', 'like', "%{$search}%")
+                      ->orWhere('lokasi_tujuan', 'like', "%{$search}%");
+                });
+            }
+            $keluarList = $keluarQuery->orderBy('tanggal', 'desc')->get()->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'no_form' => $item->no_form,
+                    'type' => 'keluar',
+                    'tanggal' => $item->tanggal,
+                    'judul' => $item->judul,
+                    'pihak' => $item->pengambil,
+                    'penerima_pengambil' => $item->pengambil,
+                    'lokasi' => $item->lokasi_tujuan ?: '-',
+                ];
+            })->toArray();
+        }
+
+        $combined = array_merge($masukList, $keluarList);
+
+        usort($combined, function($a, $b) {
+            return strcmp($b['tanggal'], $a['tanggal']) ?: strcmp($b['no_form'], $a['no_form']);
+        });
+
+        return Inertia::render('Gudang/History', [
+            'transactions' => $combined,
+            'filters' => $request->only(['cari', 'type']),
         ]);
     }
 
@@ -303,25 +360,6 @@ class GudangController extends Controller
         $transaction = GudangMasuk::with('details')->findOrFail($id);
         return Inertia::render('Gudang/MasukDetail', [
             'transaction' => $transaction,
-        ]);
-    }
-
-    public function keluarList(Request $request): Response
-    {
-        $search = $request->input('cari');
-        $query = GudangKeluar::query();
-
-        if ($search) {
-            $query->where('no_form', 'like', "%{$search}%")
-                  ->orWhere('pengambil', 'like', "%{$search}%")
-                  ->orWhere('lokasi_tujuan', 'like', "%{$search}%");
-        }
-
-        $list = $query->orderBy('tanggal', 'desc')->get();
-
-        return Inertia::render('Gudang/KeluarList', [
-            'transactions' => $list,
-            'filters' => $request->only(['cari']),
         ]);
     }
 
