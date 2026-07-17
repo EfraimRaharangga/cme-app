@@ -230,6 +230,22 @@ class AtpController extends Controller
     {
         $record = AtpRecord::findOrFail($id);
 
+        $request->validate([
+            'project' => 'required|string|max:255',
+            'no_po' => 'required|string|max:255',
+            'tanggal_mulai' => 'required|date',
+            'tanggal' => 'required|date',
+            'pelaksana' => 'required|string|max:255',
+            'lokasi' => 'required|string|max:255',
+            'hasil' => 'required|string|max:255',
+            'pihak1' => 'required|string|max:255',
+            'pihak2' => 'required|string|max:255',
+            'nama1' => 'required|string|max:255',
+            'jabatan1' => 'required|string|max:255',
+            'nama2' => 'required|string|max:255',
+            'jabatan2' => 'required|string|max:255',
+        ]);
+
         $bal = BalData::updateOrCreate(
             ['atp_id' => $record->id],
             $request->only([
@@ -240,6 +256,15 @@ class AtpController extends Controller
         );
 
         return redirect('/atp/' . $record->id)->with('success', 'Data Berita Acara Lapangan (BAL) berhasil disimpan!');
+    }
+
+    public function deleteBal($id)
+    {
+        $record = AtpRecord::findOrFail($id);
+        if ($record->bal) {
+            $record->bal->delete();
+        }
+        return redirect('/atp/' . $record->id)->with('success', 'Data Berita Acara Lapangan (BAL) berhasil dihapus!');
     }
 
     // BASTP report handlers
@@ -255,6 +280,17 @@ class AtpController extends Controller
     {
         $record = AtpRecord::findOrFail($id);
 
+        $request->validate([
+            'p1_nama' => 'required|string|max:255',
+            'p1_alamat' => 'required|string',
+            'p2_nama' => 'required|string|max:255',
+            'p2_jabatan' => 'required|string|max:255',
+            'p2_alamat' => 'required|string',
+            'pekerjaan' => 'required|string|max:255',
+            'mengetahui1' => 'required|string|max:255',
+            'mengetahui2' => 'required|string|max:255',
+        ]);
+
         $bastp = BastpData::updateOrCreate(
             ['atp_id' => $record->id],
             $request->only([
@@ -264,6 +300,15 @@ class AtpController extends Controller
         );
 
         return redirect('/atp/' . $record->id)->with('success', 'Data BASTP berhasil disimpan!');
+    }
+
+    public function deleteBastp($id)
+    {
+        $record = AtpRecord::findOrFail($id);
+        if ($record->bastp) {
+            $record->bastp->delete();
+        }
+        return redirect('/atp/' . $record->id)->with('success', 'Data BASTP berhasil dihapus!');
     }
 
     // Customizer template builder

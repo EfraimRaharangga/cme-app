@@ -18,8 +18,17 @@ export default function Print({ record }) {
     const itemHasil = record.hasil_json?.hasil || {};
     const itemCatatan = record.hasil_json?.catatan || {};
 
+    const verdictColors = {
+        ACCEPT: 'text-[#16A34A]',
+        CONDITIONAL: 'text-[#CA8A04]',
+        REJECT: 'text-[#DC2626]',
+        PENDING: 'text-[#64748B]',
+    };
+    const currentVerdict = record.verdict || 'PENDING';
+    const verdictColorClass = verdictColors[currentVerdict] || verdictColors.PENDING;
+
     return (
-        <div className="bg-white min-h-screen p-8 text-black font-body text-xs leading-relaxed max-w-[210mm] mx-auto">
+        <div className="bg-white min-h-screen text-black font-body text-xs leading-relaxed max-w-[210mm] mx-auto print-container p-8">
             <Head title={`Cetak ATP - ${record.nama_site}`} />
 
             {/* PRINT BAR */}
@@ -47,17 +56,12 @@ export default function Print({ record }) {
             {/* HEADER */}
             <div className="flex items-center justify-between border-b-2 border-gray-900 pb-4 mb-6">
                 <div>
-                    <h2 className="text-lg font-black uppercase tracking-wider font-headlines">
-                        Acceptance Test Procedure (ATP) Checklist
-                    </h2>
-                    <p className="text-[10px] text-gray-500 font-headlines mt-0.5">
-                        Civil, Mechanical, and Electrical Infrastructure Evaluation
-                    </p>
+                    <img src="/weave-logo.png" alt="Weave Logo" className="h-10 object-contain" />
                 </div>
                 <div className="text-right">
-                    <h3 className="font-bold text-sm text-[#00ADB5]">{record.nama_site}</h3>
-                    <p className="text-[9px] text-gray-400 font-mono mt-0.5">
-                        No. PO: {record.no_po} &bull; Tanggal: {record.tanggal}
+                    <h3 className="font-bold text-sm text-gray-900 font-headlines">{record.nama_site}</h3>
+                    <p className="text-[10px] text-gray-500 font-mono mt-0.5">
+                        {record.tanggal} | No. PO: {record.no_po}
                     </p>
                 </div>
             </div>
@@ -92,7 +96,22 @@ export default function Print({ record }) {
                 </div>
             </div>
 
-            {/* CHECKLIST TABLE */}
+            {/* VERDICT SECTION */}
+            <div className="border border-gray-900 p-4 rounded mb-6 break-inside-avoid">
+                <div className="flex items-center gap-2">
+                    <span className="font-bold text-xs uppercase tracking-wider text-gray-700">Verdict:</span>
+                    <span className={`font-black text-sm uppercase tracking-wider ${verdictColorClass}`}>
+                        {currentVerdict}
+                    </span>
+                </div>
+                {record.verdict_notes && (
+                    <p className="text-xs text-gray-650 mt-1 whitespace-pre-wrap font-body">
+                        catatan :{record.verdict_notes}
+                    </p>
+                )}
+            </div>
+
+            {/* CHECKLIST DATA TABLE */}
             <div className="mb-6">
                 <table className="w-full border-collapse text-left text-[10px]">
                     <thead>
@@ -122,18 +141,7 @@ export default function Print({ record }) {
                 </table>
             </div>
 
-            {/* VERDICT & SIGNATURES */}
-            <div className="border border-gray-900 p-3 rounded mb-8 break-inside-avoid">
-                <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                    <span className="font-bold text-xs uppercase tracking-wider text-gray-700">Final Audit Verdict</span>
-                    <span className="font-black text-sm text-[#00ADB5] underline">{record.verdict || 'PENDING'}</span>
-                </div>
-                <p className="text-xs text-gray-600 mt-2 whitespace-pre-wrap">
-                    {record.verdict_notes || 'Tidak ada catatan tambahan kelayakan.'}
-                </p>
-            </div>
-
-            {/* SIGNATURE BLOCK */}
+            {/* APPROVAL SECTION / SIGNATURE BLOCK */}
             <div className="grid grid-cols-2 gap-8 break-inside-avoid mt-12 text-center text-[11px]">
                 <div className="flex flex-col justify-between h-28 border border-gray-100 p-3 rounded">
                     <span className="font-bold text-gray-400 uppercase tracking-wider text-[9px]">Pihak Pelaksana (Vendor)</span>
@@ -161,8 +169,9 @@ export default function Print({ record }) {
                 @media print {
                     body { background: white; margin: 0; padding: 0; }
                     .print\\:hidden { display: none !important; }
+                    .print-container { padding: 20mm 15mm !important; }
                 }
-                @page { size: A4 portrait; margin: 15mm 10mm; }
+                @page { size: A4 portrait; margin: 0; }
             `}} />
         </div>
     );

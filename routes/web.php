@@ -51,8 +51,10 @@ Route::middleware('custom_auth')->group(function () {
     // BAL and BASTP print pages
     Route::get('/atp/{id}/bal', [AtpController::class, 'printBal']);
     Route::post('/atp/{id}/bal', [AtpController::class, 'saveBal']);
+    Route::delete('/atp/{id}/bal', [AtpController::class, 'deleteBal']);
     Route::get('/atp/{id}/bastp', [AtpController::class, 'printBastp']);
     Route::post('/atp/{id}/bastp', [AtpController::class, 'saveBastp']);
+    Route::delete('/atp/{id}/bastp', [AtpController::class, 'deleteBastp']);
 
     // Warehouse Inventory Module
     Route::get('/gudang', [GudangController::class, 'index']);

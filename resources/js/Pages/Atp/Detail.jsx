@@ -1,21 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Table from '../../Components/Table';
 import Button from '../../Components/Button';
 import Input from '../../Components/Input';
 import Modal from '../../Components/Modal';
+import ConfirmationModal from '../../Components/ConfirmationModal';
+import { Plus, Trash2, Printer } from 'lucide-react';
 
 export default function Detail({ record }) {
     const mapRef = useRef(null);
     const [showBalForm, setShowBalForm] = useState(false);
     const [showBastpForm, setShowBastpForm] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [confirmModal, setConfirmModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'info',
+        onConfirm: null
+    });
 
-    // Initial forms states for BAL
-    const balForm = useForm({
-        project: record.bal?.nama_site || record.nama_site || '',
+    // Define initial values for disabling fields if pre-filled
+    const initialBalValues = {
+        project: record.bal?.project || record.nama_site || '',
         no_po: record.bal?.no_po || record.no_po || '',
         tanggal_mulai: record.bal?.tanggal_mulai || '',
         tanggal: record.bal?.tanggal || record.tanggal || '',
@@ -28,10 +37,9 @@ export default function Detail({ record }) {
         jabatan1: record.bal?.jabatan1 || record.hasil_json?.approval?.vendor_1_role || '',
         nama2: record.bal?.nama2 || record.hasil_json?.approval?.cme_1_name || '',
         jabatan2: record.bal?.jabatan2 || record.hasil_json?.approval?.cme_1_role || '',
-    });
+    };
 
-    // Initial forms states for BASTP
-    const bastpForm = useForm({
+    const initialBastpValues = {
         p1_nama: record.bastp?.p1_nama || record.hasil_json?.approval?.vendor_1_name || '',
         p1_alamat: record.bastp?.p1_alamat || '',
         p2_nama: record.bastp?.p2_nama || record.hasil_json?.approval?.cme_1_name || '',
@@ -41,7 +49,13 @@ export default function Detail({ record }) {
         mengetahui1: record.bastp?.mengetahui1 || '',
         mengetahui2: record.bastp?.mengetahui2 || '',
         photos: record.bastp?.photos || '',
-    });
+    };
+
+    // Initial forms states for BAL
+    const balForm = useForm({ ...initialBalValues });
+
+    // Initial forms states for BASTP
+    const bastpForm = useForm({ ...initialBastpValues });
 
     // Initialize Map coords
     useEffect(() => {
@@ -82,15 +96,55 @@ export default function Detail({ record }) {
 
     const handleSaveBal = (e) => {
         e.preventDefault();
-        balForm.post(`/atp/${record.id}/bal`, {
-            onSuccess: () => setShowBalForm(false)
+        setConfirmModal({
+            isOpen: true,
+            title: 'Simpan Berita Acara Lapangan (BAL)',
+            message: 'Apakah Anda yakin ingin menyimpan dokumen BAL ini? Data yang sudah diisi akan dikunci.',
+            type: 'info',
+            onConfirm: () => {
+                balForm.post(`/atp/${record.id}/bal`, {
+                    onSuccess: () => setShowBalForm(false)
+                });
+            }
         });
     };
 
     const handleSaveBastp = (e) => {
         e.preventDefault();
-        bastpForm.post(`/atp/${record.id}/bastp`, {
-            onSuccess: () => setShowBastpForm(false)
+        setConfirmModal({
+            isOpen: true,
+            title: 'Simpan BASTP / Handover',
+            message: 'Apakah Anda yakin ingin menyimpan dokumen BASTP ini? Data yang sudah diisi akan dikunci.',
+            type: 'info',
+            onConfirm: () => {
+                bastpForm.post(`/atp/${record.id}/bastp`, {
+                    onSuccess: () => setShowBastpForm(false)
+                });
+            }
+        });
+    };
+
+    const handleDeleteBal = () => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Hapus Berita Acara Lapangan (BAL)',
+            message: 'Apakah Anda yakin ingin menghapus dokumen BAL ini? Tindakan ini tidak dapat dibatalkan.',
+            type: 'danger',
+            onConfirm: () => {
+                router.delete(`/atp/${record.id}/bal`);
+            }
+        });
+    };
+
+    const handleDeleteBastp = () => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Hapus BASTP / Handover',
+            message: 'Apakah Anda yakin ingin menghapus dokumen BASTP ini? Tindakan ini tidak dapat dibatalkan.',
+            type: 'danger',
+            onConfirm: () => {
+                router.delete(`/atp/${record.id}/bastp`);
+            }
         });
     };
 
@@ -268,105 +322,194 @@ export default function Detail({ record }) {
                     </div>
                 </Card>
 
-                {/* 5. Berita Acara & Handover Card */}
-                <Card title="Siapkan Dokumen">
-                    <div className="space-y-3">
-                        {/* BAL */}
-                        <div className="border border-gray-100 p-3 rounded-lg flex items-center justify-between">
+                {/* 5. Dokumen Pendukung Grid (2x2 Layout on Desktop) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* BAL Card */}
+                    <Card title="Berita Acara Lapangan (BAL)">
+                        <div className="flex flex-col justify-between h-full space-y-4">
                             <div>
-                                <p className="text-xs font-bold text-gray-800">Berita Acara Lapangan (BAL)</p>
-                                <p className="text-[10px] text-gray-400">{record.bal ? 'Selesai dibuat' : 'Belum dibuat'}</p>
+                                <p className="text-xs text-gray-500 leading-relaxed">
+                                    Dokumen resmi Berita Acara Lapangan yang digunakan untuk mencatat hasil audit fisik di lokasi site.
+                                </p>
+                                <div className="mt-3 flex items-center gap-2">
+                                    <span className="text-xs font-semibold text-gray-400">Status:</span>
+                                    {record.bal ? (
+                                        <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                            Selesai dibuat
+                                        </span>
+                                    ) : (
+                                        <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-100 text-gray-600 border border-gray-200">
+                                            Belum dibuat
+                                        </span>
+                                    )}
+                                </div>
                             </div>
-                            <div className="flex gap-1.5">
+                            <div className="flex gap-2 pt-2">
                                 {record.bal ? (
                                     <>
-                                        <Link href={`/atp/${record.id}/bal`} className="text-primary hover:underline text-xs font-semibold">Cetak</Link>
-                                        <button onClick={() => setShowBalForm(true)} className="text-gray-500 hover:underline text-xs font-semibold">Edit</button>
+                                        <Link
+                                            href={`/atp/${record.id}/bal`}
+                                            className="inline-flex items-center gap-1.5 px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold uppercase rounded-lg transition"
+                                        >
+                                            <Printer className="h-3.5 w-3.5 stroke-[1.5]" />
+                                            Cetak
+                                        </Link>
+                                        <Button
+                                            variant="danger"
+                                            onClick={handleDeleteBal}
+                                            className="px-3 py-2"
+                                        >
+                                            <Trash2 className="h-3.5 w-3.5 stroke-[1.5]" />
+                                            Hapus
+                                        </Button>
                                     </>
                                 ) : (
-                                    <button onClick={() => setShowBalForm(true)} className="text-primary hover:underline text-xs font-semibold">+ Buat</button>
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => setShowBalForm(true)}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        <Plus className="h-3.5 w-3.5 stroke-[1.5]" />
+                                        Buat BAL
+                                    </Button>
                                 )}
                             </div>
                         </div>
+                    </Card>
 
-                        {/* BASTP */}
-                        <div className="border border-gray-100 p-3 rounded-lg flex items-center justify-between">
+                    {/* BASTP Card */}
+                    <Card title="BASTP / Handover">
+                        <div className="flex flex-col justify-between h-full space-y-4">
                             <div>
-                                <p className="text-xs font-bold text-gray-800">BASTP / Handover</p>
-                                <p className="text-[10px] text-gray-400">{record.bastp ? 'Selesai dibuat' : 'Belum dibuat'}</p>
+                                <p className="text-xs text-gray-500 leading-relaxed">
+                                    Berita Acara Serah Terima Pekerjaan (BASTP) untuk proses serah terima formal dengan pemberi kerja.
+                                </p>
+                                <div className="mt-3 flex items-center gap-2">
+                                    <span className="text-xs font-semibold text-gray-400">Status:</span>
+                                    {record.bastp ? (
+                                        <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                            Selesai dibuat
+                                        </span>
+                                    ) : (
+                                        <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-100 text-gray-600 border border-gray-200">
+                                            Belum dibuat
+                                        </span>
+                                    )}
+                                </div>
                             </div>
-                            <div className="flex gap-1.5">
+                            <div className="flex gap-2 pt-2">
                                 {record.bastp ? (
                                     <>
-                                        <Link href={`/atp/${record.id}/bastp`} className="text-primary hover:underline text-xs font-semibold">Cetak</Link>
-                                        <button onClick={() => setShowBastpForm(true)} className="text-gray-500 hover:underline text-xs font-semibold">Edit</button>
+                                        <Link
+                                            href={`/atp/${record.id}/bastp`}
+                                            className="inline-flex items-center gap-1.5 px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold uppercase rounded-lg transition"
+                                        >
+                                            <Printer className="h-3.5 w-3.5 stroke-[1.5]" />
+                                            Cetak
+                                        </Link>
+                                        <Button
+                                            variant="danger"
+                                            onClick={handleDeleteBastp}
+                                            className="px-3 py-2"
+                                        >
+                                            <Trash2 className="h-3.5 w-3.5 stroke-[1.5]" />
+                                            Hapus
+                                        </Button>
                                     </>
                                 ) : (
-                                    <button onClick={() => setShowBastpForm(true)} className="text-primary hover:underline text-xs font-semibold">+ Buat</button>
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => setShowBastpForm(true)}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        <Plus className="h-3.5 w-3.5 stroke-[1.5]" />
+                                        Buat BASTP
+                                    </Button>
                                 )}
                             </div>
                         </div>
+                    </Card>
+
+                    {/* Cetak ATP Card (Spans across 2 columns on desktop) */}
+                    <div className="lg:col-span-2">
+                        <Card title="Cetak ATP">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div>
+                                    <p className="text-xs text-gray-500 leading-relaxed font-body">
+                                        Cetak laporan Checklist Parameter ATP lengkap beserta data koordinat GPS, verdict keputusan, otorisasi tanda tangan, dan lampiran foto dokumentasi fisik.
+                                    </p>
+                                </div>
+                                <Link
+                                    href={`/atp/${record.id}/print`}
+                                    className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase rounded-lg transition shrink-0 font-body"
+                                >
+                                    <Printer className="h-4 w-4 stroke-[1.5]" />
+                                    Cetak Dokumen ATP
+                                </Link>
+                            </div>
+                        </Card>
                     </div>
-                </Card>
+                </div>
             </div>
 
             {/* BAL DIALOG MODAL */}
-            <Modal isOpen={showBalForm} onClose={() => setShowBalForm(false)} title="Buat / Edit Berita Acara Lapangan (BAL)" size="max-w-2xl">
+            <Modal isOpen={showBalForm} onClose={() => setShowBalForm(false)} title="Buat Berita Acara Lapangan (BAL)" size="max-w-2xl">
                 <form onSubmit={handleSaveBal} className="space-y-4 text-xs">
                     <div className="grid grid-cols-2 gap-4">
-                        <Input label="Nama Project" value={balForm.data.project} onChange={(e) => balForm.setData('project', e.target.value)} required />
-                        <Input label="Nomor PO" value={balForm.data.no_po} onChange={(e) => balForm.setData('no_po', e.target.value)} required />
+                        <Input label="Nama Project" value={balForm.data.project} onChange={(e) => balForm.setData('project', e.target.value)} required disabled={!!initialBalValues.project} error={balForm.errors.project} />
+                        <Input label="Nomor PO" value={balForm.data.no_po} onChange={(e) => balForm.setData('no_po', e.target.value)} required disabled={!!initialBalValues.no_po} error={balForm.errors.no_po} />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <Input label="Mulai Tanggal" type="date" value={balForm.data.tanggal_mulai} onChange={(e) => balForm.setData('tanggal_mulai', e.target.value)} required />
-                        <Input label="Selesai Tanggal" type="date" value={balForm.data.tanggal} onChange={(e) => balForm.setData('tanggal', e.target.value)} required />
+                        <Input label="Mulai Tanggal" type="date" value={balForm.data.tanggal_mulai} onChange={(e) => balForm.setData('tanggal_mulai', e.target.value)} required disabled={!!initialBalValues.tanggal_mulai} error={balForm.errors.tanggal_mulai} />
+                        <Input label="Selesai Tanggal" type="date" value={balForm.data.tanggal} onChange={(e) => balForm.setData('tanggal', e.target.value)} required disabled={!!initialBalValues.tanggal} error={balForm.errors.tanggal} />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <Input label="Lokasi / Site" value={balForm.data.lokasi} onChange={(e) => balForm.setData('lokasi', e.target.value)} required />
-                        <Input label="Hasil Rekomendasi" value={balForm.data.hasil} onChange={(e) => balForm.setData('hasil', e.target.value)} />
+                    <div className="grid grid-cols-3 gap-4">
+                        <Input label="Pelaksana Pekerjaan" value={balForm.data.pelaksana} onChange={(e) => balForm.setData('pelaksana', e.target.value)} required disabled={!!initialBalValues.pelaksana} error={balForm.errors.pelaksana} />
+                        <Input label="Lokasi / Site" value={balForm.data.lokasi} onChange={(e) => balForm.setData('lokasi', e.target.value)} required disabled={!!initialBalValues.lokasi} error={balForm.errors.lokasi} />
+                        <Input label="Hasil Rekomendasi" value={balForm.data.hasil} onChange={(e) => balForm.setData('hasil', e.target.value)} required disabled={!!initialBalValues.hasil} error={balForm.errors.hasil} />
                     </div>
                     <div className="grid grid-cols-2 gap-4 border-t pt-3">
                         <div>
                             <h4 className="font-bold text-primary uppercase tracking-wider mb-2">Pihak I (Pelaksana)</h4>
-                            <Input label="Nama Perusahaan" value={balForm.data.pihak1} onChange={(e) => balForm.setData('pihak1', e.target.value)} required />
-                            <Input label="Nama Representative" value={balForm.data.nama1} onChange={(e) => balForm.setData('nama1', e.target.value)} required className="mt-2" />
-                            <Input label="Jabatan Representative" value={balForm.data.jabatan1} onChange={(e) => balForm.setData('jabatan1', e.target.value)} required className="mt-2" />
+                            <Input label="Nama Perusahaan" value={balForm.data.pihak1} onChange={(e) => balForm.setData('pihak1', e.target.value)} required disabled={!!initialBalValues.pihak1} error={balForm.errors.pihak1} />
+                            <Input label="Nama Representative" value={balForm.data.nama1} onChange={(e) => balForm.setData('nama1', e.target.value)} required disabled={!!initialBalValues.nama1} error={balForm.errors.nama1} className="mt-2" />
+                            <Input label="Jabatan Representative" value={balForm.data.jabatan1} onChange={(e) => balForm.setData('jabatan1', e.target.value)} required disabled={!!initialBalValues.jabatan1} error={balForm.errors.jabatan1} className="mt-2" />
                         </div>
                         <div>
                             <h4 className="font-bold text-gray-900 uppercase tracking-wider mb-2">Pihak II (Pengawas)</h4>
-                            <Input label="Nama Perusahaan" value={balForm.data.pihak2} onChange={(e) => balForm.setData('pihak2', e.target.value)} required />
-                            <Input label="Nama Representative" value={balForm.data.nama2} onChange={(e) => balForm.setData('nama2', e.target.value)} required className="mt-2" />
-                            <Input label="Jabatan Representative" value={balForm.data.jabatan2} onChange={(e) => balForm.setData('jabatan2', e.target.value)} required className="mt-2" />
+                            <Input label="Nama Perusahaan" value={balForm.data.pihak2} onChange={(e) => balForm.setData('pihak2', e.target.value)} required disabled={!!initialBalValues.pihak2} error={balForm.errors.pihak2} />
+                            <Input label="Nama Representative" value={balForm.data.nama2} onChange={(e) => balForm.setData('nama2', e.target.value)} required disabled={!!initialBalValues.nama2} error={balForm.errors.nama2} className="mt-2" />
+                            <Input label="Jabatan Representative" value={balForm.data.jabatan2} onChange={(e) => balForm.setData('jabatan2', e.target.value)} required disabled={!!initialBalValues.jabatan2} error={balForm.errors.jabatan2} className="mt-2" />
                         </div>
                     </div>
                     <div className="flex gap-2 justify-end border-t pt-3">
-                        <Button type="submit" variant="secondary" processing={balForm.processing}>Simpan BAL</Button>
+                        <Button type="submit" variant="primary" processing={balForm.processing}>Simpan BAL</Button>
                         <Button type="button" variant="outline" onClick={() => setShowBalForm(false)}>Batal</Button>
                     </div>
                 </form>
             </Modal>
 
             {/* BASTP DIALOG MODAL */}
-            <Modal isOpen={showBastpForm} onClose={() => setShowBastpForm(false)} title="Buat / Edit BASTP (BA Serah Terima Pekerjaan)" size="max-w-2xl">
+            <Modal isOpen={showBastpForm} onClose={() => setShowBastpForm(false)} title="Buat BASTP (BA Serah Terima Pekerjaan)" size="max-w-2xl">
                 <form onSubmit={handleSaveBastp} className="space-y-4 text-xs">
                     <div className="grid grid-cols-2 gap-4">
-                        <Input label="Nama Pihak I (Pelaksana)" value={bastpForm.data.p1_nama} onChange={(e) => bastpForm.setData('p1_nama', e.target.value)} required />
-                        <Input label="Alamat Pihak I" value={bastpForm.data.p1_alamat} onChange={(e) => bastpForm.setData('p1_alamat', e.target.value)} required />
+                        <Input label="Nama Pihak I (Pelaksana)" value={bastpForm.data.p1_nama} onChange={(e) => bastpForm.setData('p1_nama', e.target.value)} required disabled={!!initialBastpValues.p1_nama} error={bastpForm.errors.p1_nama} />
+                        <Input label="Alamat Pihak I" value={bastpForm.data.p1_alamat} onChange={(e) => bastpForm.setData('p1_alamat', e.target.value)} required disabled={!!initialBastpValues.p1_alamat} error={bastpForm.errors.p1_alamat} />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <Input label="Nama Pihak II (Pemberi Kerja)" value={bastpForm.data.p2_nama} onChange={(e) => bastpForm.setData('p2_nama', e.target.value)} required />
-                        <Input label="Jabatan Pihak II" value={bastpForm.data.p2_jabatan} onChange={(e) => bastpForm.setData('p2_jabatan', e.target.value)} required />
+                        <Input label="Nama Pihak II (Pemberi Kerja)" value={bastpForm.data.p2_nama} onChange={(e) => bastpForm.setData('p2_nama', e.target.value)} required disabled={!!initialBastpValues.p2_nama} error={bastpForm.errors.p2_nama} />
+                        <Input label="Jabatan Pihak II" value={bastpForm.data.p2_jabatan} onChange={(e) => bastpForm.setData('p2_jabatan', e.target.value)} required disabled={!!initialBastpValues.p2_jabatan} error={bastpForm.errors.p2_jabatan} />
                     </div>
                     <div className="space-y-3">
-                        <Input label="Alamat Pihak II" value={bastpForm.data.p2_alamat} onChange={(e) => bastpForm.setData('p2_alamat', e.target.value)} required />
-                        <Input label="Nama Pekerjaan (BASTP)" value={bastpForm.data.pekerjaan} onChange={(e) => bastpForm.setData('pekerjaan', e.target.value)} required />
+                        <Input label="Alamat Pihak II" value={bastpForm.data.p2_alamat} onChange={(e) => bastpForm.setData('p2_alamat', e.target.value)} required disabled={!!initialBastpValues.p2_alamat} error={bastpForm.errors.p2_alamat} />
+                        <Input label="Nama Pekerjaan (BASTP)" value={bastpForm.data.pekerjaan} onChange={(e) => bastpForm.setData('pekerjaan', e.target.value)} required disabled={!!initialBastpValues.pekerjaan} error={bastpForm.errors.pekerjaan} />
                     </div>
                     <div className="grid grid-cols-2 gap-4 border-t pt-3">
-                        <Input label="Mengetahui Pihak I (Nama/Jabatan)" value={bastpForm.data.mengetahui1} onChange={(e) => bastpForm.setData('mengetahui1', e.target.value)} placeholder="Nama Pemeriksa I" />
-                        <Input label="Mengetahui Pihak II (Nama/Jabatan)" value={bastpForm.data.mengetahui2} onChange={(e) => bastpForm.setData('mengetahui2', e.target.value)} placeholder="Nama Pemeriksa II" />
+                        <Input label="Mengetahui Pihak I (Nama/Jabatan)" value={bastpForm.data.mengetahui1} onChange={(e) => bastpForm.setData('mengetahui1', e.target.value)} required disabled={!!initialBastpValues.mengetahui1} error={bastpForm.errors.mengetahui1} placeholder="Nama Pemeriksa I" />
+                        <Input label="Mengetahui Pihak II (Nama/Jabatan)" value={bastpForm.data.mengetahui2} onChange={(e) => bastpForm.setData('mengetahui2', e.target.value)} required disabled={!!initialBastpValues.mengetahui2} error={bastpForm.errors.mengetahui2} placeholder="Nama Pemeriksa II" />
                     </div>
                     <div className="flex gap-2 justify-end border-t pt-3">
-                        <Button type="submit" variant="secondary" processing={bastpForm.processing}>Simpan BASTP</Button>
+                        <Button type="submit" variant="primary" processing={bastpForm.processing}>Simpan BASTP</Button>
                         <Button type="button" variant="outline" onClick={() => setShowBastpForm(false)}>Batal</Button>
                     </div>
                 </form>
@@ -390,6 +533,16 @@ export default function Detail({ record }) {
                     />
                 </div>
             </Modal>
+
+            {/* Local Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                type={confirmModal.type}
+            />
         </>
     );
 }

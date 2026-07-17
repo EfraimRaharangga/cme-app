@@ -29,6 +29,7 @@ export default function Input({
                 ref={inputRef}
                 className={
                     `w-full border-border rounded-md shadow-sm text-sm p-2 focus:border-primary focus:ring focus:ring-primary/20 outline-none transition ` +
+                    (props.disabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-75 border-gray-200 select-none ' : 'bg-white ') +
                     (error ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : '') +
                     ` ` +
                     className
