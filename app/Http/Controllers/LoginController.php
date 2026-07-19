@@ -22,7 +22,7 @@ class LoginController extends Controller
         }
 
         return Inertia::render('Login', [
-            'status' => session('success') ?: session('warning') ?: session('error'),
+            'status' => session('success') ? 'success': 'error',
             'message' => session('success') ?: session('warning') ?: session('error'),
         ]);
     }
