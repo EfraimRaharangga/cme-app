@@ -3,12 +3,14 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Table from '../../Components/Table';
-import Input from '../../Components/Input';
-import Button from '../../Components/Button';
 import ConfirmationModal from '../../Components/ConfirmationModal';
+import Search, { filterData } from '../../Components/Search';
+import Pagination from '../../Components/Pagination';
 
 export default function List({ records, filters }) {
-    const [search, setSearch] = useState(filters.cari || '');
+    const [searchQuery, setSearchQuery] = useState(filters.cari || '');
+    const [currentPage, setCurrentPage] = useState(1);
+    
     const [confirmModal, setConfirmModal] = useState({
         isOpen: false,
         title: '',
@@ -17,10 +19,15 @@ export default function List({ records, filters }) {
         onConfirm: null
     });
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        router.get('/atp', { cari: search }, { preserveState: true });
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
     };
+
+    const filteredRecords = filterData(records, searchQuery);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
+    const paginatedRecords = filteredRecords.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const handleDelete = (id) => {
         setConfirmModal({
@@ -56,31 +63,29 @@ export default function List({ records, filters }) {
             </div>
 
             <Card className="mb-6 p-4">
-                <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
-                    <Input
-                        type="text"
+                <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3">
+                    <Search
                         placeholder="Cari nama site, region, atau no. PO..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        value={searchQuery}
+                        onChange={handleSearchChange}
                     />
-                    <Button type="submit" variant="primary">
-                        Cari
-                    </Button>
-                </form>
+                </div>
             </Card>
 
             <Card title="Daftar Laporan ATP">
                 <Table headers={['No', 'Nama Site', 'Tanggal', 'Region', 'No. PO', 'Verdict', 'Aksi']}>
-                    {records.length === 0 ? (
+                    {paginatedRecords.length === 0 ? (
                         <tr>
                             <td colSpan={7} className="px-6 py-8 text-center text-gray-400 font-medium">
                                 Belum ada laporan ATP
                             </td>
                         </tr>
                     ) : (
-                        records.map((row, idx) => (
+                        paginatedRecords.map((row, idx) => (
                             <tr key={row.id} className="hover:bg-gray-50/50">
-                                <td className="px-6 py-4 text-center font-bold text-gray-400">{idx + 1}</td>
+                                <td className="px-6 py-4 text-center font-bold text-gray-400">
+                                    {(currentPage - 1) * itemsPerPage + idx + 1}
+                                </td>
                                 <td className="px-6 py-4 font-bold text-gray-900">{row.nama_site}</td>
                                 <td className="px-6 py-4 text-center text-gray-500">{row.tanggal}</td>
                                 <td className="px-6 py-4 text-center text-gray-600">{row.region || '-'}</td>
@@ -125,6 +130,14 @@ export default function List({ records, filters }) {
                         ))
                     )}
                 </Table>
+
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    totalItems={filteredRecords.length}
+                    itemsPerPage={itemsPerPage}
+                />
             </Card>
 
             <ConfirmationModal
@@ -138,6 +151,5 @@ export default function List({ records, filters }) {
         </>
     );
 }
-
 
 List.layout = page => <AppLayout children={page} />;

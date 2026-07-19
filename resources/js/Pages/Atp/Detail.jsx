@@ -8,6 +8,8 @@ import Input from '../../Components/Input';
 import Modal from '../../Components/Modal';
 import ConfirmationModal from '../../Components/ConfirmationModal';
 import { Plus, Trash2, Printer } from 'lucide-react';
+import SearchInput, { filterData } from '../../Components/Search';
+import Pagination from '../../Components/Pagination';
 
 export default function Detail({ record }) {
     const mapRef = useRef(null);
@@ -186,6 +188,29 @@ export default function Detail({ record }) {
     const itemHasil = record.hasil_json?.hasil || {};
     const itemCatatan = record.hasil_json?.catatan || {};
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
+    };
+
+    const itemsList = Object.entries(itemNames).map(([key, name]) => ({
+        key,
+        name,
+        tool: itemTools[key],
+        std: itemStds[key],
+        hasil: itemHasil[key],
+        val: itemVals[key],
+        catatan: itemCatatan[key]
+    }));
+
+    const filteredItems = filterData(itemsList, searchQuery);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    const paginatedItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
     return (
         <>
             <Head title={`ATP Detail ${record.nama_site} - Web CME`} />
@@ -258,55 +283,75 @@ export default function Detail({ record }) {
 
                 {/* 2. Checkpoint Table Card */}
                 <Card title="Checkpoint Parameter ATP">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3 mb-4">
+                        <SearchInput value={searchQuery} onChange={handleSearchChange} />
+                    </div>
+
                     <Table headers={['Nama Parameter', 'Standard', 'Hasil', 'Status', 'Catatan', 'Dokumentasi']}>
-                        {Object.entries(itemNames).map(([key, name]) => {
-                            const itemPhotos = record.photos.filter(p => String(p.item_id) === String(key));
-                            return (
-                                <tr key={key} className="hover:bg-gray-50/50">
-                                    <td className="px-4 py-3 font-bold text-gray-900">
-                                        {name}
-                                        <div className="text-[10px] text-gray-400 mt-0.5">Alat: {itemTools[key]}</div>
-                                    </td>
-                                    <td className="px-4 py-3 text-center text-xs text-gray-500">{itemStds[key]}</td>
-                                    <td className="px-4 py-3 text-center font-semibold text-gray-700">{itemHasil[key] || '-'}</td>
-                                    <td className="px-4 py-3 text-center">
-                                        <span
-                                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${itemVals[key] === 'OK'
-                                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                                                : itemVals[key] === 'NG'
-                                                    ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                                                    : 'bg-amber-50 text-amber-800 border border-amber-200'
-                                                }`}
-                                        >
-                                            {itemVals[key] || '-'}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-gray-600 text-xs">{itemCatatan[key] || '-'}</td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {itemPhotos.map((photo) => (
-                                                <div
-                                                    key={photo.id}
-                                                    className="relative w-10 h-10 rounded border border-gray-200 overflow-hidden bg-white shadow-sm hover:border-[#00ADB5] transition cursor-pointer"
-                                                    onClick={() => setSelectedImage(photo.file_url)}
-                                                >
-                                                    <img
-                                                        src={photo.file_url}
-                                                        alt={name}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => {
-                                                            e.target.src = 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=400&q=85';
-                                                        }}
-                                                    />
-                                                </div>
-                                            ))}
-                                            {itemPhotos.length === 0 && <span className="text-gray-400 text-xs">-</span>}
-                                        </div>
-                                    </td>
-                                </tr>
-                            );
-                        })}
+                        {paginatedItems.length === 0 ? (
+                            <tr>
+                                <td colSpan={6} className="px-6 py-8 text-center text-gray-400 font-medium">
+                                    Tidak ada data checkpoint
+                                </td>
+                            </tr>
+                        ) : (
+                            paginatedItems.map((item) => {
+                                const itemPhotos = record.photos.filter(p => String(p.item_id) === String(item.key));
+                                return (
+                                    <tr key={item.key} className="hover:bg-gray-50/50">
+                                        <td className="px-4 py-3 font-bold text-gray-900">
+                                            {item.name}
+                                            <div className="text-[10px] text-gray-400 mt-0.5">Alat: {item.tool}</div>
+                                        </td>
+                                        <td className="px-4 py-3 text-center text-xs text-gray-500">{item.std}</td>
+                                        <td className="px-4 py-3 text-center font-semibold text-gray-700">{item.hasil || '-'}</td>
+                                        <td className="px-4 py-3 text-center">
+                                            <span
+                                                className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${item.val === 'OK'
+                                                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                                    : item.val === 'NG'
+                                                        ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                                                        : 'bg-amber-50 text-amber-800 border border-amber-200'
+                                                    }`}
+                                            >
+                                                {item.val || '-'}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-3 text-gray-600 text-xs">{item.catatan || '-'}</td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {itemPhotos.map((photo) => (
+                                                    <div
+                                                        key={photo.id}
+                                                        className="relative w-10 h-10 rounded border border-gray-200 overflow-hidden bg-white shadow-sm hover:border-[#00ADB5] transition cursor-pointer"
+                                                        onClick={() => setSelectedImage(photo.file_url)}
+                                                    >
+                                                        <img
+                                                            src={photo.file_url}
+                                                            alt={item.name}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => {
+                                                                e.target.src = 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=400&q=85';
+                                                            }}
+                                                        />
+                                                    </div>
+                                                ))}
+                                                {itemPhotos.length === 0 && <span className="text-gray-400 text-xs">-</span>}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        )}
                     </Table>
+
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                        totalItems={filteredItems.length}
+                        itemsPerPage={itemsPerPage}
+                    />
                 </Card>
 
                 {/* 3. Verdict Keputusan Card */}
@@ -495,7 +540,7 @@ export default function Detail({ record }) {
                         <Input label="Mulai Tanggal" type="date" value={balForm.data.tanggal_mulai} onChange={(e) => balForm.setData('tanggal_mulai', e.target.value)} required disabled={!!initialBalValues.tanggal_mulai} error={balForm.errors.tanggal_mulai} />
                         <Input label="Selesai Tanggal" type="date" value={balForm.data.tanggal} onChange={(e) => balForm.setData('tanggal', e.target.value)} required disabled={!!initialBalValues.tanggal} error={balForm.errors.tanggal} />
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <Input label="Pelaksana Pekerjaan" value={balForm.data.pelaksana} onChange={(e) => balForm.setData('pelaksana', e.target.value)} required disabled={!!initialBalValues.pelaksana} error={balForm.errors.pelaksana} />
                         <Input label="Lokasi / Site" value={balForm.data.lokasi} onChange={(e) => balForm.setData('lokasi', e.target.value)} required disabled={!!initialBalValues.lokasi} error={balForm.errors.lokasi} />
                         <Input label="Hasil Rekomendasi" value={balForm.data.hasil} onChange={(e) => balForm.setData('hasil', e.target.value)} required disabled={!!initialBalValues.hasil} error={balForm.errors.hasil} />

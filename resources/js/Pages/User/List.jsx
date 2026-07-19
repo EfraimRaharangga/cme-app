@@ -9,10 +9,15 @@ import Select from '../../Components/Select';
 import PasswordField from '../../Components/PasswordField';
 import Alert from '../../Components/Alert';
 import ConfirmationModal from '../../Components/ConfirmationModal';
+import Search, { filterData } from '../../Components/Search';
+import Pagination from '../../Components/Pagination';
 
 export default function List({ users }) {
     const [editMode, setEditMode] = useState(false);
     const [editingUserId, setEditingUserId] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    
     const [confirmModal, setConfirmModal] = useState({
         isOpen: false,
         title: '',
@@ -26,6 +31,16 @@ export default function List({ users }) {
         password: '',
         role: 'surveyor',
     });
+
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
+    };
+
+    const filteredUsers = filterData(users, searchQuery);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+    const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -152,17 +167,23 @@ export default function List({ users }) {
                 {/* Users tables list */}
                 <div className="lg:col-span-2">
                     <Card title="List Akun Terdaftar">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3 mb-4">
+                            <Search value={searchQuery} onChange={handleSearchChange} />
+                        </div>
+
                         <Table headers={['No', 'Username', 'Peran', 'Dibuat Pada', 'Aksi']}>
-                            {users.length === 0 ? (
+                            {paginatedUsers.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-8 text-center text-gray-400 font-medium">
                                         Belum ada pengguna terdaftar
                                     </td>
                                 </tr>
                             ) : (
-                                users.map((user, idx) => (
+                                paginatedUsers.map((user, idx) => (
                                     <tr key={user.id} className="hover:bg-gray-50/50">
-                                        <td className="px-6 py-4 text-center font-bold text-gray-400">{idx + 1}</td>
+                                        <td className="px-6 py-4 text-center font-bold text-gray-400">
+                                            {(currentPage - 1) * itemsPerPage + idx + 1}
+                                        </td>
                                         <td className="px-6 py-4 font-bold text-gray-900">{user.username}</td>
                                         <td className="px-6 py-4 text-center">
                                             <span
@@ -202,6 +223,14 @@ export default function List({ users }) {
                                 ))
                             )}
                         </Table>
+
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                            totalItems={filteredUsers.length}
+                            itemsPerPage={itemsPerPage}
+                        />
                     </Card>
                 </div>
             </div>
@@ -217,6 +246,5 @@ export default function List({ users }) {
         </>
     );
 }
-
 
 List.layout = page => <AppLayout children={page} />;

@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Table from '../../Components/Table';
+import Search, { filterData } from '../../Components/Search';
+import Pagination from '../../Components/Pagination';
 
 export default function Item({ kategori, spec, sow, images }) {
     // Premium placeholder specs if none exists in DB
@@ -54,6 +56,19 @@ export default function Item({ kategori, spec, sow, images }) {
     const activeSpec = spec || defaultSpecs[kategori] || [];
     const activeSow = sow || defaultSow[kategori] || [];
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
+    };
+
+    const filteredSpecs = filterData(activeSpec, searchQuery);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredSpecs.length / itemsPerPage);
+    const paginatedSpecs = filteredSpecs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
     return (
         <>
             <Head title={`Panduan ${kategori} - Web CME`} />
@@ -79,15 +94,35 @@ export default function Item({ kategori, spec, sow, images }) {
                 {/* Specs and SOW */}
                 <div className="lg:col-span-2 space-y-6">
                     <Card title="📐 Spesifikasi Standar Material">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3 mb-4">
+                            <Search value={searchQuery} onChange={handleSearchChange} />
+                        </div>
+
                         <Table headers={['Nama Parameter / Material', 'Kriteria Standard Kelayakan', 'Alat Ukur / Cara Uji']}>
-                            {activeSpec.map((row, idx) => (
-                                <tr key={idx} className="hover:bg-gray-50/50">
-                                    <td className="px-6 py-3 font-bold text-gray-900">{row.item || row[0]}</td>
-                                    <td className="px-6 py-3 text-gray-600 font-medium">{row.std || row[1]}</td>
-                                    <td className="px-6 py-3 text-center text-gray-500 font-mono text-xs">{row.tool || row[2]}</td>
+                            {paginatedSpecs.length === 0 ? (
+                                <tr>
+                                    <td colSpan={3} className="px-6 py-8 text-center text-gray-400 font-medium">
+                                        Tidak ada data spesifikasi material
+                                    </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                paginatedSpecs.map((row, idx) => (
+                                    <tr key={idx} className="hover:bg-gray-50/50">
+                                        <td className="px-6 py-3 font-bold text-gray-900">{row.item || row[0]}</td>
+                                        <td className="px-6 py-3 text-gray-600 font-medium">{row.std || row[1]}</td>
+                                        <td className="px-6 py-3 text-center text-gray-500 font-mono text-xs">{row.tool || row[2]}</td>
+                                    </tr>
+                                ))
+                            )}
                         </Table>
+
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                            totalItems={filteredSpecs.length}
+                            itemsPerPage={itemsPerPage}
+                        />
                     </Card>
 
                     <Card title="📝 Langkah-langkah Kerja (SOW)">
@@ -109,13 +144,17 @@ export default function Item({ kategori, spec, sow, images }) {
                                 <svg className="mx-auto h-8 w-8 stroke-[1.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375 0 11-.75 0 .375 0 01.75 0z" />
                                 </svg>
-                                <p className="text-[10px] font-bold text-gray-500 mt-2">Blueprint gambar CAD teknis belum diunggah.</p>
+                                <p className="mt-2 text-xs font-semibold">Belum Ada Drawing Blueprint</p>
+                                <p className="text-[10px] text-gray-400 mt-1">Gunakan form admin untuk mengunggah gambar blueprint kerja.</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
                                 {images.map((img) => (
-                                    <div key={img.id} className="border border-gray-150 rounded-lg overflow-hidden bg-gray-100 hover:shadow-sm transition">
-                                        <img src={`/assets/instruction/${img.file_path}`} alt="Drawing guide" className="w-full h-auto" />
+                                    <div key={img.id} className="relative rounded-lg border border-gray-200 overflow-hidden bg-white shadow-sm group">
+                                        <img src={img.file_url} className="w-full object-contain" alt="Blueprint" />
+                                        <div className="absolute bottom-0 inset-x-0 bg-black/60 p-2 text-[10px] font-bold text-white text-center">
+                                            {img.filename}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -126,6 +165,5 @@ export default function Item({ kategori, spec, sow, images }) {
         </>
     );
 }
-
 
 Item.layout = page => <AppLayout children={page} />;

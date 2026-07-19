@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Table from '../../Components/Table';
 import { ClipboardCheck, FileSpreadsheet, HardDrive, Users, CheckCircle, Clock } from 'lucide-react';
+import Search, { filterData } from '../../Components/Search';
+import Pagination from '../../Components/Pagination';
 
 export default function CmeDashboard({ stats, recentAtp }) {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
+    };
+
+    const filteredAtp = filterData(recentAtp, searchQuery);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredAtp.length / itemsPerPage);
+    const paginatedAtp = filteredAtp.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
     return (
         <>
             <Head title="CME Dashboard - Web CME" />
@@ -87,15 +102,19 @@ export default function CmeDashboard({ stats, recentAtp }) {
                 {/* RECENT ATP TABLES */}
                 <div className="lg:col-span-2 space-y-6">
                     <Card title="ATP Terbaru">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3 mb-4">
+                            <Search value={searchQuery} onChange={handleSearchChange} />
+                        </div>
+
                         <Table headers={['Nama Site', 'Tanggal', 'Verdict', 'Aksi']}>
-                            {recentAtp.length === 0 ? (
+                            {paginatedAtp.length === 0 ? (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-8 text-center text-gray-400 font-medium">
                                         Belum ada data ATP
                                     </td>
                                 </tr>
                             ) : (
-                                recentAtp.map((record) => (
+                                paginatedAtp.map((record) => (
                                     <tr key={record.id} className="hover:bg-gray-50/50">
                                         <td className="px-6 py-4 font-bold text-gray-900">{record.nama_site}</td>
                                         <td className="px-6 py-4 text-center text-gray-500">{record.tanggal}</td>
@@ -125,6 +144,14 @@ export default function CmeDashboard({ stats, recentAtp }) {
                                 ))
                             )}
                         </Table>
+
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                            totalItems={filteredAtp.length}
+                            itemsPerPage={itemsPerPage}
+                        />
                     </Card>
                 </div>
 
@@ -153,6 +180,5 @@ export default function CmeDashboard({ stats, recentAtp }) {
         </>
     );
 }
-
 
 CmeDashboard.layout = page => <AppLayout children={page} />;

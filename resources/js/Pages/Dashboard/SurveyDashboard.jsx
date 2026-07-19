@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Table from '../../Components/Table';
 import { FileSpreadsheet, Users, User } from 'lucide-react';
+import Search, { filterData } from '../../Components/Search';
+import Pagination from '../../Components/Pagination';
 
 export default function SurveyDashboard({ stats, recent }) {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
+    };
+
+    const filteredRecent = filterData(recent, searchQuery);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredRecent.length / itemsPerPage);
+    const paginatedRecent = filteredRecent.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
     return (
         <>
             <Head title="Survey ODC Dashboard - Web CME" />
@@ -69,15 +84,19 @@ export default function SurveyDashboard({ stats, recent }) {
                         </Link>
                     }
                 >
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3 mb-4">
+                        <Search value={searchQuery} onChange={handleSearchChange} />
+                    </div>
+
                     <Table headers={['Nama Site', 'Tanggal Survey', 'Surveyor', 'Lokasi', 'Aksi']}>
-                        {recent.length === 0 ? (
+                        {paginatedRecent.length === 0 ? (
                             <tr>
                                 <td colSpan={5} className="px-6 py-8 text-center text-gray-400 font-medium">
                                     Belum ada data survey
                                 </td>
                             </tr>
                         ) : (
-                            recent.map((row) => (
+                            paginatedRecent.map((row) => (
                                 <tr key={row.id} className="hover:bg-gray-50/50">
                                     <td className="px-6 py-4 font-bold text-gray-900">{row.nama_site}</td>
                                     <td className="px-6 py-4 text-center text-gray-500">{row.tanggal_survey}</td>
@@ -104,6 +123,14 @@ export default function SurveyDashboard({ stats, recent }) {
                             ))
                         )}
                     </Table>
+
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                        totalItems={filteredRecent.length}
+                        itemsPerPage={itemsPerPage}
+                    />
                 </Card>
 
                 <Card title="Peta & Panduan Lapangan">
@@ -137,6 +164,5 @@ export default function SurveyDashboard({ stats, recent }) {
         </>
     );
 }
-
 
 SurveyDashboard.layout = page => <AppLayout children={page} />;

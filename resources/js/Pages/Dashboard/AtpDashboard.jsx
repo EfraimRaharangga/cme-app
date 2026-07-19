@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Table from '../../Components/Table';
 import { ClipboardCheck, CheckCircle2, AlertTriangle, XCircle, Clock } from 'lucide-react';
+import Search, { filterData } from '../../Components/Search';
+import Pagination from '../../Components/Pagination';
 
 export default function AtpDashboard({ stats, recent }) {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
+    };
+
+    const filteredRecent = filterData(recent, searchQuery);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredRecent.length / itemsPerPage);
+    const paginatedRecent = filteredRecent.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
     return (
         <>
             <Head title="ATP Dashboard - Web CME" />
@@ -19,7 +34,7 @@ export default function AtpDashboard({ stats, recent }) {
                 </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-8">
                 <Card className="border-l-4 border-l-gray-900 p-2">
                     <div className="flex items-center justify-between">
                         <div>
@@ -94,17 +109,23 @@ export default function AtpDashboard({ stats, recent }) {
                             </Link>
                         }
                     >
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3 mb-4">
+                            <Search value={searchQuery} onChange={handleSearchChange} />
+                        </div>
+
                         <Table headers={['No', 'Nama Site', 'Tanggal', 'Lokasi', 'No. PO', 'Verdict', 'Aksi']}>
-                            {recent.length === 0 ? (
+                            {paginatedRecent.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className="px-6 py-8 text-center text-gray-400 font-medium">
                                         Belum ada data ATP
                                     </td>
                                 </tr>
                             ) : (
-                                recent.map((row, idx) => (
+                                paginatedRecent.map((row, idx) => (
                                     <tr key={row.id} className="hover:bg-gray-50/50">
-                                        <td className="px-6 py-4 text-center font-bold text-gray-500">{idx + 1}</td>
+                                        <td className="px-6 py-4 text-center font-bold text-gray-400">
+                                            {(currentPage - 1) * itemsPerPage + idx + 1}
+                                        </td>
                                         <td className="px-6 py-4 font-bold text-gray-900">{row.nama_site}</td>
                                         <td className="px-6 py-4 text-center text-gray-500">{row.tanggal}</td>
                                         <td className="px-6 py-4 text-center text-gray-600">{row.region || '-'}</td>
@@ -135,6 +156,14 @@ export default function AtpDashboard({ stats, recent }) {
                                 ))
                             )}
                         </Table>
+
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                            totalItems={filteredRecent.length}
+                            itemsPerPage={itemsPerPage}
+                        />
                     </Card>
 
                     <Card title="Panduan Kategori Verdict">
@@ -174,6 +203,5 @@ export default function AtpDashboard({ stats, recent }) {
         </>
     );
 }
-
 
 AtpDashboard.layout = page => <AppLayout children={page} />;

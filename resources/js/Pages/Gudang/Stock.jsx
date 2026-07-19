@@ -8,6 +8,8 @@ import Input from '../../Components/Input';
 import Select from '../../Components/Select';
 import Modal from '../../Components/Modal';
 import ImageUpload from '../../Components/ImageUpload';
+import SearchInput, { filterData } from '../../Components/Search';
+import Pagination from '../../Components/Pagination';
 import {
     Package,
     ArrowUpRight,
@@ -34,7 +36,18 @@ function MetricCard({ title, value, action }) {
 }
 
 export default function Stock({ items, categories, totals, filters, totalMasukCount, totalKeluarCount }) {
-    const [search, setSearch] = useState(filters.cari || '');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
+    };
+
+    const filteredItems = filterData(items, searchQuery);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    const paginatedItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     // Modal controllers state
     const [showMasukModal, setShowMasukModal] = useState(false);
@@ -269,15 +282,19 @@ export default function Stock({ items, categories, totals, filters, totalMasukCo
                     </Button>
                 }
             >
+                <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3 mb-4">
+                    <SearchInput value={searchQuery} onChange={handleSearchChange} />
+                </div>
+
                 <Table headers={['Nama Barang / Spesifikasi', 'Kategori', 'Tipe / Model', 'Min Stok Limit', 'Stok Saat Ini', 'Satuan', 'Status']}>
-                    {items.length === 0 ? (
+                    {paginatedItems.length === 0 ? (
                         <tr>
                             <td colSpan={7} className="px-6 py-8 text-center text-gray-400 font-medium">
                                 Tidak ada data barang terdaftar.
                             </td>
                         </tr>
                     ) : (
-                        items.map((row) => {
+                        paginatedItems.map((row) => {
                             const isLow = row.stok <= row.min_stok;
                             const badgeBgColor = categoryColors[row.kategori] || '#475569';
                             return (
@@ -313,6 +330,14 @@ export default function Stock({ items, categories, totals, filters, totalMasukCo
                         })
                     )}
                 </Table>
+
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    totalItems={filteredItems.length}
+                    itemsPerPage={itemsPerPage}
+                />
             </Card>
 
             {/* BARANG MASUK MODAL */}

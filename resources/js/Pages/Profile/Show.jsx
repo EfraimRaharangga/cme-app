@@ -7,6 +7,8 @@ import Button from '../../Components/Button';
 import PasswordField from '../../Components/PasswordField';
 import ConfirmationModal from '../../Components/ConfirmationModal';
 import { Shield, Key, User, Clock, CheckCircle2 } from 'lucide-react';
+import Search, { filterData } from '../../Components/Search';
+import Pagination from '../../Components/Pagination';
 
 export default function Show({ user, logs, permissions }) {
     const [confirmModal, setConfirmModal] = useState({
@@ -16,6 +18,19 @@ export default function Show({ user, logs, permissions }) {
         type: 'info',
         onConfirm: null
     });
+
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
+    };
+
+    const filteredLogs = filterData(logs, searchQuery);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
+    const paginatedLogs = filteredLogs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const { data, setData, post, reset, errors, processing } = useForm({
         current_password: '',
@@ -96,16 +111,20 @@ export default function Show({ user, logs, permissions }) {
 
                     {/* Recent Login logs */}
                     <Card title="⏰ Riwayat Aktivitas Masuk">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3 mb-4">
+                            <Search value={searchQuery} onChange={handleSearchChange} />
+                        </div>
+
                         <div className="overflow-x-auto">
                             <Table headers={['Waktu', 'Status', 'IP Address', 'Browser', 'Sistem Operasi', 'Perangkat']}>
-                                {logs.length === 0 ? (
+                                {paginatedLogs.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-8 text-center text-gray-400 font-medium">
                                             Belum ada data aktivitas login
                                         </td>
                                     </tr>
                                 ) : (
-                                    logs.map((log) => (
+                                    paginatedLogs.map((log) => (
                                         <tr key={log.id} className="hover:bg-gray-50/50">
                                             <td className="px-6 py-3.5 text-center text-xs text-gray-500 whitespace-nowrap">{log.created_at}</td>
                                             <td className="px-6 py-3.5 text-center">
@@ -138,19 +157,27 @@ export default function Show({ user, logs, permissions }) {
                                 )}
                             </Table>
                         </div>
+
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                            totalItems={filteredLogs.length}
+                            itemsPerPage={itemsPerPage}
+                        />
                     </Card>
                 </div>
 
-                {/* Sidebar area (Right: Change Password form) */}
-                <div className="lg:col-span-1">
-                    <Card title="🔐 Ubah Password">
+                {/* Sidebar area: Change Password */}
+                <div>
+                    <Card title="🔐 Ubah Kata Sandi">
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <PasswordField
                                 label="Password Saat Ini"
                                 value={data.current_password}
                                 onChange={(e) => setData('current_password', e.target.value)}
                                 error={errors.current_password}
-                                placeholder="Masukkan password saat ini"
+                                placeholder="Masukkan password sekarang"
                                 required
                             />
 
@@ -159,7 +186,7 @@ export default function Show({ user, logs, permissions }) {
                                 value={data.new_password}
                                 onChange={(e) => setData('new_password', e.target.value)}
                                 error={errors.new_password}
-                                placeholder="Masukkan password baru (min 6 karakter)"
+                                placeholder="Masukkan password baru"
                                 required
                             />
 
@@ -172,17 +199,14 @@ export default function Show({ user, logs, permissions }) {
                                 required
                             />
 
-                            <div className="pt-2">
-                                <Button
-                                    type="submit"
-                                    variant="primary"
-                                    className="w-full flex justify-center py-2.5"
-                                    processing={processing}
-                                >
-                                    <Key className="h-3.5 w-3.5 mr-1.5 stroke-[1.5]" />
-                                    Simpan Perubahan
-                                </Button>
-                            </div>
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                className="w-full mt-2"
+                                processing={processing}
+                            >
+                                Perbarui Password
+                            </Button>
                         </form>
                     </Card>
                 </div>

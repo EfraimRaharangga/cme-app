@@ -150,7 +150,7 @@ export default function ImageUpload({
             {/* Show Previews if uploaded */}
             {value.length > 0 ? (
                 <div className="space-y-4">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         {value.map((img, idx) => (
                             <div key={idx} className="relative aspect-video rounded-lg border border-gray-200 overflow-hidden bg-white shadow group">
                                 <img src={img.url} className="w-full h-full object-cover" alt="Preview" />

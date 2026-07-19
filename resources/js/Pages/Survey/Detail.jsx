@@ -4,6 +4,100 @@ import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Table from '../../Components/Table';
 import Modal from '../../Components/Modal';
+import Search, { filterData } from '../../Components/Search';
+import Pagination from '../../Components/Pagination';
+
+function CategoryTableCard({ category, items, survey, setSelectedImage }) {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
+    };
+
+    const filteredItems = filterData(items, searchQuery);
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    const paginatedItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    return (
+        <Card title={category}>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3 mb-4">
+                <Search value={searchQuery} onChange={handleSearchChange} />
+            </div>
+            <Table headers={['No', 'Nama Checkpoint', 'Status', 'Catatan Kondisi', 'Dokumentasi']}>
+                {paginatedItems.length === 0 ? (
+                    <tr>
+                        <td colSpan={5} className="px-6 py-8 text-center text-gray-400 font-medium">
+                            Tidak ada data checkpoint
+                        </td>
+                    </tr>
+                ) : (
+                    paginatedItems.map((it) => {
+                        const itemPhotos = survey.photos.filter(p => p.item_id === it.id);
+                        return (
+                            <tr key={it.id} className="hover:bg-gray-50/50">
+                                <td className="px-4 py-3 font-mono font-bold text-xs text-center text-gray-400">
+                                    {it.nomor_item}
+                                </td>
+                                <td className="px-4 py-3 font-bold text-gray-900">{it.nama_item}</td>
+                                <td className="px-4 py-3 text-center">
+                                    <span
+                                        className={`inline-block px-2.5 py-0.5 rounded text-xs font-black ${it.status_check === 'checked'
+                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                            : it.status_check === 'cross'
+                                                ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                                : 'bg-gray-50 text-gray-400'
+                                            }`}
+                                    >
+                                        {it.status_check === 'checked' ? 'OK' : it.status_check === 'cross' ? 'NG' : '-'}
+                                    </span>
+                                </td>
+                                <td className="px-4 py-3 text-gray-600 whitespace-pre-wrap text-sm">
+                                    {it.kondisi_nilai || '-'}
+                                    {it.catatan && (
+                                        <div className="text-[10px] text-gray-400 mt-1 italic">
+                                            Catatan: {it.catatan}
+                                        </div>
+                                    )}
+                                </td>
+                                <td className="px-4 py-3">
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {itemPhotos.map((photo) => (
+                                            <div
+                                                key={photo.id}
+                                                className="relative w-10 h-10 rounded border border-gray-200 overflow-hidden bg-white shadow-sm hover:border-[#00ADB5] transition cursor-pointer"
+                                                onClick={() => setSelectedImage(photo.file_url)}
+                                            >
+                                                <img
+                                                    src={photo.file_url}
+                                                    alt={it.nama_item}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        e.target.src = 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=400&q=85';
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                        {itemPhotos.length === 0 && <span className="text-gray-400 text-xs">-</span>}
+                                    </div>
+                                </td>
+                            </tr>
+                        );
+                    })
+                )}
+            </Table>
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                totalItems={filteredItems.length}
+                itemsPerPage={itemsPerPage}
+            />
+        </Card>
+    );
+}
 
 export default function Detail({ survey }) {
     const mapRef = useRef(null);
@@ -132,62 +226,13 @@ export default function Detail({ survey }) {
                 {/* 2. CHECKLIST REPORT DETAIL */}
                 <div className="space-y-6">
                     {Object.entries(groupedItems).map(([category, items]) => (
-                        <Card key={category} title={category}>
-                            <Table headers={['No', 'Nama Checkpoint', 'Status', 'Catatan Kondisi', 'Dokumentasi']}>
-                                {items.map((it) => {
-                                    const itemPhotos = survey.photos.filter(p => p.item_id === it.id);
-                                    return (
-                                        <tr key={it.id} className="hover:bg-gray-50/50">
-                                            <td className="px-4 py-3 font-mono font-bold text-xs text-center text-gray-400">
-                                                {it.nomor_item}
-                                            </td>
-                                            <td className="px-4 py-3 font-bold text-gray-900">{it.nama_item}</td>
-                                            <td className="px-4 py-3 text-center">
-                                                <span
-                                                    className={`inline-block px-2.5 py-0.5 rounded text-xs font-black ${it.status_check === 'checked'
-                                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                        : it.status_check === 'cross'
-                                                            ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                                                            : 'bg-gray-50 text-gray-400'
-                                                        }`}
-                                                >
-                                                    {it.status_check === 'checked' ? 'OK' : it.status_check === 'cross' ? 'NG' : '-'}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-3 text-gray-600 whitespace-pre-wrap">
-                                                {it.kondisi_nilai || '-'}
-                                                {it.catatan && (
-                                                    <div className="text-[10px] text-gray-400 mt-1 italic">
-                                                        Catatan: {it.catatan}
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex flex-wrap gap-1.5">
-                                                    {itemPhotos.map((photo) => (
-                                                        <div
-                                                            key={photo.id}
-                                                            className="relative w-10 h-10 rounded border border-gray-200 overflow-hidden bg-white shadow-sm hover:border-[#00ADB5] transition cursor-pointer"
-                                                            onClick={() => setSelectedImage(photo.file_url)}
-                                                        >
-                                                            <img
-                                                                src={photo.file_url}
-                                                                alt={it.nama_item}
-                                                                className="w-full h-full object-cover"
-                                                                onError={(e) => {
-                                                                    e.target.src = 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=400&q=85';
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    ))}
-                                                    {itemPhotos.length === 0 && <span className="text-gray-400 text-xs">-</span>}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </Table>
-                        </Card>
+                        <CategoryTableCard
+                            key={category}
+                            category={category}
+                            items={items}
+                            survey={survey}
+                            setSelectedImage={setSelectedImage}
+                        />
                     ))}
 
                     {survey.catatan_tambahan && (
@@ -221,6 +266,5 @@ export default function Detail({ survey }) {
         </>
     );
 }
-
 
 Detail.layout = page => <AppLayout children={page} />;

@@ -1,32 +1,39 @@
 import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Table from '../../Components/Table';
-import Input from '../../Components/Input';
-import Button from '../../Components/Button';
 import Select from '../../Components/Select';
 import { ArrowLeft, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import Search, { filterData } from '../../Components/Search';
+import Pagination from '../../Components/Pagination';
 
 export default function History({ transactions, filters }) {
-    const [search, setSearch] = useState(filters.cari || '');
-    const [type, setType] = useState(filters.type || '');
-    const [isSearching, setIsSearching] = useState(false);
+    const [searchQuery, setSearchQuery] = useState(filters.cari || '');
+    const [selectedType, setSelectedType] = useState(filters.type || '');
+    const [currentPage, setCurrentPage] = useState(1);
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        setIsSearching(true);
-        router.get('/gudang/history', { cari: search, type }, {
-            preserveState: true,
-            onFinish: () => setIsSearching(false)
-        });
+    const handleSearchChange = (query) => {
+        setSearchQuery(query);
+        setCurrentPage(1);
     };
 
     const handleTypeChange = (e) => {
-        const val = e.target.value;
-        setType(val);
-        router.get('/gudang/history', { cari: search, type: val }, { preserveState: true });
+        setSelectedType(e.target.value);
+        setCurrentPage(1);
     };
+
+    // Filter by type first
+    const typeFiltered = selectedType 
+        ? transactions.filter(t => t.type === selectedType)
+        : transactions;
+
+    // Filter deeply by search query
+    const filteredTransactions = filterData(typeFiltered, searchQuery);
+    
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+    const paginatedTransactions = filteredTransactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
         <>
@@ -51,18 +58,13 @@ export default function History({ transactions, filters }) {
             </div>
 
             <Card className="mb-6 p-4">
-                <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 max-w-2xl">
-                    <div className="flex-grow">
-                        <Input
-                            type="text"
-                            placeholder="Cari nomor form, supplier, pengambil, site..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
+                <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+                    <div className="w-full sm:w-72">
+                        <Search value={searchQuery} onChange={handleSearchChange} placeholder="Cari riwayat..." />
                     </div>
                     <div className="w-full sm:w-48">
                         <Select
-                            value={type}
+                            value={selectedType}
                             onChange={handleTypeChange}
                             options={[
                                 { label: 'Semua Transaksi', value: '' },
@@ -72,22 +74,19 @@ export default function History({ transactions, filters }) {
                             placeholder="Pilih Tipe..."
                         />
                     </div>
-                    <Button type="submit" variant="primary" processing={isSearching}>
-                        Cari
-                    </Button>
-                </form>
+                </div>
             </Card>
 
             <Card title="Log Mutasi & Surat Jalan Inventaris">
                 <Table headers={['No Form', 'Tipe', 'Tanggal', 'Judul Transaksi / Proyek', 'Pihak Terkait / PJ', 'Lokasi Rak / Tujuan', 'Aksi']}>
-                    {transactions.length === 0 ? (
+                    {paginatedTransactions.length === 0 ? (
                         <tr>
                             <td colSpan={7} className="px-6 py-8 text-center text-gray-400 font-medium">
                                 Belum ada log transaksi yang sesuai
                             </td>
                         </tr>
                     ) : (
-                        transactions.map((tr) => {
+                        paginatedTransactions.map((tr) => {
                             const isMasuk = tr.type === 'masuk';
                             return (
                                 <tr key={`${tr.type}-${tr.id}`} className="hover:bg-gray-50/50">
@@ -129,6 +128,14 @@ export default function History({ transactions, filters }) {
                         })
                     )}
                 </Table>
+
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    totalItems={filteredTransactions.length}
+                    itemsPerPage={itemsPerPage}
+                />
             </Card>
         </>
     );
