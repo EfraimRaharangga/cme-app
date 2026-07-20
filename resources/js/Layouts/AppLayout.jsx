@@ -13,7 +13,8 @@ import {
     Users,
     History,
     BookOpen,
-    X
+    X,
+    Zap
 } from 'lucide-react';
 import FlashMessage from '../Components/FlashMessage';
 import ConfirmationModal from '../Components/ConfirmationModal';
@@ -159,7 +160,8 @@ export default function AppLayout({ children }) {
                         <Menu className="h-5 w-5 stroke-[1.5]" />
                     </button>
                     <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold tracking-wider font-headlines">
+                        <Zap className="h-5 w-5 text-primary fill-primary stroke-[1.5] shrink-0" />
+                        <span className="text-lg font-bold tracking-wider font-headlines hidden sm:inline">
                             CME <span className="text-primary">APP</span>
                         </span>
                     </div>

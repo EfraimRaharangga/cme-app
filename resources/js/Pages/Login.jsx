@@ -4,6 +4,7 @@ import Button from '../Components/Button';
 import Input from '../Components/Input';
 import PasswordField from '../Components/PasswordField';
 import Alert from '../Components/Alert';
+import { Zap } from 'lucide-react';
 
 export default function Login({ status, message }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -20,10 +21,13 @@ export default function Login({ status, message }) {
         <div className="min-h-screen bg-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-body">
             <Head title="Login - Web CME" />
 
-            <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-                <h2 className="text-3xl font-extrabold text-text font-headlines leading-tight">
-                    CME App
-                </h2>
+            <div className="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center justify-center text-center">
+                <div className="flex items-center gap-2">
+                    <Zap className="h-8 w-8 text-primary fill-primary stroke-[1.5]" />
+                    <h2 className="text-3xl font-bold tracking-wider font-headlines text-text">
+                        CME <span className="text-primary">APP</span>
+                    </h2>
+                </div>
                 <p className="mt-2 text-sm text-text/75 font-headlines">
                     Central Monitoring &amp; Evaluation
                 </p>
