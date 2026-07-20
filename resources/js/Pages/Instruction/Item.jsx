@@ -2,72 +2,11 @@ import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
-import Table from '../../Components/Table';
-import Search, { filterData } from '../../Components/Search';
-import Pagination from '../../Components/Pagination';
+import Modal from '../../Components/Modal';
+import { ArrowLeft, ZoomIn } from 'lucide-react';
 
-export default function Item({ kategori, spec, sow, images }) {
-    // Premium placeholder specs if none exists in DB
-    const defaultSpecs = {
-        'ODC 1 Phase': [
-            { item: 'Dimensi Pondasi', std: 'Panjang 3m, Lebar 2m, Tinggi 50cm', tool: 'Meteran Rol' },
-            { item: 'Besi Hollow Kerangkeng', std: 'Hollow Galvalum 40x40x2mm', tool: 'Calipers' },
-            { item: 'Kabel Power PLN', std: 'NYY 3x16mm² dari meteran ke ACPDB', tool: 'Visual / Penampang' },
-            { item: 'Limit Grounding Site', std: 'Tahanan tanah ≤ 5 Ohm', tool: 'Earth Tester' },
-        ],
-        'ODC 3 Phase': [
-            { item: 'Dimensi Pondasi', std: 'Panjang 3m, Lebar 3m, Tinggi 60cm', tool: 'Meteran Rol' },
-            { item: 'Besi Hollow Kerangkeng', std: 'Hollow Galvalum 50x50x3mm', tool: 'Calipers' },
-            { item: 'Kabel Power PLN', std: 'NYY 4x25mm² dari meteran ke ATS/AMF', tool: 'Visual' },
-            { item: 'Limit Grounding Site', std: 'Tahanan tanah ≤ 1 Ohm', tool: 'Earth Tester' },
-        ],
-        'Shelter CME': [
-            { item: 'Ukuran Pondasi Utama', std: 'Panjang 4m, Lebar 4m, Tebal 20cm', tool: 'Meteran Rol' },
-            { item: 'Dinding Kerangkeng', std: 'Bata Ringan finishing plester & cat', tool: 'Visual' },
-            { item: 'Air Conditioner (AC)', std: '2 Unit AC Split 1.5 PK Alternate', tool: 'Visual' },
-            { item: 'Limit Grounding Shelter', std: 'Tahanan tanah ≤ 1 Ohm', tool: 'Earth Tester' },
-        ],
-    };
-
-    const defaultSow = {
-        'ODC 1 Phase': [
-            '1. Lakukan penggalian tanah sedalam 40cm untuk pondasi cakar ayam.',
-            '2. Cor semen adukan 1:2:3 dengan tinggi finishing 50cm di atas permukaan tanah.',
-            '3. Pasang kerangkeng besi hollow dengan pengelasan sambungan full weld.',
-            '4. Hubungkan kabel NYY 3x16mm² dari KWH meter ke MCB utama panel ODC.',
-            '5. Uji tahanan grounding rod di bawah 5 Ohm menggunakan Earth Tester.',
-        ],
-        'ODC 3 Phase': [
-            '1. Lakukan konstruksi pondasi beton bertulang mutu K-250.',
-            '2. Rakit kerangkeng hollow pelindung outdoor cabinet dengan baut angkur M16.',
-            '3. Hubungkan panel ATS/AMF ke modul panel generator cadangan.',
-            '4. Tarik jalur kabel power utama 3 Phase NYY 4x25mm².',
-            '5. Pasang grounding copper busbar dan grounding ring tanah di bawah 1 Ohm.',
-        ],
-        'Shelter CME': [
-            '1. Kerjakan sloof pondasi beton keliling berdimensi 4x4m.',
-            '2. Pasang dinding bata ringan setinggi 3 meter beserta pintu besi fireproof.',
-            '3. Instalasi kabel tray gantung dan ducting udara.',
-            '4. Pasang 2 unit AC split dengan controller modul alternation pintar.',
-            '5. Koneksikan arrester petir panel utama ke grounding ring tembaga.',
-        ],
-    };
-
-    const activeSpec = spec || defaultSpecs[kategori] || [];
-    const activeSow = sow || defaultSow[kategori] || [];
-
-    const [searchQuery, setSearchQuery] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const handleSearchChange = (query) => {
-        setSearchQuery(query);
-        setCurrentPage(1);
-    };
-
-    const filteredSpecs = filterData(activeSpec, searchQuery);
-    const itemsPerPage = 10;
-    const totalPages = Math.ceil(filteredSpecs.length / itemsPerPage);
-    const paginatedSpecs = filteredSpecs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+export default function Item({ id, kategori, description, items = [] }) {
+    const [previewImage, setPreviewImage] = useState(null);
 
     return (
         <>
@@ -86,82 +25,158 @@ export default function Item({ kategori, spec, sow, images }) {
                     href="/instruction"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-black transition"
                 >
-                    &larr; Panduan
+                    <ArrowLeft className="h-3.5 w-3.5 stroke-[1.5]" />
+                    Kembali
                 </Link>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Specs and SOW */}
-                <div className="lg:col-span-2 space-y-6">
-                    <Card title="📐 Spesifikasi Standar Material">
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3 mb-4">
-                            <Search value={searchQuery} onChange={handleSearchChange} />
+            <div className="space-y-6">
+                {/* Description Banner */}
+                <Card>
+                    <div className="p-1">
+                        <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 font-headlines">Deskripsi Panduan</h2>
+                        <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                            {description || 'Tidak ada deskripsi untuk panduan teknis ini.'}
+                        </p>
+                    </div>
+                </Card>
+
+                {/* Checklist Parameters Table/Grid Card */}
+                <Card title="📐 Parameter &amp; Spesifikasi SOW">
+                    {items.length === 0 ? (
+                        <div className="py-8 text-center text-gray-400 font-medium">
+                            Tidak ada item panduan dalam database.
                         </div>
-
-                        <Table headers={['Nama Parameter / Material', 'Kriteria Standard Kelayakan', 'Alat Ukur / Cara Uji']}>
-                            {paginatedSpecs.length === 0 ? (
-                                <tr>
-                                    <td colSpan={3} className="px-6 py-8 text-center text-gray-400 font-medium">
-                                        Tidak ada data spesifikasi material
-                                    </td>
-                                </tr>
-                            ) : (
-                                paginatedSpecs.map((row, idx) => (
-                                    <tr key={idx} className="hover:bg-gray-50/50">
-                                        <td className="px-6 py-3 font-bold text-gray-900">{row.item || row[0]}</td>
-                                        <td className="px-6 py-3 text-gray-600 font-medium">{row.std || row[1]}</td>
-                                        <td className="px-6 py-3 text-center text-gray-500 font-mono text-xs">{row.tool || row[2]}</td>
-                                    </tr>
-                                ))
-                            )}
-                        </Table>
-
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={setCurrentPage}
-                            totalItems={filteredSpecs.length}
-                            itemsPerPage={itemsPerPage}
-                        />
-                    </Card>
-
-                    <Card title="Langkah-langkah Kerja (SOW)">
-                        <div className="bg-gray-50 p-4 border border-gray-250 rounded-lg space-y-3 font-medium text-xs text-gray-700 leading-relaxed">
-                            {activeSow.map((step, idx) => (
-                                <p key={idx} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
-                                    {step}
-                                </p>
-                            ))}
-                        </div>
-                    </Card>
-                </div>
-
-                {/* Blueprint Drawing graphics if any */}
-                <div>
-                    <Card title=" Drawing Blueprint Layout">
-                        {images.length === 0 ? (
-                            <div className="border border-gray-200 border-dashed rounded-lg p-8 text-center text-gray-400 bg-gray-50/50">
-                                <svg className="mx-auto h-8 w-8 stroke-[1.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375 0 11-.75 0 .375 0 01.75 0z" />
-                                </svg>
-                                <p className="mt-2 text-xs font-semibold">Belum Ada Drawing Blueprint</p>
-                                <p className="text-[10px] text-gray-400 mt-1">Gunakan form admin untuk mengunggah gambar blueprint kerja.</p>
+                    ) : (
+                        <>
+                            {/* Desktop View Table (hidden on mobile) */}
+                            <div className="hidden md:block overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="border-b border-border bg-gray-50 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                            <th className="px-6 py-3 w-1/4">Parameter Name</th>
+                                            <th className="px-6 py-3 w-1/4">Specification</th>
+                                            <th className="px-6 py-3 w-1/3">SOW</th>
+                                            <th className="px-6 py-3 text-center">Images</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100 text-xs">
+                                        {items.map((row, idx) => (
+                                            <tr key={idx} className="hover:bg-gray-50/50">
+                                                <td className="px-6 py-4 font-bold text-gray-900 align-top">
+                                                    {row.parameter_name}
+                                                </td>
+                                                <td className="px-6 py-4 text-gray-600 font-medium whitespace-pre-line align-top">
+                                                    {row.specification}
+                                                </td>
+                                                <td className="px-6 py-4 align-top">
+                                                    <ul className="list-disc list-inside space-y-1 text-gray-600 font-medium pl-1">
+                                                        {row.sow && row.sow.map((step, sIdx) => (
+                                                            <li key={sIdx}>{step}</li>
+                                                        ))}
+                                                    </ul>
+                                                </td>
+                                                <td className="px-6 py-4 align-top">
+                                                    <div className="flex flex-wrap justify-center gap-1.5">
+                                                        {row.images && row.images.map((img, imgIdx) => (
+                                                            <div key={imgIdx} className="relative w-12 h-12 rounded border border-gray-200 overflow-hidden bg-white shadow-sm group">
+                                                                <img
+                                                                    src={img.url}
+                                                                    className="w-full h-full object-cover cursor-pointer"
+                                                                    onClick={() => setPreviewImage(img.url)}
+                                                                    alt="Preview"
+                                                                />
+                                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center pointer-events-none">
+                                                                    <ZoomIn className="w-3.5 h-3.5 text-white" />
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                        {(!row.images || row.images.length === 0) && (
+                                                            <span className="text-gray-400 italic text-[10px]">No images</span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
-                        ) : (
-                            <div className="space-y-4">
-                                {images.map((img) => (
-                                    <div key={img.id} className="relative rounded-lg border border-gray-200 overflow-hidden bg-white shadow-sm group">
-                                        <img src={img.file_url} className="w-full object-contain" alt="Blueprint" />
-                                        <div className="absolute bottom-0 inset-x-0 bg-black/60 p-2 text-[10px] font-bold text-white text-center">
-                                            {img.filename}
+
+                            {/* Mobile View: Collapses 4 columns into a single column grid-cols-1 */}
+                            <div className="block md:hidden space-y-4">
+                                {items.map((row, idx) => (
+                                    <div
+                                        key={idx}
+                                        className="bg-white p-4 border border-border rounded-lg shadow-sm space-y-3"
+                                    >
+                                        <div>
+                                            <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+                                                Parameter Name
+                                            </span>
+                                            <span className="text-sm font-bold text-gray-900">
+                                                {row.parameter_name}
+                                            </span>
                                         </div>
+
+                                        <div className="border-t border-gray-100 pt-2">
+                                            <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+                                                Specification
+                                            </span>
+                                            <span className="text-xs text-gray-700 whitespace-pre-line font-medium">
+                                                {row.specification}
+                                            </span>
+                                        </div>
+
+                                        <div className="border-t border-gray-100 pt-2">
+                                            <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+                                                SOW (Scope of Work)
+                                            </span>
+                                            <ul className="list-disc list-inside text-xs text-gray-650 space-y-1 pl-1 font-medium">
+                                                {row.sow && row.sow.map((step, sIdx) => (
+                                                    <li key={sIdx}>{step}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
+                                        {row.images && row.images.length > 0 && (
+                                            <div className="border-t border-gray-100 pt-2">
+                                                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                                                    Images / Drawing Blueprint
+                                                </span>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {row.images.map((img, imgIdx) => (
+                                                        <div key={imgIdx} className="relative w-14 h-14 rounded border border-gray-200 overflow-hidden bg-white shadow-sm">
+                                                            <img
+                                                                src={img.url}
+                                                                className="w-full h-full object-cover cursor-pointer"
+                                                                onClick={() => setPreviewImage(img.url)}
+                                                                alt="Blueprint"
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
-                        )}
-                    </Card>
-                </div>
+                        </>
+                    )}
+                </Card>
             </div>
+
+            {/* Live image preview modal */}
+            <Modal isOpen={previewImage !== null} onClose={() => setPreviewImage(null)} size="max-w-xl">
+                <div className="p-2 flex flex-col items-center">
+                    {previewImage && (
+                        <img
+                            src={previewImage}
+                            className="w-full h-auto rounded-lg shadow max-h-[80vh] object-contain"
+                            alt="Drawing Blueprint Preview"
+                        />
+                    )}
+                </div>
+            </Modal>
         </>
     );
 }

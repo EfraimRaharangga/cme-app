@@ -70,7 +70,12 @@ Route::middleware('custom_auth')->group(function () {
 
     // Scope of Work Spec Guides Reference Module
     Route::get('/instruction', [InstructionController::class, 'index']);
-    Route::get('/instruction/{kategori}', [InstructionController::class, 'showItem']);
+    Route::get('/instruction/baru', [InstructionController::class, 'create']);
+    Route::post('/instruction/baru', [InstructionController::class, 'store']);
+    Route::get('/instruction/{id}', [InstructionController::class, 'showItem']);
+    Route::get('/instruction/{id}/edit', [InstructionController::class, 'edit']);
+    Route::post('/instruction/{id}/edit', [InstructionController::class, 'update']);
+    Route::delete('/instruction/{id}', [InstructionController::class, 'delete']);
 
     // Admin Users Management (admin role checks inside controllers)
     Route::get('/users', [UserController::class, 'index']);
