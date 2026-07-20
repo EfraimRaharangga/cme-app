@@ -7,6 +7,8 @@ import Input from '../../Components/Input';
 import Button from '../../Components/Button';
 import ConfirmationModal from '../../Components/ConfirmationModal';
 import ImageUpload from '../../Components/ImageUpload';
+import Breadcrumbs from '../../Components/Breadcrumbs';
+import { ArrowLeft } from 'lucide-react';
 
 export default function Edit({ record, templates }) {
     const [mapLoaded, setMapLoaded] = useState(false);
@@ -281,7 +283,20 @@ export default function Edit({ record, templates }) {
         <>
             <Head title={`Edit ATP - ${record.nama_site}`} />
 
-            <div className="mb-6 flex justify-between items-center">
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'ATP Check', href: '/atp' },
+                { label: record.nama_site || `ATP #${record.id}`, href: `/atp/${record.id}` },
+                { label: 'Edit Laporan' }
+            ]} />
+
+            <div className="mb-6 flex items-center gap-3">
+                <Link
+                    href={`/atp/${record.id}`}
+                    className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition shrink-0"
+                >
+                    <ArrowLeft className="h-4 w-4 stroke-[1.5]" />
+                </Link>
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">
                         Edit Laporan ATP
@@ -290,12 +305,6 @@ export default function Edit({ record, templates }) {
                         Sesuaikan checklist, verdict kelayakan, dan foto verifikasi.
                     </p>
                 </div>
-                <Link
-                    href={`/atp/${record.id}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-black transition"
-                >
-                    &larr; Detail
-                </Link>
             </div>
 
             {/* PROGRESS BAR */}

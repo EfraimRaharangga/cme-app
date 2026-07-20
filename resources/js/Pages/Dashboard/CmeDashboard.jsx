@@ -36,65 +36,73 @@ export default function CmeDashboard({ stats, recentAtp }) {
 
             {/* STATS WIDGETS */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <Card className="border-l-4 border-l-[#00ADB5] p-2 hover:-translate-y-0.5 transition duration-200">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total ATP</p>
-                            <h4 className="text-2xl font-black text-gray-900 mt-1 font-headlines">{stats.totalAtp}</h4>
+                <Link href="/atp" className="block">
+                    <Card className="border-l-4 border-l-[#00ADB5] p-2 hover:-translate-y-0.5 transition duration-200 cursor-pointer h-full">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total ATP</p>
+                                <h4 className="text-2xl font-black text-gray-900 mt-1 font-headlines">{stats.totalAtp}</h4>
+                            </div>
+                            <div className="p-3 bg-[#00ADB5]/10 text-[#00ADB5] rounded-full">
+                                <ClipboardCheck className="h-5 w-5 stroke-[1.5]" />
+                            </div>
                         </div>
-                        <div className="p-3 bg-[#00ADB5]/10 text-[#00ADB5] rounded-full">
-                            <ClipboardCheck className="h-5 w-5 stroke-[1.5]" />
+                        <div className="mt-2 text-xs text-gray-400 font-medium">
+                            {stats.accept} Disetujui &bull; {stats.pending} Tertunda
                         </div>
-                    </div>
-                    <div className="mt-2 text-xs text-gray-400 font-medium">
-                        {stats.accept} Disetujui &bull; {stats.pending} Tertunda
-                    </div>
-                </Card>
+                    </Card>
+                </Link>
 
-                <Card className="border-l-4 border-l-gray-900 p-2 hover:-translate-y-0.5 transition duration-200">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Survey ODC</p>
-                            <h4 className="text-2xl font-black text-gray-900 mt-1 font-headlines">{stats.totalSurvey}</h4>
+                <Link href="/survey" className="block">
+                    <Card className="border-l-4 border-l-gray-900 p-2 hover:-translate-y-0.5 transition duration-200 cursor-pointer h-full">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Survey ODC</p>
+                                <h4 className="text-2xl font-black text-gray-900 mt-1 font-headlines">{stats.totalSurvey}</h4>
+                            </div>
+                            <div className="p-3 bg-gray-100 text-gray-900 rounded-full">
+                                <FileSpreadsheet className="h-5 w-5 stroke-[1.5]" />
+                            </div>
                         </div>
-                        <div className="p-3 bg-gray-100 text-gray-900 rounded-full">
-                            <FileSpreadsheet className="h-5 w-5 stroke-[1.5]" />
+                        <div className="mt-2 text-xs text-gray-400 font-medium">
+                            {stats.mySurveyCount} Survey Saya
                         </div>
-                    </div>
-                    <div className="mt-2 text-xs text-gray-400 font-medium">
-                        {stats.mySurveyCount} Survey Saya
-                    </div>
-                </Card>
+                    </Card>
+                </Link>
 
-                <Card className="border-l-4 border-l-[#00ADB5] p-2 hover:-translate-y-0.5 transition duration-200">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Stok Gudang</p>
-                            <h4 className="text-2xl font-black text-gray-900 mt-1 font-headlines">{stats.totalBarang}</h4>
+                <Link href="/gudang" className="block">
+                    <Card className="border-l-4 border-l-[#00ADB5] p-2 hover:-translate-y-0.5 transition duration-200 cursor-pointer h-full">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Stok Gudang</p>
+                                <h4 className="text-2xl font-black text-gray-900 mt-1 font-headlines">{stats.totalBarang}</h4>
+                            </div>
+                            <div className="p-3 bg-[#00ADB5]/10 text-[#00ADB5] rounded-full">
+                                <HardDrive className="h-5 w-5 stroke-[1.5]" />
+                            </div>
                         </div>
-                        <div className="p-3 bg-[#00ADB5]/10 text-[#00ADB5] rounded-full">
-                            <HardDrive className="h-5 w-5 stroke-[1.5]" />
+                        <div className="mt-2 text-xs text-gray-400 font-medium">
+                            Total item terdaftar
                         </div>
-                    </div>
-                    <div className="mt-2 text-xs text-gray-400 font-medium">
-                        Total item terdaftar
-                    </div>
-                </Card>
+                    </Card>
+                </Link>
 
-                <Card className="border-l-4 border-l-gray-900 p-2 hover:-translate-y-0.5 transition duration-200">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pengguna</p>
-                            <h4 className="text-2xl font-black text-gray-900 mt-1 font-headlines">{stats.totalUsers}</h4>
+                <Link href="/users" className="block">
+                    <Card className="border-l-4 border-l-gray-900 p-2 hover:-translate-y-0.5 transition duration-200 cursor-pointer h-full">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pengguna</p>
+                                <h4 className="text-2xl font-black text-gray-900 mt-1 font-headlines">{stats.totalUsers}</h4>
+                            </div>
+                            <div className="p-3 bg-gray-100 text-gray-900 rounded-full">
+                                <Users className="h-5 w-5 stroke-[1.5]" />
+                            </div>
                         </div>
-                        <div className="p-3 bg-gray-100 text-gray-900 rounded-full">
-                            <Users className="h-5 w-5 stroke-[1.5]" />
+                        <div className="mt-2 text-xs text-gray-400 font-medium">
+                            Akun aktif terdaftar
                         </div>
-                    </div>
-                    <div className="mt-2 text-xs text-gray-400 font-medium">
-                        Akun aktif terdaftar
-                    </div>
-                </Card>
+                    </Card>
+                </Link>
             </div>
 
             {/* ASYMMETRICAL GRID */}

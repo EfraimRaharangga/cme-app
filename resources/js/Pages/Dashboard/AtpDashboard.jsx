@@ -6,6 +6,7 @@ import Table from '../../Components/Table';
 import { ClipboardCheck, CheckCircle2, AlertTriangle, XCircle, Clock } from 'lucide-react';
 import Search, { filterData } from '../../Components/Search';
 import Pagination from '../../Components/Pagination';
+import Breadcrumbs from '../../Components/Breadcrumbs';
 
 export default function AtpDashboard({ stats, recent }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -25,6 +26,11 @@ export default function AtpDashboard({ stats, recent }) {
         <>
             <Head title="ATP Dashboard - Web CME" />
 
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'ATP Check' }
+            ]} />
+
             <div className="mb-8">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">
                     ATP Dashboard
@@ -35,7 +41,10 @@ export default function AtpDashboard({ stats, recent }) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-                <Card className="border-l-4 border-l-gray-900 p-2">
+                <Card 
+                    className="border-l-4 border-l-gray-900 p-2 cursor-pointer hover:bg-gray-50 transition duration-150"
+                    onClick={() => handleSearchChange('')}
+                >
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Total ATP</p>
@@ -47,7 +56,10 @@ export default function AtpDashboard({ stats, recent }) {
                     </div>
                 </Card>
 
-                <Card className="border-l-4 border-l-emerald-500 p-2">
+                <Card 
+                    className="border-l-4 border-l-emerald-500 p-2 cursor-pointer hover:bg-emerald-50/30 transition duration-150"
+                    onClick={() => handleSearchChange('ACCEPT')}
+                >
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">ACCEPT</p>
@@ -59,7 +71,10 @@ export default function AtpDashboard({ stats, recent }) {
                     </div>
                 </Card>
 
-                <Card className="border-l-4 border-l-amber-500 p-2">
+                <Card 
+                    className="border-l-4 border-l-amber-500 p-2 cursor-pointer hover:bg-amber-50/30 transition duration-150"
+                    onClick={() => handleSearchChange('CONDITIONAL')}
+                >
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">CONDITIONAL</p>
@@ -71,7 +86,10 @@ export default function AtpDashboard({ stats, recent }) {
                     </div>
                 </Card>
 
-                <Card className="border-l-4 border-l-rose-500 p-2">
+                <Card 
+                    className="border-l-4 border-l-rose-500 p-2 cursor-pointer hover:bg-rose-50/30 transition duration-150"
+                    onClick={() => handleSearchChange('REJECT')}
+                >
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">REJECT</p>
@@ -83,7 +101,10 @@ export default function AtpDashboard({ stats, recent }) {
                     </div>
                 </Card>
 
-                <Card className="border-l-4 border-l-gray-400 p-2">
+                <Card 
+                    className="border-l-4 border-l-gray-450 p-2 cursor-pointer hover:bg-gray-50 transition duration-150"
+                    onClick={() => handleSearchChange('PENDING')}
+                >
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">PENDING</p>

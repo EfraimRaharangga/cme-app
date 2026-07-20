@@ -8,6 +8,8 @@ import Button from '../../Components/Button';
 import Alert from '../../Components/Alert';
 import ConfirmationModal from '../../Components/ConfirmationModal';
 import ImageUpload from '../../Components/ImageUpload';
+import Breadcrumbs from '../../Components/Breadcrumbs';
+import { ArrowLeft } from 'lucide-react';
 
 export default function New({ defaultTemplate, templates }) {
     const [mapLoaded, setMapLoaded] = useState(false);
@@ -242,7 +244,19 @@ export default function New({ defaultTemplate, templates }) {
         <>
             <Head title="Survey Baru - Web CME" />
 
-            <div className="mb-6 flex justify-between items-center">
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Survey ODC', href: '/survey' },
+                { label: 'Survey Baru' }
+            ]} />
+
+            <div className="mb-6 flex items-center gap-3">
+                <Link
+                    href="/survey"
+                    className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition shrink-0"
+                >
+                    <ArrowLeft className="h-4 w-4 stroke-[1.5]" />
+                </Link>
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">
                         Survey ODC Baru

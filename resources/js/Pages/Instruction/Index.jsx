@@ -5,6 +5,7 @@ import Card from '../../Components/Card';
 import Button from '../../Components/Button';
 import ConfirmationModal from '../../Components/ConfirmationModal';
 import { BookOpen, Plus, Edit, Trash2 } from 'lucide-react';
+import Breadcrumbs from '../../Components/Breadcrumbs';
 
 export default function Index({ guides = [] }) {
     const { props } = usePage();
@@ -31,6 +32,11 @@ export default function Index({ guides = [] }) {
     return (
         <>
             <Head title="Panduan Teknis (SOW) - Web CME" />
+
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Panduan Teknis (SOW)' }
+            ]} />
 
             <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>

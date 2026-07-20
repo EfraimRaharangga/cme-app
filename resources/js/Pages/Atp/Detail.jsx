@@ -7,9 +7,10 @@ import Button from '../../Components/Button';
 import Input from '../../Components/Input';
 import Modal from '../../Components/Modal';
 import ConfirmationModal from '../../Components/ConfirmationModal';
-import { Plus, Trash2, Printer } from 'lucide-react';
+import { Plus, Trash2, Printer, ArrowLeft } from 'lucide-react';
 import SearchInput, { filterData } from '../../Components/Search';
 import Pagination from '../../Components/Pagination';
+import Breadcrumbs from '../../Components/Breadcrumbs';
 
 export default function Detail({ record }) {
     const mapRef = useRef(null);
@@ -215,8 +216,20 @@ export default function Detail({ record }) {
         <>
             <Head title={`ATP Detail ${record.nama_site} - Web CME`} />
 
-            <div className="mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-                <div>
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'ATP Check', href: '/atp' },
+                { label: record.nama_site || `ATP #${record.id}` }
+            ]} />
+
+            <div className="mb-6 flex items-center gap-3">
+                <Link
+                    href="/atp"
+                    className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition shrink-0"
+                >
+                    <ArrowLeft className="h-4 w-4 stroke-[1.5]" />
+                </Link>
+                <div className="flex-grow">
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">
                         Detail ATP Check
                     </h1>
@@ -224,7 +237,7 @@ export default function Detail({ record }) {
                         Informasi site {record.nama_site} &bull; No. PO: {record.no_po}
                     </p>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 shrink-0">
                     <Link
                         href={`/atp/${record.id}/edit`}
                         className="px-3.5 py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase rounded-lg transition"

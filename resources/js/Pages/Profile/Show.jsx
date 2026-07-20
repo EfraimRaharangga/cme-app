@@ -9,6 +9,7 @@ import ConfirmationModal from '../../Components/ConfirmationModal';
 import { Shield, Key, User, Clock, CheckCircle2 } from 'lucide-react';
 import Search, { filterData } from '../../Components/Search';
 import Pagination from '../../Components/Pagination';
+import Breadcrumbs from '../../Components/Breadcrumbs';
 
 export default function Show({ user, logs, permissions }) {
     const [confirmModal, setConfirmModal] = useState({
@@ -61,6 +62,11 @@ export default function Show({ user, logs, permissions }) {
     return (
         <>
             <Head title="Profil Saya - Web CME" />
+
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Profil Saya' }
+            ]} />
 
             <div className="mb-6">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">

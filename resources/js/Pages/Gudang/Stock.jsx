@@ -10,6 +10,7 @@ import Modal from '../../Components/Modal';
 import DocumentUpload from '../../Components/DocumentUpload';
 import SearchInput, { filterData } from '../../Components/Search';
 import Pagination from '../../Components/Pagination';
+import Breadcrumbs from '../../Components/Breadcrumbs';
 import {
     Package,
     ArrowUpRight,
@@ -197,6 +198,11 @@ export default function Stock({ items, categories, totals, filters, totalMasukCo
     return (
         <>
             <Head title="Stok Gudang - Web CME" />
+
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Gudang' }
+            ]} />
 
             <div className="mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div>

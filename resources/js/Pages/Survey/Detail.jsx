@@ -6,6 +6,8 @@ import Table from '../../Components/Table';
 import Modal from '../../Components/Modal';
 import Search, { filterData } from '../../Components/Search';
 import Pagination from '../../Components/Pagination';
+import Breadcrumbs from '../../Components/Breadcrumbs';
+import { ArrowLeft } from 'lucide-react';
 
 function CategoryTableCard({ category, items, survey, setSelectedImage }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -153,8 +155,20 @@ export default function Detail({ survey }) {
         <>
             <Head title={`Survey ${survey.nama_site} - Web CME`} />
 
-            <div className="mb-6 flex justify-between items-center">
-                <div>
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Survey ODC', href: '/survey' },
+                { label: survey.nama_site || `Survey #${survey.id}` }
+            ]} />
+
+            <div className="mb-6 flex items-center gap-3">
+                <Link
+                    href="/survey"
+                    className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition shrink-0"
+                >
+                    <ArrowLeft className="h-4 w-4 stroke-[1.5]" />
+                </Link>
+                <div className="flex-grow">
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">
                         Detail Survey ODC
                     </h1>
@@ -162,7 +176,7 @@ export default function Detail({ survey }) {
                         Laporan teknis site {survey.nama_site} terdaftar.
                     </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                     <Link
                         href={`/survey/${survey.id}/edit`}
                         className="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition"
@@ -174,12 +188,6 @@ export default function Detail({ survey }) {
                         className="inline-flex items-center px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider rounded-lg transition"
                     >
                         Cetak (A4)
-                    </Link>
-                    <Link
-                        href="/survey"
-                        className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-black transition"
-                    >
-                        &larr; Riwayat
                     </Link>
                 </div>
             </div>

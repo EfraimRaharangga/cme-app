@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '../../Layouts/AppLayout';
 import Card from '../../Components/Card';
 import Table from '../../Components/Table';
 import { FileSpreadsheet, Users, User } from 'lucide-react';
 import Search, { filterData } from '../../Components/Search';
 import Pagination from '../../Components/Pagination';
+import Breadcrumbs from '../../Components/Breadcrumbs';
 
 export default function SurveyDashboard({ stats, recent }) {
+    const { auth } = usePage().props;
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -25,6 +27,11 @@ export default function SurveyDashboard({ stats, recent }) {
         <>
             <Head title="Survey ODC Dashboard - Web CME" />
 
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Survey ODC' }
+            ]} />
+
             <div className="mb-8">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">
                     Survey ODC Dashboard
@@ -35,7 +42,10 @@ export default function SurveyDashboard({ stats, recent }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <Card className="border-l-4 border-l-[#00ADB5] p-2">
+                <Card 
+                    className="border-l-4 border-l-[#00ADB5] p-2 cursor-pointer hover:bg-gray-50 transition duration-150"
+                    onClick={() => handleSearchChange('')}
+                >
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Survey</p>
@@ -47,7 +57,10 @@ export default function SurveyDashboard({ stats, recent }) {
                     </div>
                 </Card>
 
-                <Card className="border-l-4 border-l-gray-900 p-2">
+                <Card 
+                    className="border-l-4 border-l-gray-900 p-2 cursor-pointer hover:bg-gray-50 transition duration-150"
+                    onClick={() => handleSearchChange(auth?.user?.name || auth?.user?.username || '')}
+                >
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Survey Saya</p>
@@ -59,17 +72,19 @@ export default function SurveyDashboard({ stats, recent }) {
                     </div>
                 </Card>
 
-                <Card className="border-l-4 border-l-[#00ADB5] p-2">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Pengguna</p>
-                            <h4 className="text-2xl font-black text-gray-900 mt-1 font-headlines">{stats.users}</h4>
+                <Link href="/users" className="block">
+                    <Card className="border-l-4 border-l-[#00ADB5] p-2 cursor-pointer hover:bg-gray-50 transition duration-150 h-full">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Pengguna</p>
+                                <h4 className="text-2xl font-black text-gray-900 mt-1 font-headlines">{stats.users}</h4>
+                            </div>
+                            <div className="p-3 bg-[#00ADB5]/10 text-[#00ADB5] rounded-full">
+                                <Users className="h-5 w-5 stroke-[1.5]" />
+                            </div>
                         </div>
-                        <div className="p-3 bg-[#00ADB5]/10 text-[#00ADB5] rounded-full">
-                            <Users className="h-5 w-5 stroke-[1.5]" />
-                        </div>
-                    </div>
-                </Card>
+                    </Card>
+                </Link>
             </div>
 
             <div className="space-y-8">

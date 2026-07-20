@@ -7,6 +7,7 @@ import Select from '../../Components/Select';
 import { ArrowLeft, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import Search, { filterData } from '../../Components/Search';
 import Pagination from '../../Components/Pagination';
+import Breadcrumbs from '../../Components/Breadcrumbs';
 
 export default function History({ transactions, filters }) {
     const [searchQuery, setSearchQuery] = useState(filters.cari || '');
@@ -39,7 +40,19 @@ export default function History({ transactions, filters }) {
         <>
             <Head title="Riwayat Transaksi Gudang - Web CME" />
 
-            <div className="mb-6 flex justify-between items-center">
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Gudang', href: '/gudang' },
+                { label: 'Riwayat Transaksi' }
+            ]} />
+
+            <div className="mb-6 flex items-center gap-3">
+                <Link
+                    href="/gudang"
+                    className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition shrink-0"
+                >
+                    <ArrowLeft className="h-4 w-4 stroke-[1.5]" />
+                </Link>
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">
                         Riwayat Transaksi Gudang
@@ -48,13 +61,6 @@ export default function History({ transactions, filters }) {
                         Log gabungan seluruh barang masuk (BM) dan barang keluar (BK) dari inventaris.
                     </p>
                 </div>
-                <Link
-                    href="/gudang"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-white text-xs font-semibold text-text hover:bg-surface hover:text-primary transition duration-150"
-                >
-                    <ArrowLeft className="h-3.5 w-3.5 stroke-[1.5]" />
-                    Stok Ledger
-                </Link>
             </div>
 
             <Card className="mb-6 p-4">

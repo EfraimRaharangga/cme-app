@@ -7,6 +7,8 @@ import Input from '../../Components/Input';
 import Button from '../../Components/Button';
 import ConfirmationModal from '../../Components/ConfirmationModal';
 import ImageUpload from '../../Components/ImageUpload';
+import Breadcrumbs from '../../Components/Breadcrumbs';
+import { ArrowLeft } from 'lucide-react';
 
 export default function Edit({ survey, templates, defaultTemplate }) {
     const [mapLoaded, setMapLoaded] = useState(false);
@@ -330,7 +332,20 @@ export default function Edit({ survey, templates, defaultTemplate }) {
         <>
             <Head title={`Edit Survey - ${survey.nama_site}`} />
 
-            <div className="mb-6 flex justify-between items-center">
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Survey ODC', href: '/survey' },
+                { label: survey.nama_site || `Survey #${survey.id}`, href: `/survey/${survey.id}` },
+                { label: 'Edit Laporan' }
+            ]} />
+
+            <div className="mb-6 flex items-center gap-3">
+                <Link
+                    href={`/survey/${survey.id}`}
+                    className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition shrink-0"
+                >
+                    <ArrowLeft className="h-4 w-4 stroke-[1.5]" />
+                </Link>
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">
                         Edit Laporan Survey
@@ -339,12 +354,6 @@ export default function Edit({ survey, templates, defaultTemplate }) {
                         Sesuaikan checklist site ODC, rincian koordinat, dan tambahkan foto verifikasi baru.
                     </p>
                 </div>
-                <Link
-                    href={`/survey/${survey.id}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-black transition"
-                >
-                    &larr; Detail
-                </Link>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">

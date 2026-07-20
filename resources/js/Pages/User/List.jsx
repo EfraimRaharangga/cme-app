@@ -11,6 +11,7 @@ import Alert from '../../Components/Alert';
 import ConfirmationModal from '../../Components/ConfirmationModal';
 import Search, { filterData } from '../../Components/Search';
 import Pagination from '../../Components/Pagination';
+import Breadcrumbs from '../../Components/Breadcrumbs';
 
 export default function List({ users }) {
     const [editMode, setEditMode] = useState(false);
@@ -97,6 +98,11 @@ export default function List({ users }) {
     return (
         <>
             <Head title="Kelola Pengguna - Web CME" />
+
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Kelola Pengguna' }
+            ]} />
 
             <div className="mb-6">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">

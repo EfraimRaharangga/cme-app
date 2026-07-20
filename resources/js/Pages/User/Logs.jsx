@@ -5,6 +5,7 @@ import Card from '../../Components/Card';
 import Table from '../../Components/Table';
 import Search, { filterData } from '../../Components/Search';
 import Pagination from '../../Components/Pagination';
+import Breadcrumbs from '../../Components/Breadcrumbs';
 
 export default function Logs({ logs }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -23,6 +24,11 @@ export default function Logs({ logs }) {
     return (
         <>
             <Head title="Log Aktivitas - Web CME" />
+
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Log Aktivitas' }
+            ]} />
 
             <div className="mb-6">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900 font-headlines">
