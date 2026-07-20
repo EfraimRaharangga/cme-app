@@ -289,25 +289,6 @@ export default function New({ defaultTemplate, templates }) {
         const items = data.hasil_json?.items || {};
         const itemNames = data.hasil_json?.itemNames || {};
 
-        defaultTemplate.forEach((item) => {
-            if (item.ty === 'it') {
-                const key = item._id;
-                const status = items[key];
-                const namaItem = itemNames[key] || item.d[0] || key;
-
-                if (!status) {
-                    newErrors[`hasil_json.items.${key}`] = `Status untuk '${namaItem}' wajib dipilih.`;
-                    hasError = true;
-                } else if (status === 'OK' || status === 'NG') {
-                    const photos = data.fotos_item[key] || [];
-                    if (photos.length === 0) {
-                        newErrors[`fotos_item.${key}`] = `Foto untuk '${namaItem}' wajib diunggah.`;
-                        hasError = true;
-                    }
-                }
-            }
-        });
-
         if (hasError) {
             setError(newErrors);
             setAlertModal({

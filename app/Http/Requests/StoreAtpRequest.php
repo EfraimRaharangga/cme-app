@@ -20,24 +20,14 @@ class StoreAtpRequest extends FormRequest
             'region' => 'nullable|string',
             'latitude' => 'nullable|string',
             'longitude' => 'nullable|string',
-            'hasil_json' => 'required|array',
-            'hasil_json.items' => 'required|array',
+            'hasil_json' => 'array',
+            'hasil_json.items' => 'array',
             'verdict' => 'nullable|string',
             'verdict_notes' => 'nullable|string',
             'approval_json' => 'nullable|array',
             'bastp_json' => 'nullable|string',
             'fotos_item' => 'nullable|array',
         ];
-
-        $items = $this->input('hasil_json.items', []);
-        foreach ($items as $key => $status) {
-            $rules["hasil_json.items.{$key}"] = 'required|in:OK,NG,NA';
-            
-            if ($status === 'OK' || $status === 'NG') {
-                $rules["fotos_item.{$key}"] = 'required|array|min:1';
-                $rules["fotos_item.{$key}.*.path"] = 'required|string';
-            }
-        }
 
         return $rules;
     }
