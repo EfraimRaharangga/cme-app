@@ -5,15 +5,27 @@ import Card from '../../Components/Card';
 import Table from '../../Components/Table';
 import Search, { filterData } from '../../Components/Search';
 import Pagination from '../../Components/Pagination';
+import Modal from '../../Components/Modal';
+import { FileText, Image as ImageIcon, Download, Eye } from 'lucide-react';
 
 export default function MasukDetail({ transaction }) {
     const photos = transaction.media_urls || [];
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    
+    // Preview states
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const [previewType, setPreviewType] = useState(null); // 'pdf' | 'image'
 
     const handleSearchChange = (query) => {
         setSearchQuery(query);
         setCurrentPage(1);
+    };
+
+    const triggerPreview = (url) => {
+        const isPdf = url.toLowerCase().endsWith('.pdf');
+        setPreviewUrl(url);
+        setPreviewType(isPdf ? 'pdf' : 'image');
     };
 
     const filteredDetails = filterData(transaction.details, searchQuery);
@@ -45,7 +57,7 @@ export default function MasukDetail({ transaction }) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Items received lists */}
                 <div className="lg:col-span-2 space-y-6">
-                    <Card title="📦 Rincian Barang Diterima">
+                    <Card title="Rincian Barang Diterima">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-3 mb-4">
                             <Search value={searchQuery} onChange={handleSearchChange} />
                         </div>
@@ -85,7 +97,7 @@ export default function MasukDetail({ transaction }) {
 
                 {/* Metadata card */}
                 <div className="space-y-6">
-                    <Card title="📝 Metadata Transaksi">
+                    <Card title="Metadata Transaksi">
                         <div className="space-y-4 text-xs text-gray-700">
                             <div>
                                 <p className="text-[10px] font-semibold text-gray-400 uppercase">Judul Batch</p>
@@ -120,30 +132,101 @@ export default function MasukDetail({ transaction }) {
                                     <p className="text-gray-700 mt-1 whitespace-pre-wrap">{transaction.keterangan}</p>
                                 </div>
                             )}
+
+                            {photos.length > 0 && (
+                                <div className="pt-3 border-t border-gray-100 space-y-2">
+                                    <p className="text-[10px] font-semibold text-gray-400 uppercase">Lampiran Dokumen</p>
+                                    <div className="space-y-2">
+                                        {photos.map((ph, idx) => {
+                                            const filename = ph.split('/').pop() || 'Download File';
+                                            return (
+                                                <div key={idx} className="flex items-center justify-between p-2 bg-white rounded border border-gray-200">
+                                                    <span className="truncate max-w-[130px] font-mono text-[10px] text-gray-600" title={filename}>
+                                                        {filename}
+                                                    </span>
+                                                    <a
+                                                        href={ph}
+                                                        download
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded text-[10px] font-bold transition"
+                                                    >
+                                                        <Download className="w-3.5 h-3.5 stroke-[1.5]" />
+                                                        Download
+                                                    </a>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </Card>
 
                     {/* ATTACHMENT NOTES PICTURES */}
                     {photos.length > 0 && (
-                        <Card title=" Nota &amp; Surat Jalan Fisik">
-                            <div className="grid grid-cols-2 gap-3">
-                                {photos.map((ph, idx) => (
-                                    <div key={idx} className="border border-gray-150 rounded-lg overflow-hidden bg-gray-50">
-                                        <img
-                                            src={ph}
-                                            alt="Surat Jalan"
-                                            className="w-full h-32 object-cover"
-                                            onError={(e) => {
-                                                e.target.src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80';
-                                            }}
-                                        />
-                                    </div>
-                                ))}
+                        <Card title="Nota &amp; Surat Jalan Fisik">
+                            <div className="space-y-3">
+                                {photos.map((ph, idx) => {
+                                    const filename = ph.split('/').pop() || 'document';
+                                    const isPdf = ph.toLowerCase().endsWith('.pdf');
+                                    return (
+                                        <div
+                                            key={idx}
+                                            onClick={() => triggerPreview(ph)}
+                                            className="border border-gray-200 rounded-lg p-3 bg-white hover:bg-gray-50/50 cursor-pointer transition flex items-center gap-3 group"
+                                        >
+                                            <div className={`p-2 rounded-lg flex-shrink-0 ${isPdf ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-primary'}`}>
+                                                {isPdf ? (
+                                                    <FileText className="w-6 h-6 stroke-[1.5]" />
+                                                ) : (
+                                                    <ImageIcon className="w-6 h-6 stroke-[1.5]" />
+                                                )}
+                                            </div>
+                                            <div className="min-w-0 flex-grow">
+                                                <p className="text-xs font-bold text-gray-900 truncate" title={filename}>
+                                                    {filename}
+                                                </p>
+                                                <p className="text-[10px] text-gray-400 font-semibold uppercase mt-0.5 flex items-center gap-1">
+                                                    <Eye className="w-3.5 h-3.5 text-gray-400 group-hover:text-primary transition" />
+                                                    Klik untuk Preview
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </Card>
                     )}
                 </div>
             </div>
+
+            {/* Live Preview Modal */}
+            <Modal
+                isOpen={previewUrl !== null}
+                onClose={() => {
+                    setPreviewUrl(null);
+                    setPreviewType(null);
+                }}
+                title="Preview Dokumen"
+                size="max-w-4xl"
+            >
+                <div className="flex justify-center items-center w-full bg-gray-50/50 rounded-lg p-2 min-h-[50vh]">
+                    {previewType === 'pdf' ? (
+                        <iframe
+                            src={previewUrl}
+                            className="w-full h-[60vh] md:h-[75vh] border-0 rounded-lg shadow-sm"
+                            title="PDF Preview"
+                        />
+                    ) : previewType === 'image' ? (
+                        <img
+                            src={previewUrl}
+                            className="w-full h-[60vh] md:h-[75vh] object-contain rounded-lg shadow-sm"
+                            alt="Document Preview"
+                        />
+                    ) : null}
+                </div>
+            </Modal>
         </>
     );
 }

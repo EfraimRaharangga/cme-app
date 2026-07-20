@@ -348,81 +348,81 @@ export default function New({ defaultTemplate, templates }) {
                                                     {item[1]}
                                                 </span>
                                             </div>
-                                             {/* Checklist check controls depending on type */}
-                                             <div>
-                                                 <div className="flex border border-gray-200 rounded overflow-hidden w-fit mt-2">
-                                                     <button
-                                                         type="button"
-                                                         onClick={() => handleItemChange(key, 'status', 'checked')}
-                                                         className={`px-3 py-1 text-xs font-bold transition ${state.status === 'checked'
-                                                             ? 'bg-emerald-500 text-white'
-                                                             : 'bg-white text-gray-400 hover:bg-gray-50'
-                                                             }`}
-                                                     >
-                                                         OK
-                                                     </button>
-                                                     <button
-                                                         type="button"
-                                                         onClick={() => handleItemChange(key, 'status', 'cross')}
-                                                         className={`px-3 py-1 text-xs font-bold transition ${state.status === 'cross'
-                                                             ? 'bg-red-500 text-white'
-                                                             : 'bg-white text-gray-400 hover:bg-gray-50'
-                                                             }`}
-                                                     >
-                                                         NG
-                                                     </button>
-                                                 </div>
-                                                 {errors[`items.${key}.status`] && (
-                                                     <p className="text-red-500 text-[10px] mt-1">{errors[`items.${key}.status`]}</p>
-                                                 )}
-                                             </div>
-                                         </div>
+                                            {/* Checklist check controls depending on type */}
+                                            <div>
+                                                <div className="flex border border-gray-200 rounded overflow-hidden w-fit mt-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleItemChange(key, 'status', 'checked')}
+                                                        className={`px-3 py-1 text-xs font-bold transition ${state.status === 'checked'
+                                                            ? 'bg-emerald-500 text-white'
+                                                            : 'bg-white text-gray-400 hover:bg-gray-50'
+                                                            }`}
+                                                    >
+                                                        OK
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleItemChange(key, 'status', 'cross')}
+                                                        className={`px-3 py-1 text-xs font-bold transition ${state.status === 'cross'
+                                                            ? 'bg-red-500 text-white'
+                                                            : 'bg-white text-gray-400 hover:bg-gray-50'
+                                                            }`}
+                                                    >
+                                                        NG
+                                                    </button>
+                                                </div>
+                                                {errors[`items.${key}.status`] && (
+                                                    <p className="text-red-500 text-[10px] mt-1">{errors[`items.${key}.status`]}</p>
+                                                )}
+                                            </div>
+                                        </div>
 
-                                         <div className="w-full md:w-80 space-y-3">
-                                             {item[2] === 'select' ? (
-                                                 <div className="w-full">
-                                                     <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Pilihan Nilai</label>
-                                                     <select
-                                                         value={state.kondisi || ''}
-                                                         onChange={(e) => handleItemChange(key, 'kondisi', e.target.value)}
-                                                         className="w-full border-gray-300 rounded-md text-xs p-1.5 bg-white focus:border-[#00ADB5] focus:ring focus:ring-[#00ADB5]/20 outline-none"
-                                                     >
-                                                         <option value="">Pilih...</option>
-                                                         {item[3].map((opt, oIdx) => (
-                                                             <option key={oIdx} value={opt}>{opt}</option>
-                                                         ))}
-                                                     </select>
-                                                     {errors[`items.${key}.kondisi`] && (
-                                                         <p className="text-red-500 text-[10px] mt-1">{errors[`items.${key}.kondisi`]}</p>
-                                                     )}
-                                                 </div>
-                                             ) : (
-                                                 <Input
-                                                     label="Catatan Kondisi"
-                                                     placeholder="Kondisi riil lapangan"
-                                                     className="text-xs p-1.5"
-                                                     value={state.kondisi || ''}
-                                                     onChange={(e) => handleItemChange(key, 'kondisi', e.target.value)}
-                                                 />
-                                             )}
+                                        <div className="w-full md:w-80 space-y-3">
+                                            {item[2] === 'select' ? (
+                                                <div className="w-full">
+                                                    <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Pilihan Nilai</label>
+                                                    <select
+                                                        value={state.kondisi || ''}
+                                                        onChange={(e) => handleItemChange(key, 'kondisi', e.target.value)}
+                                                        className="w-full border-gray-300 rounded-md text-xs p-1.5 bg-white focus:border-[#00ADB5] focus:ring focus:ring-[#00ADB5]/20 outline-none"
+                                                    >
+                                                        <option value="">Pilih...</option>
+                                                        {item[3].map((opt, oIdx) => (
+                                                            <option key={oIdx} value={opt}>{opt}</option>
+                                                        ))}
+                                                    </select>
+                                                    {errors[`items.${key}.kondisi`] && (
+                                                        <p className="text-red-500 text-[10px] mt-1">{errors[`items.${key}.kondisi`]}</p>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <Input
+                                                    label="Catatan Kondisi"
+                                                    placeholder="Kondisi riil lapangan"
+                                                    className="text-xs p-1.5"
+                                                    value={state.kondisi || ''}
+                                                    onChange={(e) => handleItemChange(key, 'kondisi', e.target.value)}
+                                                />
+                                            )}
 
-                                             <div>
-                                                 <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">
-                                                     Unggah Foto
-                                                 </label>
-                                                 <ImageUpload
-                                                     compact={true}
-                                                     multiple={true}
-                                                     value={data.photos[key] || []}
-                                                     onChange={(files) => setData('photos', {
-                                                         ...data.photos,
-                                                         [key]: files
-                                                     })}
-                                                 />
-                                                 {errors[`photos.${key}`] && (
-                                                     <p className="text-red-500 text-[10px] mt-1">{errors[`photos.${key}`]}</p>
-                                                 )}
-                                             </div>
+                                            <div>
+                                                <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">
+                                                    Unggah Foto
+                                                </label>
+                                                <ImageUpload
+                                                    compact={true}
+                                                    multiple={true}
+                                                    value={data.photos[key] || []}
+                                                    onChange={(files) => setData('photos', {
+                                                        ...data.photos,
+                                                        [key]: files
+                                                    })}
+                                                />
+                                                {errors[`photos.${key}`] && (
+                                                    <p className="text-red-500 text-[10px] mt-1">{errors[`photos.${key}`]}</p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 );
@@ -432,7 +432,7 @@ export default function New({ defaultTemplate, templates }) {
                 ))}
 
                 {/* 3. ADDITIONAL REMARKS */}
-                <Card title="📝 Catatan Tambahan">
+                <Card title="Catatan Tambahan">
                     <textarea
                         placeholder="Catatan tambahan hasil pemeriksaan lapangan..."
                         value={data.catatan_tambahan}

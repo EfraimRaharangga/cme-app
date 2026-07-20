@@ -19,6 +19,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware('custom_auth')->group(function () {
     // Temporary Upload Route
     Route::post('/api/upload-temp', [App\Http\Controllers\MediaController::class, 'uploadTemp']);
+    Route::post('/api/upload-temp-doc', [App\Http\Controllers\MediaController::class, 'uploadTempDoc']);
 
     // Dashboards
     Route::get('/dashboard', [DashboardController::class, 'cmeDashboard']);

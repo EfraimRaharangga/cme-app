@@ -522,7 +522,7 @@ export default function Edit({ survey, templates, defaultTemplate }) {
                 ))}
 
                 {/* 3. ADDITIONAL REMARKS */}
-                <Card title="📝 Catatan Tambahan">
+                <Card title="Catatan Tambahan">
                     <textarea
                         placeholder="Catatan tambahan..."
                         value={data.catatan_tambahan}

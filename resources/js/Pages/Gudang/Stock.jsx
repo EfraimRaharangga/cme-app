@@ -7,7 +7,7 @@ import Button from '../../Components/Button';
 import Input from '../../Components/Input';
 import Select from '../../Components/Select';
 import Modal from '../../Components/Modal';
-import ImageUpload from '../../Components/ImageUpload';
+import DocumentUpload from '../../Components/DocumentUpload';
 import SearchInput, { filterData } from '../../Components/Search';
 import Pagination from '../../Components/Pagination';
 import {
@@ -359,10 +359,8 @@ export default function Stock({ items, categories, totals, filters, totalMasukCo
                         </div>
                     </div>
                     <div className="w-full">
-                        <label className="block font-medium text-xs text-gray-700 mb-1">Unggah Nota / Surat Jalan Fisik</label>
-                        <ImageUpload
-                            compact={false}
-                            multiple={true}
+                        <label className="block font-medium text-xs text-gray-700 mb-1">Unggah Nota / Surat Jalan Fisik (PDF/JPG/JPEG)</label>
+                        <DocumentUpload
                             value={masukForm.data.foto || []}
                             onChange={(files) => masukForm.setData('foto', files)}
                         />
@@ -489,10 +487,8 @@ export default function Stock({ items, categories, totals, filters, totalMasukCo
                         </div>
                     </div>
                     <div className="w-full">
-                        <label className="block font-medium text-xs text-gray-700 mb-1">Unggah Dokumen Pengeluaran / Bukti Fisik</label>
-                        <ImageUpload
-                            compact={false}
-                            multiple={true}
+                        <label className="block font-medium text-xs text-gray-700 mb-1">Unggah Dokumen Pengeluaran / Bukti Fisik (PDF/JPG/JPEG)</label>
+                        <DocumentUpload
                             value={keluarForm.data.foto || []}
                             onChange={(files) => keluarForm.setData('foto', files)}
                         />

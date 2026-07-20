@@ -125,7 +125,7 @@ export default function Item({ kategori, spec, sow, images }) {
                         />
                     </Card>
 
-                    <Card title="📝 Langkah-langkah Kerja (SOW)">
+                    <Card title="Langkah-langkah Kerja (SOW)">
                         <div className="bg-gray-50 p-4 border border-gray-250 rounded-lg space-y-3 font-medium text-xs text-gray-700 leading-relaxed">
                             {activeSow.map((step, idx) => (
                                 <p key={idx} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">

@@ -236,7 +236,7 @@ export default function Detail({ survey }) {
                     ))}
 
                     {survey.catatan_tambahan && (
-                        <Card title="📝 Catatan Tambahan">
+                        <Card title="Catatan Tambahan">
                             <p className="text-sm text-gray-700 whitespace-pre-wrap">
                                 {survey.catatan_tambahan}
                             </p>
